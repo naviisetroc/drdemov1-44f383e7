@@ -28,6 +28,12 @@ const navItems = [
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("medisec_logged_in");
+    navigate("/");
+  };
 
   return (
     <div className="flex h-screen overflow-hidden">
