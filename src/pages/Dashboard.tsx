@@ -64,6 +64,7 @@ export default function Dashboard() {
               </div>
             ))}
             <Link to="/agenda" className="block text-center text-sm text-primary font-medium hover:underline pt-1">
+
               Ver toda la agenda →
             </Link>
           </CardContent>

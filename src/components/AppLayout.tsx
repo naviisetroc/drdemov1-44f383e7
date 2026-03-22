@@ -10,13 +10,17 @@ import {
   Menu,
   X,
   Stethoscope,
+  MessageCircle,
+  LogOut,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const navItems = [
-  { to: "/", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/pacientes", icon: Users, label: "Pacientes" },
   { to: "/notas", icon: FileText, label: "Notas Médicas" },
   { to: "/agenda", icon: Calendar, label: "Agenda" },
+  { to: "/chat", icon: MessageCircle, label: "Chat IA" },
   { to: "/referencias", icon: ArrowRightLeft, label: "Referencias" },
   { to: "/configuracion", icon: Settings, label: "Configuración" },
 ];
@@ -24,6 +28,12 @@ const navItems = [
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("medisec_logged_in");
+    navigate("/");
+  };
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -87,6 +97,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <p className="truncate text-sm font-medium text-sidebar-primary-foreground">Dr. Alejandro Ramírez</p>
               <p className="truncate text-xs text-sidebar-muted">Medicina General</p>
             </div>
+            <button onClick={handleLogout} className="text-sidebar-muted hover:text-sidebar-foreground transition-colors" title="Cerrar sesión">
+              <LogOut className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </aside>
