@@ -97,6 +97,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <p className="truncate text-sm font-medium text-sidebar-primary-foreground">Dr. Alejandro Ramírez</p>
               <p className="truncate text-xs text-sidebar-muted">Medicina General</p>
             </div>
+            <button onClick={handleLogout} className="text-sidebar-muted hover:text-sidebar-foreground transition-colors" title="Cerrar sesión">
+              <LogOut className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </aside>
