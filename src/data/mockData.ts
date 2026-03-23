@@ -19,7 +19,7 @@ export interface ClinicalNote {
   inputType: "texto" | "voz";
   rawInput: string;
   aiOutput: string;
-  format: "SOAP";
+  format: "SOAP" | "Estructurado";
   doctorName: string;
 }
 
