@@ -11,21 +11,21 @@ import {
   X,
   Stethoscope,
   MessageCircle,
-  LogOut,
-} from "lucide-react";
+  LogOut } from
+"lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const navItems = [
-  { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/pacientes", icon: Users, label: "Pacientes" },
-  { to: "/notas", icon: FileText, label: "Notas Médicas" },
-  { to: "/agenda", icon: Calendar, label: "Agenda" },
-  { to: "/chat", icon: MessageCircle, label: "Chat IA" },
-  { to: "/referencias", icon: ArrowRightLeft, label: "Referencias" },
-  { to: "/configuracion", icon: Settings, label: "Configuración" },
-];
+{ to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+{ to: "/pacientes", icon: Users, label: "Pacientes" },
+{ to: "/notas", icon: FileText, label: "Notas Médicas" },
+{ to: "/agenda", icon: Calendar, label: "Agenda" },
+{ to: "/chat", icon: MessageCircle, label: "Chat IA" },
+{ to: "/referencias", icon: ArrowRightLeft, label: "Referencias" },
+{ to: "/configuracion", icon: Settings, label: "Configuración" }];
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+
+export default function AppLayout({ children }: {children: React.ReactNode;}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -38,26 +38,26 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      {sidebarOpen &&
+      <div
+        className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm lg:hidden"
+        onClick={() => setSidebarOpen(false)} />
+
+      }
 
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-sidebar text-sidebar-foreground transition-transform duration-200 lg:static lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
+        sidebarOpen ? "translate-x-0" : "-translate-x-full"}`
+        }>
+        
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 border-b border-sidebar-border px-5">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sidebar-primary">
             <Stethoscope className="h-5 w-5 text-sidebar-primary-foreground" />
           </div>
           <div>
-            <h1 className="font-display text-base font-bold text-sidebar-primary-foreground">MediSec</h1>
+            <h1 className="font-display text-base font-bold text-sidebar-primary-foreground">​Dr. Guapo </h1>
             <p className="text-xs text-sidebar-muted">Secretario Inteligente</p>
           </div>
           <button className="ml-auto lg:hidden" onClick={() => setSidebarOpen(false)}>
@@ -75,15 +75,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 to={item.to}
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                  active
-                    ? "bg-sidebar-accent text-sidebar-primary-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                }`}
-              >
+                active ?
+                "bg-sidebar-accent text-sidebar-primary-foreground" :
+                "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"}`
+                }>
+                
                 <item.icon className="h-[18px] w-[18px]" />
                 {item.label}
-              </Link>
-            );
+              </Link>);
+
           })}
         </nav>
 
@@ -121,6 +121,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="animate-fade-in">{children}</div>
         </main>
       </div>
-    </div>
-  );
+    </div>);
+
 }
