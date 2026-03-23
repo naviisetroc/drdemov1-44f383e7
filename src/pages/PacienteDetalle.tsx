@@ -1,10 +1,18 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Phone, Mail, Calendar, FileText, ArrowRightLeft } from "lucide-react";
+import { ArrowLeft, Phone, Mail, Calendar, FileText, ArrowRightLeft, Heart, AlertTriangle, Shield, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { patients, clinicalNotes, appointments, referrals } from "@/data/mockData";
+
+const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+  confirmada: { label: "✅ Confirmada", variant: "default" },
+  programada: { label: "🕐 Pendiente", variant: "outline" },
+  completada: { label: "✓ Completada", variant: "secondary" },
+  cancelada: { label: "✕ Cancelada", variant: "destructive" },
+};
 
 export default function PacienteDetalle() {
   const { id } = useParams();
@@ -19,6 +27,7 @@ export default function PacienteDetalle() {
     );
   }
 
+  const isNewPatient = patient.id === "10";
   const patientNotes = clinicalNotes.filter((n) => n.patientId === id);
   const patientAppts = appointments.filter((a) => a.patientId === id);
   const patientRefs = referrals.filter((r) => r.patientId === id);
@@ -32,7 +41,7 @@ export default function PacienteDetalle() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 font-display text-lg font-bold text-primary">
-          {patient.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+          {isNewPatient ? <UserPlus className="h-6 w-6" /> : patient.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
@@ -40,41 +49,105 @@ export default function PacienteDetalle() {
             <Badge variant={patient.status === "activo" ? "default" : "secondary"}>{patient.status}</Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-0.5">
-            {patient.age} años · {patient.sex === "M" ? "Masculino" : "Femenino"}
+            {isNewPatient
+              ? "Paciente nuevo — Sin información registrada"
+              : `${patient.age} años · ${patient.sex === "M" ? "Masculino" : "Femenino"}${patient.bloodType ? ` · Tipo ${patient.bloodType}` : ""}`
+            }
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="gap-1.5"><Phone className="h-3.5 w-3.5" /> Llamar</Button>
-          <Button variant="outline" size="sm" className="gap-1.5"><Mail className="h-3.5 w-3.5" /> Email</Button>
-        </div>
+        {!isNewPatient && (
+          <div className="flex gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-1.5"><Phone className="h-3.5 w-3.5" /> Llamar</Button>
+              </TooltipTrigger>
+              <TooltipContent>{patient.phone}</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-1.5"><Mail className="h-3.5 w-3.5" /> Email</Button>
+              </TooltipTrigger>
+              <TooltipContent>{patient.email}</TooltipContent>
+            </Tooltip>
+          </div>
+        )}
       </div>
 
-      {/* Info cards */}
-      <div className="grid sm:grid-cols-3 gap-4">
-        <Card className="shadow-card">
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Teléfono</p>
-            <p className="text-sm font-medium mt-0.5">{patient.phone}</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-card">
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Última visita</p>
-            <p className="text-sm font-medium mt-0.5">{new Date(patient.lastVisit).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-card">
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">Condiciones</p>
-            <div className="flex gap-1 flex-wrap mt-1">
-              {patient.conditions.length > 0
-                ? patient.conditions.map(c => <Badge key={c} variant="outline" className="text-[10px]">{c}</Badge>)
-                : <span className="text-sm text-muted-foreground">Ninguna registrada</span>
-              }
+      {/* New patient banner */}
+      {isNewPatient && (
+        <Card className="shadow-card border-primary/20 bg-primary/5">
+          <CardContent className="p-4 flex items-center gap-3">
+            <UserPlus className="h-5 w-5 text-primary shrink-0" />
+            <div>
+              <p className="text-sm font-semibold">Paciente nuevo</p>
+              <p className="text-xs text-muted-foreground">Este paciente aún no tiene historial clínico. Comienza registrando su primera consulta.</p>
             </div>
+            <Link to="/notas" className="ml-auto">
+              <Button size="sm" className="gap-1.5 shrink-0"><FileText className="h-3.5 w-3.5" /> Crear nota</Button>
+            </Link>
           </CardContent>
         </Card>
-      </div>
+      )}
+
+      {/* Info cards */}
+      {!isNewPatient && (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="shadow-card">
+            <CardContent className="p-4">
+              <p className="text-xs text-muted-foreground flex items-center gap-1"><Phone className="h-3 w-3" /> Teléfono</p>
+              <p className="text-sm font-medium mt-0.5">{patient.phone}</p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-card">
+            <CardContent className="p-4">
+              <p className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" /> Última visita</p>
+              <p className="text-sm font-medium mt-0.5">{new Date(patient.lastVisit).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-card">
+            <CardContent className="p-4">
+              <p className="text-xs text-muted-foreground flex items-center gap-1"><Shield className="h-3 w-3" /> Seguro médico</p>
+              <p className="text-sm font-medium mt-0.5">{patient.insuranceProvider || "No registrado"}</p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-card">
+            <CardContent className="p-4">
+              <p className="text-xs text-muted-foreground flex items-center gap-1"><Heart className="h-3 w-3" /> Contacto de emergencia</p>
+              <p className="text-sm font-medium mt-0.5 truncate">{patient.emergencyContact || "No registrado"}</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Conditions & Allergies row */}
+      {!isNewPatient && (
+        <div className="grid sm:grid-cols-2 gap-4">
+          <Card className="shadow-card">
+            <CardContent className="p-4">
+              <p className="text-xs text-muted-foreground font-medium mb-2">Condiciones activas</p>
+              <div className="flex gap-1.5 flex-wrap">
+                {patient.conditions.length > 0
+                  ? patient.conditions.map(c => <Badge key={c} variant="outline" className="text-[11px]">{c}</Badge>)
+                  : <span className="text-sm text-muted-foreground">Ninguna registrada</span>
+                }
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="shadow-card">
+            <CardContent className="p-4">
+              <p className="text-xs text-muted-foreground font-medium mb-2 flex items-center gap-1">
+                <AlertTriangle className="h-3 w-3 text-warning" /> Alergias
+              </p>
+              <div className="flex gap-1.5 flex-wrap">
+                {patient.allergies && patient.allergies.length > 0
+                  ? patient.allergies.map(a => <Badge key={a} variant="destructive" className="text-[11px]">{a}</Badge>)
+                  : <span className="text-sm text-muted-foreground">Sin alergias conocidas</span>
+                }
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Clinical notes */}
       <Card className="shadow-card">
@@ -82,11 +155,18 @@ export default function PacienteDetalle() {
           <CardTitle className="font-display text-base flex items-center gap-2">
             <FileText className="h-4 w-4 text-primary" />
             Notas Clínicas
+            <Badge variant="secondary" className="text-[10px] ml-auto">{patientNotes.length} notas</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {patientNotes.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No hay notas clínicas registradas.</p>
+            <div className="text-center py-8">
+              <FileText className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">No hay notas clínicas registradas.</p>
+              <Link to="/notas">
+                <Button variant="outline" size="sm" className="mt-3 gap-1.5"><FileText className="h-3.5 w-3.5" /> Crear primera nota</Button>
+              </Link>
+            </div>
           ) : (
             patientNotes.map((note) => (
               <div key={note.id} className="rounded-lg border border-border p-4 space-y-2">
@@ -99,7 +179,15 @@ export default function PacienteDetalle() {
                     {new Date(note.date).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" })}
                   </span>
                 </div>
-                <div className="text-sm whitespace-pre-line leading-relaxed">{note.aiOutput}</div>
+                <div
+                  className="text-sm whitespace-pre-line leading-relaxed"
+                  dangerouslySetInnerHTML={{
+                    __html: note.aiOutput
+                      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                      .replace(/━+/g, '<hr class="border-border my-1"/>')
+                      .replace(/→/g, '<span class="text-primary">→</span>')
+                  }}
+                />
               </div>
             ))
           )}
@@ -112,26 +200,31 @@ export default function PacienteDetalle() {
           <CardTitle className="font-display text-base flex items-center gap-2">
             <Calendar className="h-4 w-4 text-primary" />
             Historial de Citas
+            <Badge variant="secondary" className="text-[10px] ml-auto">{patientAppts.length} citas</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
           {patientAppts.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No hay citas registradas.</p>
+            <div className="text-center py-8">
+              <Calendar className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">No hay citas registradas.</p>
+            </div>
           ) : (
             <div className="space-y-2">
-              {patientAppts.map((apt) => (
-                <div key={apt.id} className="flex items-center justify-between rounded-lg border border-border p-3">
-                  <div>
-                    <p className="text-sm font-medium">{apt.reason}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(apt.datetime).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" })} — {new Date(apt.datetime).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
-                    </p>
+              {patientAppts.map((apt) => {
+                const config = statusConfig[apt.status] || statusConfig.programada;
+                return (
+                  <div key={apt.id} className="flex items-center justify-between rounded-lg border border-border p-3">
+                    <div>
+                      <p className="text-sm font-medium">{apt.reason}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(apt.datetime).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" })} — {new Date(apt.datetime).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                    <Badge variant={config.variant} className="text-[10px]">{config.label}</Badge>
                   </div>
-                  <Badge variant={apt.status === "programada" ? "default" : apt.status === "completada" ? "secondary" : "destructive"} className="text-[10px]">
-                    {apt.status}
-                  </Badge>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>
@@ -143,14 +236,22 @@ export default function PacienteDetalle() {
           <CardHeader className="pb-3">
             <CardTitle className="font-display text-base flex items-center gap-2">
               <ArrowRightLeft className="h-4 w-4 text-primary" />
-              Referencias
+              Referencias Médicas
+              <Badge variant="secondary" className="text-[10px] ml-auto">{patientRefs.length}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {patientRefs.map((ref) => (
               <div key={ref.id} className="rounded-lg border border-border p-4 space-y-2">
                 <div className="flex items-center justify-between">
-                  <Badge>{ref.toSpecialty}</Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge>{ref.toSpecialty}</Badge>
+                    {ref.status && (
+                      <Badge variant={ref.status === "enviada" ? "default" : ref.status === "aceptada" ? "secondary" : "outline"} className="text-[10px]">
+                        {ref.status === "enviada" ? "📨 Enviada" : ref.status === "aceptada" ? "✅ Aceptada" : "🕐 Pendiente"}
+                      </Badge>
+                    )}
+                  </div>
                   <span className="text-xs text-muted-foreground">{new Date(ref.date).toLocaleDateString("es-MX")}</span>
                 </div>
                 <p className="text-sm">{ref.notes}</p>

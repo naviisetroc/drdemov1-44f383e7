@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Stethoscope, LogIn } from "lucide-react";
+import { Stethoscope, LogIn, Shield, Zap, Brain, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+
+const features = [
+  { icon: Brain, text: "Notas médicas con IA" },
+  { icon: MessageCircle, text: "Chat inteligente WhatsApp" },
+  { icon: Zap, text: "Agenda automatizada" },
+  { icon: Shield, text: "Referencias en 1 click" },
+];
 
 export default function Login() {
   const navigate = useNavigate();
@@ -22,14 +29,24 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-sm space-y-8">
+      <div className="w-full max-w-sm space-y-6">
         {/* Logo */}
         <div className="text-center space-y-2">
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary mx-auto">
             <Stethoscope className="h-7 w-7 text-primary-foreground" />
           </div>
           <h1 className="font-display text-2xl font-bold">MediSec</h1>
-          <p className="text-sm text-muted-foreground">Secretario Inteligente con IA</p>
+          <p className="text-sm text-muted-foreground">Tu secretario médico inteligente con IA</p>
+        </div>
+
+        {/* Feature pills */}
+        <div className="flex flex-wrap justify-center gap-2">
+          {features.map((f) => (
+            <div key={f.text} className="flex items-center gap-1.5 rounded-full bg-primary/5 border border-primary/10 px-3 py-1.5">
+              <f.icon className="h-3 w-3 text-primary" />
+              <span className="text-[11px] font-medium text-foreground">{f.text}</span>
+            </div>
+          ))}
         </div>
 
         <Card className="shadow-card">
@@ -55,19 +72,21 @@ export default function Login() {
                   placeholder="••••••••"
                 />
               </div>
-              <Button type="submit" className="w-full gap-2" disabled={loading}>
+              <Button type="submit" className="w-full gap-2 h-11" disabled={loading}>
                 {loading ? (
                   <span className="animate-pulse">Iniciando sesión...</span>
                 ) : (
                   <>
-                    <LogIn className="h-4 w-4" /> Iniciar sesión
+                    <LogIn className="h-4 w-4" /> Entrar al demo
                   </>
                 )}
               </Button>
             </form>
-            <p className="text-xs text-muted-foreground text-center mt-4">
-              Demo — presiona "Iniciar sesión" para continuar
-            </p>
+            <div className="mt-4 p-3 rounded-lg bg-muted/50 border border-border">
+              <p className="text-[11px] text-muted-foreground text-center">
+                👆 <strong>Demo lista</strong> — Solo presiona "Entrar al demo" para explorar la plataforma
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
