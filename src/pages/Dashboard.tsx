@@ -88,7 +88,7 @@ export default function Dashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((s) => (
+        {getStats(allPatientCount, allAppointments.filter(a => a.status === "confirmada").length).map((s) => (
           <Tooltip key={s.label}>
             <TooltipTrigger asChild>
               <Card className="shadow-card hover:shadow-md transition-shadow cursor-default">
