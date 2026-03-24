@@ -88,6 +88,18 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
           })}
         </nav>
 
+        {/* Demo patient link */}
+        <div className="border-t border-sidebar-border p-3">
+          <Link
+            to="/paciente"
+            target="_blank"
+            className="flex items-center gap-2 rounded-lg bg-sidebar-accent/50 px-3 py-2 text-xs font-medium text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+          >
+            <User className="h-3.5 w-3.5" />
+            Vista paciente (demo)
+          </Link>
+        </div>
+
         {/* Doctor info */}
         <div className="border-t border-sidebar-border p-4">
           <div className="flex items-center gap-3">
