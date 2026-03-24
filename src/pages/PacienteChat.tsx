@@ -177,7 +177,6 @@ export default function PacienteChat() {
       description: `${patient.name} ha sido agregado al sistema${appointmentCreated ? " con cita agendada" : ""}`,
       duration: 4000,
     });
-    }
 
     setTyping(true);
     setTimeout(() => {
