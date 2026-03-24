@@ -9,10 +9,10 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import DoctorAssistantChat from "@/components/DoctorAssistantChat";
 
-const stats = [
+const getStats = (activeCount: number, apptCount: number) => [
   {
     label: "Pacientes activos",
-    value: patients.filter(p => p.status === "activo").length,
+    value: activeCount,
     icon: Users,
     color: "text-primary",
     tooltip: "Total de pacientes con estado activo en tu consultorio",
