@@ -16,13 +16,14 @@ import {
 import { useNavigate } from "react-router-dom";
 
 const navItems = [
-{ to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-{ to: "/pacientes", icon: Users, label: "Pacientes" },
-{ to: "/notas", icon: FileText, label: "Notas Médicas" },
-{ to: "/agenda", icon: Calendar, label: "Agenda" },
-{ to: "/chat", icon: MessageCircle, label: "Chat IA" },
-{ to: "/referencias", icon: ArrowRightLeft, label: "Referencias" },
-{ to: "/configuracion", icon: Settings, label: "Configuración" }];
+  { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/pacientes", icon: Users, label: "Pacientes" },
+  { to: "/notas", icon: FileText, label: "Notas Médicas" },
+  { to: "/agenda", icon: Calendar, label: "Agenda" },
+  { to: "/chat", icon: MessageCircle, label: "Chat IA" },
+  { to: "/referencias", icon: ArrowRightLeft, label: "Referencias" },
+  { to: "/configuracion", icon: Settings, label: "Configuración" },
+];
 
 
 export default function AppLayout({ children }: {children: React.ReactNode;}) {
