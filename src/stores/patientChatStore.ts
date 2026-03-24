@@ -125,8 +125,6 @@ export function getChatAppointments(): Appointment[] {
 
 export const STORE_UPDATE_EVENT = STORE_EVENT;
 
-export const STORE_UPDATE_EVENT = STORE_EVENT;
-
 export function chatPatientToPatient(cp: ChatPatient): Patient {
   return {
     id: cp.id,
