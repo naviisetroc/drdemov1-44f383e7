@@ -19,7 +19,7 @@ const getStats = (activeCount: number, apptCount: number) => [
   },
   {
     label: "Citas hoy",
-    value: appointments.filter(a => a.status === "confirmada").length,
+    value: apptCount,
     icon: Calendar,
     color: "text-success",
     tooltip: "Citas confirmadas para el día de hoy",
