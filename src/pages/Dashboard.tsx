@@ -197,6 +197,35 @@ export default function Dashboard() {
         </Card>
       </div>
 
+      {/* Chat patients */}
+      {chatPatients.length > 0 && (
+        <Card className="shadow-card border-success/20 bg-success/5">
+          <CardHeader className="pb-3">
+            <CardTitle className="font-display text-base flex items-center gap-2">
+              <Users className="h-4 w-4 text-success" />
+              Pacientes nuevos (vía chat)
+              <Badge variant="secondary" className="text-[10px] ml-auto">{chatPatients.length} nuevos</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {chatPatients.map((p) => (
+              <div key={p.id} className="flex items-center justify-between rounded-lg border border-border p-3 bg-card">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-success/10 text-xs font-semibold text-success">
+                    {p.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">{p.name}</p>
+                    <p className="text-xs text-muted-foreground">{p.reason}</p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="text-[10px] text-success border-success/30">Nuevo</Badge>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Quick actions banner */}
       <Card className="shadow-card border-primary/20 bg-primary/5">
         <CardContent className="p-4">
@@ -228,6 +257,16 @@ export default function Dashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Floating assistant button */}
+      <button
+        onClick={() => setChatOpen(!chatOpen)}
+        className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl transition-all flex items-center justify-center hover:scale-105"
+      >
+        <Sparkles className="h-6 w-6" />
+      </button>
+
+      <DoctorAssistantChat open={chatOpen} onClose={() => setChatOpen(false)} />
     </div>
   );
 }
