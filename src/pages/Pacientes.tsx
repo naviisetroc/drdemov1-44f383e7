@@ -1,24 +1,28 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, Plus, UserPlus, AlertTriangle } from "lucide-react";
+import { Search, Plus, UserPlus, AlertTriangle, MessageCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { patients, Patient } from "@/data/mockData";
-import { getChatPatients, chatPatientToPatient } from "@/stores/patientChatStore";
+import { chatPatientToPatient } from "@/stores/patientChatStore";
+import { useStoreSync } from "@/hooks/useStoreSync";
 
 export default function Pacientes() {
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<"todos" | "activo" | "inactivo">("todos");
+  const [filter, setFilter] = useState<"todos" | "activo" | "inactivo" | "nuevo">("todos");
+  const { chatPatients } = useStoreSync();
 
-  const chatPats = getChatPatients().map(chatPatientToPatient);
-  const allPatients: Patient[] = [...patients, ...chatPats];
+  const chatPats = chatPatients.map(chatPatientToPatient);
+  const chatIds = new Set(chatPats.map(p => p.id));
+  const allPatients: Patient[] = [...patients.filter(p => p.id !== "10"), ...chatPats];
 
   const filtered = allPatients.filter((p) => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.conditions.some(c => c.toLowerCase().includes(search.toLowerCase()));
+    if (filter === "nuevo") return matchSearch && chatIds.has(p.id);
     const matchFilter = filter === "todos" || p.status === filter;
     return matchSearch && matchFilter;
   });
@@ -29,7 +33,7 @@ export default function Pacientes() {
         <div>
           <h1 className="font-display text-2xl font-bold">Pacientes</h1>
           <p className="text-sm text-muted-foreground">
-            {patients.filter(p => p.status === "activo").length} activos · {patients.length} registrados en total
+            {patients.filter(p => p.status === "activo" && p.id !== "10").length} registrados · {chatPats.length} nuevos vía chat
           </p>
         </div>
         <Tooltip>
@@ -55,15 +59,19 @@ export default function Pacientes() {
           />
         </div>
         <div className="flex gap-2">
-          {(["todos", "activo", "inactivo"] as const).map((f) => (
+          {([
+            { key: "todos", label: "Todos" },
+            { key: "activo", label: "Activos" },
+            { key: "nuevo", label: `Nuevos (${chatPats.length})` },
+            { key: "inactivo", label: "Inactivos" },
+          ] as const).map((f) => (
             <Button
-              key={f}
-              variant={filter === f ? "default" : "outline"}
+              key={f.key}
+              variant={filter === f.key ? "default" : "outline"}
               size="sm"
-              onClick={() => setFilter(f)}
-              className="capitalize"
+              onClick={() => setFilter(f.key as typeof filter)}
             >
-              {f}
+              {f.label}
             </Button>
           ))}
         </div>
@@ -72,13 +80,13 @@ export default function Pacientes() {
       {/* Patient list */}
       <div className="space-y-3">
         {filtered.map((p) => {
-          const isNew = p.id === "10";
+          const isFromChat = chatIds.has(p.id);
           return (
             <Link key={p.id} to={`/pacientes/${p.id}`}>
-              <Card className={`shadow-card hover:shadow-md transition-shadow cursor-pointer ${isNew ? "border-primary/30 bg-primary/5" : ""}`}>
+              <Card className={`shadow-card hover:shadow-md transition-shadow cursor-pointer ${isFromChat ? "border-success/30 bg-success/5" : ""}`}>
                 <CardContent className="p-4 flex items-center gap-4">
-                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold ${isNew ? "bg-primary/20 text-primary" : "bg-primary/10 text-primary"}`}>
-                    {isNew ? <UserPlus className="h-5 w-5" /> : p.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold ${isFromChat ? "bg-success/20 text-success" : "bg-primary/10 text-primary"}`}>
+                    {isFromChat ? <MessageCircle className="h-5 w-5" /> : p.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
@@ -86,10 +94,15 @@ export default function Pacientes() {
                       <Badge variant={p.status === "activo" ? "default" : "secondary"} className="text-[10px] shrink-0">
                         {p.status}
                       </Badge>
-                      {isNew && <Badge variant="outline" className="text-[10px] shrink-0 border-primary/30 text-primary">Nuevo</Badge>}
+                      {isFromChat && (
+                        <Badge variant="outline" className="text-[10px] shrink-0 border-success/30 text-success gap-0.5">
+                          <MessageCircle className="h-2.5 w-2.5" />
+                          Vía chat
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {isNew ? "Sin información registrada" : `${p.age} años · ${p.sex === "M" ? "Masculino" : "Femenino"} · ${p.phone}`}
+                      {p.age} años · {p.sex === "M" ? "Masculino" : "Femenino"} {p.phone ? `· ${p.phone}` : ""}
                     </p>
                     {p.conditions.length > 0 && (
                       <div className="flex gap-1.5 mt-1.5 flex-wrap">
@@ -117,7 +130,7 @@ export default function Pacientes() {
                         )}
                       </>
                     ) : (
-                      <p className="text-xs text-muted-foreground">Sin visitas</p>
+                      <p className="text-xs text-muted-foreground">Sin visitas previas</p>
                     )}
                   </div>
                 </CardContent>

@@ -1,28 +1,29 @@
-import { Calendar, Users, FileText, ArrowRightLeft, Clock, Bell, CheckCircle2, AlertCircle, TrendingUp, Sparkles } from "lucide-react";
+import { Calendar, Users, FileText, ArrowRightLeft, Clock, Bell, CheckCircle2, AlertCircle, TrendingUp, Sparkles, MessageCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { appointments, patients, clinicalNotes, referrals } from "@/data/mockData";
-import { getChatPatients, getChatAppointments } from "@/stores/patientChatStore";
+import { chatPatientToPatient } from "@/stores/patientChatStore";
+import { useStoreSync } from "@/hooks/useStoreSync";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import DoctorAssistantChat from "@/components/DoctorAssistantChat";
 
-const getStats = (activeCount: number, apptCount: number) => [
+const getStats = (activeCount: number, apptCount: number, chatCount: number) => [
   {
     label: "Pacientes activos",
     value: activeCount,
     icon: Users,
     color: "text-primary",
-    tooltip: "Total de pacientes con estado activo en tu consultorio",
+    tooltip: `${activeCount - chatCount} registrados + ${chatCount} nuevos vía chat`,
   },
   {
     label: "Citas hoy",
     value: apptCount,
     icon: Calendar,
     color: "text-success",
-    tooltip: "Citas confirmadas para el día de hoy",
+    tooltip: "Citas confirmadas y programadas",
   },
   {
     label: "Notas esta semana",
@@ -50,16 +51,17 @@ const statusConfig: Record<string, { label: string; variant: "default" | "second
 export default function Dashboard() {
   const [showNotif, setShowNotif] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
-  const chatPatients = getChatPatients();
-  const chatAppts = getChatAppointments();
-  const allAppointments = [...appointments, ...chatAppts];
+  const { chatPatients, chatAppointments } = useStoreSync();
+
+  const allAppointments = [...appointments, ...chatAppointments];
   const upcoming = allAppointments.filter(a => a.status === "programada" || a.status === "confirmada").slice(0, 5);
   const allPatientCount = patients.filter(p => p.status === "activo").length + chatPatients.length;
   const recentPatients = patients.filter(p => p.status === "activo" && p.id !== "10").slice(0, 5);
+  const chatAptIds = new Set(chatAppointments.map(a => a.id));
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      toast.success("Cita confirmada", {
+      toast.success("Cita confirmada vía WhatsApp", {
         description: "Laura Pérez Vega confirmó su cita para mañana a las 9:00 AM",
         duration: 5000,
       });
@@ -73,22 +75,26 @@ export default function Dashboard() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold">Buenos días, Dr. Ramírez</h1>
-          <p className="text-muted-foreground text-sm mt-1">Resumen de tu consultorio — Lunes 23 de marzo, 2026</p>
+          <p className="text-muted-foreground text-sm mt-1">Resumen de tu consultorio — Lunes 24 de marzo, 2026</p>
         </div>
         <Tooltip>
           <TooltipTrigger asChild>
             <button className="relative p-2 rounded-lg hover:bg-muted transition-colors">
               <Bell className="h-5 w-5 text-muted-foreground" />
-              {showNotif && <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive" />}
+              {(showNotif || chatPatients.length > 0) && <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive animate-pulse" />}
             </button>
           </TooltipTrigger>
-          <TooltipContent>Notificaciones</TooltipContent>
+          <TooltipContent>
+            {chatPatients.length > 0
+              ? `${chatPatients.length} pacientes nuevos vía chat`
+              : "Notificaciones"}
+          </TooltipContent>
         </Tooltip>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {getStats(allPatientCount, allAppointments.filter(a => a.status === "confirmada").length).map((s) => (
+        {getStats(allPatientCount, allAppointments.filter(a => a.status === "confirmada" || a.status === "programada").length, chatPatients.length).map((s) => (
           <Tooltip key={s.label}>
             <TooltipTrigger asChild>
               <Card className="shadow-card hover:shadow-md transition-shadow cursor-default">
@@ -107,7 +113,7 @@ export default function Dashboard() {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Upcoming appointments */}
+        {/* Upcoming appointments — unified */}
         <Card className="shadow-card">
           <CardHeader className="pb-3">
             <CardTitle className="font-display text-base flex items-center gap-2">
@@ -119,8 +125,9 @@ export default function Dashboard() {
           <CardContent className="space-y-2">
             {upcoming.map((apt) => {
               const config = statusConfig[apt.status] || statusConfig.programada;
+              const fromChat = chatAptIds.has(apt.id);
               return (
-                <div key={apt.id} className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-muted/30 transition-colors">
+                <div key={apt.id} className={`flex items-center justify-between rounded-lg border p-3 hover:bg-muted/30 transition-colors ${fromChat ? "border-success/30 bg-success/5" : "border-border"}`}>
                   <div className="flex items-center gap-3">
                     <div className="text-center min-w-[40px]">
                       <p className="font-display text-base font-bold text-primary leading-none">
@@ -131,7 +138,14 @@ export default function Dashboard() {
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium">{apt.patientName}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-sm font-medium">{apt.patientName}</p>
+                        {fromChat && (
+                          <Badge variant="outline" className="text-[9px] border-success/30 text-success gap-0.5 py-0 px-1">
+                            <MessageCircle className="h-2 w-2" /> Chat
+                          </Badge>
+                        )}
+                      </div>
                       <p className="text-xs text-muted-foreground">{apt.reason}</p>
                     </div>
                   </div>
@@ -202,9 +216,9 @@ export default function Dashboard() {
         <Card className="shadow-card border-success/20 bg-success/5">
           <CardHeader className="pb-3">
             <CardTitle className="font-display text-base flex items-center gap-2">
-              <Users className="h-4 w-4 text-success" />
-              Pacientes nuevos (vía chat)
-              <Badge variant="secondary" className="text-[10px] ml-auto">{chatPatients.length} nuevos</Badge>
+              <MessageCircle className="h-4 w-4 text-success" />
+              Pacientes registrados vía chat
+              <Badge variant="outline" className="text-[10px] ml-auto border-success/30 text-success animate-pulse">{chatPatients.length} nuevos</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -217,9 +231,15 @@ export default function Dashboard() {
                   <div>
                     <p className="text-sm font-medium">{p.name}</p>
                     <p className="text-xs text-muted-foreground">{p.reason}</p>
+                    <p className="text-[10px] text-muted-foreground">
+                      Registrado: {new Date(p.createdAt).toLocaleDateString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                    </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-[10px] text-success border-success/30">Nuevo</Badge>
+                <div className="flex flex-col items-end gap-1">
+                  <Badge variant="outline" className="text-[10px] text-success border-success/30">Nuevo</Badge>
+                  <span className="text-[10px] text-muted-foreground">{p.age} años · {p.sex === "F" ? "F" : "M"}</span>
+                </div>
               </div>
             ))}
           </CardContent>

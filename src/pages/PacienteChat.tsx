@@ -158,7 +158,9 @@ export default function PacienteChat() {
 
     addChatPatient(patient);
 
+    let appointmentCreated = false;
     if (time) {
+      appointmentCreated = true;
       addChatAppointment({
         id: `apt-${Date.now()}`,
         patientId: id,

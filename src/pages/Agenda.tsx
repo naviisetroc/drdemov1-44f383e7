@@ -1,9 +1,10 @@
-import { Calendar, Plus, Clock, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
+import { Calendar, Plus, Clock, CheckCircle2, AlertCircle, XCircle, MessageCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { appointments } from "@/data/mockData";
+import { useStoreSync } from "@/hooks/useStoreSync";
 import { toast } from "sonner";
 
 const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon: typeof CheckCircle2; color: string }> = {
@@ -14,9 +15,13 @@ const statusConfig: Record<string, { label: string; variant: "default" | "second
 };
 
 export default function Agenda() {
-  const sorted = [...appointments].sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime());
+  const { chatAppointments } = useStoreSync();
+  const allAppointments = [...appointments, ...chatAppointments];
+  const sorted = [...allAppointments].sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime());
   const upcoming = sorted.filter(a => a.status === "programada" || a.status === "confirmada");
   const past = sorted.filter(a => a.status === "completada" || a.status === "cancelada");
+
+  const chatAptIds = new Set(chatAppointments.map(a => a.id));
 
   const handleConfirm = (name: string) => {
     toast.success("Recordatorio enviado", {
@@ -55,6 +60,11 @@ export default function Agenda() {
         <Badge variant="secondary" className="gap-1 py-1 px-3">
           <CheckCircle2 className="h-3 w-3" /> {past.filter(a => a.status === "completada").length} completadas
         </Badge>
+        {chatAppointments.length > 0 && (
+          <Badge variant="outline" className="gap-1 py-1 px-3 border-success/50 text-success">
+            <MessageCircle className="h-3 w-3" /> {chatAppointments.length} vía chat
+          </Badge>
+        )}
       </div>
 
       {/* Upcoming */}
@@ -68,8 +78,9 @@ export default function Agenda() {
         <CardContent className="space-y-3">
           {upcoming.map((apt) => {
             const config = statusConfig[apt.status] || statusConfig.programada;
+            const fromChat = chatAptIds.has(apt.id);
             return (
-              <div key={apt.id} className="flex items-center justify-between rounded-lg border border-border p-4 hover:bg-muted/30 transition-colors">
+              <div key={apt.id} className={`flex items-center justify-between rounded-lg border p-4 hover:bg-muted/30 transition-colors ${fromChat ? "border-success/30 bg-success/5" : "border-border"}`}>
                 <div className="flex items-center gap-4">
                   <div className="text-center min-w-[48px]">
                     <p className={`font-display text-lg font-bold ${config.color} leading-none`}>
@@ -80,7 +91,15 @@ export default function Agenda() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium">{apt.patientName}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium">{apt.patientName}</p>
+                      {fromChat && (
+                        <Badge variant="outline" className="text-[9px] border-success/30 text-success gap-0.5 py-0 px-1.5">
+                          <MessageCircle className="h-2.5 w-2.5" />
+                          Chat
+                        </Badge>
+                      )}
+                    </div>
                     <p className="text-xs text-muted-foreground">{apt.reason}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       🕐 {new Date(apt.datetime).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
