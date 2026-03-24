@@ -49,7 +49,12 @@ const statusConfig: Record<string, { label: string; variant: "default" | "second
 
 export default function Dashboard() {
   const [showNotif, setShowNotif] = useState(false);
-  const upcoming = appointments.filter(a => a.status === "programada" || a.status === "confirmada").slice(0, 5);
+  const [chatOpen, setChatOpen] = useState(false);
+  const chatPatients = getChatPatients();
+  const chatAppts = getChatAppointments();
+  const allAppointments = [...appointments, ...chatAppts];
+  const upcoming = allAppointments.filter(a => a.status === "programada" || a.status === "confirmada").slice(0, 5);
+  const allPatientCount = patients.filter(p => p.status === "activo").length + chatPatients.length;
   const recentPatients = patients.filter(p => p.status === "activo" && p.id !== "10").slice(0, 5);
 
   useEffect(() => {
