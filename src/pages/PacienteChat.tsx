@@ -173,6 +173,12 @@ export default function PacienteChat() {
       });
     }
 
+    toast.success("✅ Paciente registrado exitosamente", {
+      description: `${patient.name} ha sido agregado al sistema${appointmentCreated ? " con cita agendada" : ""}`,
+      duration: 4000,
+    });
+    }
+
     setTyping(true);
     setTimeout(() => {
       const summaryMsg = `✅ **¡Listo!** He registrado toda tu información.\n\n📋 **Resumen de tu registro:**\n\n👤 **Nombre:** ${patient.name}\n🎂 **Edad:** ${patient.age} años\n🩺 **Motivo:** ${patient.reason}\n📝 **Síntomas:** ${patient.symptoms}\n📂 **Antecedentes:** ${patient.history}${time ? `\n\n📅 **Cita agendada:** ${time}` : ""}\n\nEl Dr. Ramírez revisará tu información antes de la consulta. ${time ? "Recibirás un recordatorio antes de tu cita." : ""}\n\n¡Gracias por confiar en nosotros! 💙`;
