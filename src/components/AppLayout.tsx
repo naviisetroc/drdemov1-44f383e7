@@ -11,8 +11,8 @@ import {
   X,
   Stethoscope,
   MessageCircle,
-  LogOut } from
-"lucide-react";
+   LogOut,
+   User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const navItems = [

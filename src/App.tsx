@@ -38,6 +38,7 @@ const App = () => (
           <Route path="/chat" element={<ProtectedLayout><Chat /></ProtectedLayout>} />
           <Route path="/referencias" element={<ProtectedLayout><Referencias /></ProtectedLayout>} />
           <Route path="/configuracion" element={<ProtectedLayout><Configuracion /></ProtectedLayout>} />
+          <Route path="/paciente" element={<PacienteChat />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
