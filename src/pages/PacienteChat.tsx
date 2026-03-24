@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { addChatPatient, addChatAppointment, ChatPatient } from "@/stores/patientChatStore";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
