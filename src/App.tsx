@@ -13,6 +13,7 @@ import Agenda from "@/pages/Agenda";
 import Chat from "@/pages/Chat";
 import Referencias from "@/pages/Referencias";
 import Configuracion from "@/pages/Configuracion";
+import PacienteChat from "@/pages/PacienteChat";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
