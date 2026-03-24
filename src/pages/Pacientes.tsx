@@ -6,13 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { patients } from "@/data/mockData";
+import { patients, Patient } from "@/data/mockData";
+import { getChatPatients, chatPatientToPatient } from "@/stores/patientChatStore";
 
 export default function Pacientes() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"todos" | "activo" | "inactivo">("todos");
 
-  const filtered = patients.filter((p) => {
+  const chatPats = getChatPatients().map(chatPatientToPatient);
+  const allPatients: Patient[] = [...patients, ...chatPats];
+
+  const filtered = allPatients.filter((p) => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.conditions.some(c => c.toLowerCase().includes(search.toLowerCase()));
     const matchFilter = filter === "todos" || p.status === filter;
