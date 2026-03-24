@@ -1,11 +1,13 @@
-import { Calendar, Users, FileText, ArrowRightLeft, Clock, Bell, CheckCircle2, AlertCircle, TrendingUp } from "lucide-react";
+import { Calendar, Users, FileText, ArrowRightLeft, Clock, Bell, CheckCircle2, AlertCircle, TrendingUp, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { appointments, patients, clinicalNotes, referrals } from "@/data/mockData";
+import { getChatPatients, getChatAppointments } from "@/stores/patientChatStore";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
+import DoctorAssistantChat from "@/components/DoctorAssistantChat";
 
 const stats = [
   {
