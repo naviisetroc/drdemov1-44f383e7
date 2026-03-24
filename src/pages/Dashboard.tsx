@@ -1,23 +1,25 @@
-import { Calendar, Users, FileText, ArrowRightLeft, Clock, Bell, CheckCircle2, AlertCircle, TrendingUp } from "lucide-react";
+import { Calendar, Users, FileText, ArrowRightLeft, Clock, Bell, CheckCircle2, AlertCircle, TrendingUp, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { appointments, patients, clinicalNotes, referrals } from "@/data/mockData";
+import { getChatPatients, getChatAppointments } from "@/stores/patientChatStore";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
+import DoctorAssistantChat from "@/components/DoctorAssistantChat";
 
-const stats = [
+const getStats = (activeCount: number, apptCount: number) => [
   {
     label: "Pacientes activos",
-    value: patients.filter(p => p.status === "activo").length,
+    value: activeCount,
     icon: Users,
     color: "text-primary",
     tooltip: "Total de pacientes con estado activo en tu consultorio",
   },
   {
     label: "Citas hoy",
-    value: appointments.filter(a => a.status === "confirmada").length,
+    value: apptCount,
     icon: Calendar,
     color: "text-success",
     tooltip: "Citas confirmadas para el día de hoy",
@@ -47,7 +49,12 @@ const statusConfig: Record<string, { label: string; variant: "default" | "second
 
 export default function Dashboard() {
   const [showNotif, setShowNotif] = useState(false);
-  const upcoming = appointments.filter(a => a.status === "programada" || a.status === "confirmada").slice(0, 5);
+  const [chatOpen, setChatOpen] = useState(false);
+  const chatPatients = getChatPatients();
+  const chatAppts = getChatAppointments();
+  const allAppointments = [...appointments, ...chatAppts];
+  const upcoming = allAppointments.filter(a => a.status === "programada" || a.status === "confirmada").slice(0, 5);
+  const allPatientCount = patients.filter(p => p.status === "activo").length + chatPatients.length;
   const recentPatients = patients.filter(p => p.status === "activo" && p.id !== "10").slice(0, 5);
 
   useEffect(() => {
@@ -81,7 +88,7 @@ export default function Dashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((s) => (
+        {getStats(allPatientCount, allAppointments.filter(a => a.status === "confirmada").length).map((s) => (
           <Tooltip key={s.label}>
             <TooltipTrigger asChild>
               <Card className="shadow-card hover:shadow-md transition-shadow cursor-default">
@@ -190,6 +197,35 @@ export default function Dashboard() {
         </Card>
       </div>
 
+      {/* Chat patients */}
+      {chatPatients.length > 0 && (
+        <Card className="shadow-card border-success/20 bg-success/5">
+          <CardHeader className="pb-3">
+            <CardTitle className="font-display text-base flex items-center gap-2">
+              <Users className="h-4 w-4 text-success" />
+              Pacientes nuevos (vía chat)
+              <Badge variant="secondary" className="text-[10px] ml-auto">{chatPatients.length} nuevos</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {chatPatients.map((p) => (
+              <div key={p.id} className="flex items-center justify-between rounded-lg border border-border p-3 bg-card">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-success/10 text-xs font-semibold text-success">
+                    {p.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">{p.name}</p>
+                    <p className="text-xs text-muted-foreground">{p.reason}</p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="text-[10px] text-success border-success/30">Nuevo</Badge>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Quick actions banner */}
       <Card className="shadow-card border-primary/20 bg-primary/5">
         <CardContent className="p-4">
@@ -221,6 +257,16 @@ export default function Dashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Floating assistant button */}
+      <button
+        onClick={() => setChatOpen(!chatOpen)}
+        className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl transition-all flex items-center justify-center hover:scale-105"
+      >
+        <Sparkles className="h-6 w-6" />
+      </button>
+
+      <DoctorAssistantChat open={chatOpen} onClose={() => setChatOpen(false)} />
     </div>
   );
 }

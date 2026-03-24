@@ -13,6 +13,7 @@ import Agenda from "@/pages/Agenda";
 import Chat from "@/pages/Chat";
 import Referencias from "@/pages/Referencias";
 import Configuracion from "@/pages/Configuracion";
+import PacienteChat from "@/pages/PacienteChat";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/chat" element={<ProtectedLayout><Chat /></ProtectedLayout>} />
           <Route path="/referencias" element={<ProtectedLayout><Referencias /></ProtectedLayout>} />
           <Route path="/configuracion" element={<ProtectedLayout><Configuracion /></ProtectedLayout>} />
+          <Route path="/paciente" element={<PacienteChat />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
