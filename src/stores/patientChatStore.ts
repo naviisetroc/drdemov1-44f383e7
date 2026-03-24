@@ -123,21 +123,7 @@ export function getChatAppointments(): Appointment[] {
   return load().chatAppointments;
 }
 
-/** React hook that re-renders when the store changes */
-export function usePatientChatStore() {
-  const { useState: useS, useEffect: useE } = require("react");
-  const [data, setData] = useS<PatientChatStore>(load);
-  useE(() => {
-    const handler = () => setData(load());
-    window.addEventListener(STORE_EVENT, handler);
-    window.addEventListener("storage", handler);
-    return () => {
-      window.removeEventListener(STORE_EVENT, handler);
-      window.removeEventListener("storage", handler);
-    };
-  }, []);
-  return data;
-}
+export const STORE_UPDATE_EVENT = STORE_EVENT;
 
 export const STORE_UPDATE_EVENT = STORE_EVENT;
 
