@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { addChatPatient, addChatAppointment, ChatPatient } from "@/stores/patientChatStore";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
@@ -158,7 +159,9 @@ export default function PacienteChat() {
 
     addChatPatient(patient);
 
+    let appointmentCreated = false;
     if (time) {
+      appointmentCreated = true;
       addChatAppointment({
         id: `apt-${Date.now()}`,
         patientId: id,
@@ -169,6 +172,11 @@ export default function PacienteChat() {
         notes: `Registrado vía chat. Síntomas: ${patient.symptoms}`,
       });
     }
+
+    toast.success("✅ Paciente registrado exitosamente", {
+      description: `${patient.name} ha sido agregado al sistema${appointmentCreated ? " con cita agendada" : ""}`,
+      duration: 4000,
+    });
 
     setTyping(true);
     setTimeout(() => {
