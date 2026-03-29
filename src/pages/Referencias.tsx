@@ -281,7 +281,7 @@ export default function Referencias() {
 
       <div className="space-y-4">
         {allRefs.map((ref) => (
-          <Card key={ref.id} className="shadow-card">
+          <Card key={ref.id} className="glass border-border/40 hover:border-primary/20 transition-all">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="font-display text-base">{ref.patientName}</CardTitle>
