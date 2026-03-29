@@ -314,7 +314,7 @@ export default function Chat() {
 
         {typing && (
           <div className="flex justify-start mb-1">
-            <div className="bg-card border border-border rounded-lg rounded-tl-none px-4 py-3 shadow-sm">
+            <div className="glass-strong rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
               <div className="flex gap-1.5 items-center">
                 <span className="h-2 w-2 rounded-full bg-muted-foreground/60 animate-bounce" style={{ animationDelay: "0ms", animationDuration: "0.6s" }} />
                 <span className="h-2 w-2 rounded-full bg-muted-foreground/60 animate-bounce" style={{ animationDelay: "150ms", animationDuration: "0.6s" }} />
