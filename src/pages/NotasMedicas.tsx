@@ -316,7 +316,7 @@ export default function NotasMedicas() {
                   </div>
 
                   <div
-                    className="text-sm whitespace-pre-line leading-relaxed bg-background rounded-lg p-4 border border-border max-h-[400px] overflow-y-auto"
+                    className="text-sm whitespace-pre-line leading-relaxed bg-muted/30 rounded-xl p-4 border border-border/30 max-h-[400px] overflow-y-auto"
                     dangerouslySetInnerHTML={{
                       __html: generatedNote
                         .replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>')
