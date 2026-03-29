@@ -356,7 +356,7 @@ export default function NotasMedicas() {
           placeholder="Buscar por paciente o contenido..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9"
+          className="pl-9 bg-muted/30 border-border/40 rounded-xl focus:border-primary/50"
         />
       </div>
 
