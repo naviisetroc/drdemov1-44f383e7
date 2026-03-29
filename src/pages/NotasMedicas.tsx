@@ -220,7 +220,7 @@ export default function NotasMedicas() {
         </div>
         <Dialog open={newNoteOpen} onOpenChange={(open) => { setNewNoteOpen(open); if (!open) { setGeneratedNote(null); setNoteText(""); setGenProgress(0); } }}>
           <DialogTrigger asChild>
-            <Button className="gap-2">
+            <Button className="gap-2 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all">
               <Plus className="h-4 w-4" />
               Nueva nota clínica
             </Button>
