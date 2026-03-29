@@ -226,7 +226,7 @@ export default function Referencias() {
               </div>
               <div>
                 <label className="text-sm font-medium">Motivo de referencia y contexto clínico</label>
-                <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Describe el motivo de la referencia, antecedentes relevantes, tratamiento actual y lo que esperas de la valoración del especialista..." className="mt-1 min-h-[120px]" />
+                <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Describe el motivo de la referencia..." className="mt-1 min-h-[120px] bg-muted/30 border-border/40 rounded-xl" />
               </div>
 
               <Button onClick={handleGenerate} className="w-full gap-2 h-11" disabled={generating || !notes.trim()}>
