@@ -266,8 +266,6 @@ export default function Chat() {
           backgroundColor: "hsl(222 47% 9% / 0.5)",
         }}
       >
-        }}
-      >
         {/* Date separator */}
         <div className="flex justify-center py-2">
           <span className="glass text-[11px] text-muted-foreground px-3 py-1 rounded-xl shadow-sm">
