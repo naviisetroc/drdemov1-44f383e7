@@ -229,7 +229,7 @@ export default function Referencias() {
                 <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Describe el motivo de la referencia..." className="mt-1 min-h-[120px] bg-muted/30 border-border/40 rounded-xl" />
               </div>
 
-              <Button onClick={handleGenerate} className="w-full gap-2 h-11" disabled={generating || !notes.trim()}>
+              <Button onClick={handleGenerate} className="w-full gap-2 h-11 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={generating || !notes.trim()}>
                 {generating ? (
                   <><Loader2 className="h-4 w-4 animate-spin" /> {genStep}</>
                 ) : (
