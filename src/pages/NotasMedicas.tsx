@@ -304,7 +304,7 @@ export default function NotasMedicas() {
 
               {/* Generated note */}
               {generatedNote && (
-                <div className="rounded-xl bg-muted/50 border border-primary/20 p-5 space-y-3 animate-fade-in">
+                <div className="rounded-2xl glass border-primary/20 p-5 space-y-3 animate-fade-in">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
