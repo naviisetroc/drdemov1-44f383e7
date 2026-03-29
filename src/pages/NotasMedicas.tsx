@@ -286,7 +286,7 @@ export default function NotasMedicas() {
               </div>
 
               {/* Generate button */}
-              <Button onClick={handleGenerate} className="w-full gap-2 h-11" disabled={generating || !noteText.trim()}>
+              <Button onClick={handleGenerate} className="w-full gap-2 h-11 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={generating || !noteText.trim()}>
                 {generating ? (
                   <><Loader2 className="h-4 w-4 animate-spin" /> {genStep}</>
                 ) : (
