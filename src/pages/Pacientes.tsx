@@ -38,7 +38,7 @@ export default function Pacientes() {
         </div>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button className="gap-2">
+            <Button className="gap-2 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all">
               <Plus className="h-4 w-4" />
               Nuevo paciente
             </Button>
@@ -55,7 +55,7 @@ export default function Pacientes() {
             placeholder="Buscar por nombre o condición..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="pl-9 bg-muted/30 border-border/40 rounded-xl focus:border-primary/50"
           />
         </div>
         <div className="flex gap-2">
@@ -70,6 +70,7 @@ export default function Pacientes() {
               variant={filter === f.key ? "default" : "outline"}
               size="sm"
               onClick={() => setFilter(f.key as typeof filter)}
+              className={`rounded-xl ${filter === f.key ? "bg-primary/20 text-primary border-primary/30 hover:bg-primary/30" : "border-border/40 hover:border-primary/30"}`}
             >
               {f.label}
             </Button>
@@ -83,19 +84,19 @@ export default function Pacientes() {
           const isFromChat = chatIds.has(p.id);
           return (
             <Link key={p.id} to={`/pacientes/${p.id}`}>
-              <Card className={`shadow-card hover:shadow-md transition-shadow cursor-pointer ${isFromChat ? "border-success/30 bg-success/5" : ""}`}>
+              <Card className={`glass border-border/40 hover:border-primary/30 hover:shadow-glow transition-all duration-300 cursor-pointer ${isFromChat ? "border-success/30 bg-success/5" : ""}`}>
                 <CardContent className="p-4 flex items-center gap-4">
-                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold ${isFromChat ? "bg-success/20 text-success" : "bg-primary/10 text-primary"}`}>
+                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl font-display text-sm font-bold ${isFromChat ? "bg-success/15 text-success" : "bg-gradient-to-br from-primary/20 to-accent/20 text-primary"}`}>
                     {isFromChat ? <MessageCircle className="h-5 w-5" /> : p.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="font-medium truncate">{p.name}</p>
-                      <Badge variant={p.status === "activo" ? "default" : "secondary"} className="text-[10px] shrink-0">
+                      <Badge variant={p.status === "activo" ? "default" : "secondary"} className="text-[10px] shrink-0 rounded-full bg-primary/15 text-primary border-primary/20">
                         {p.status}
                       </Badge>
                       {isFromChat && (
-                        <Badge variant="outline" className="text-[10px] shrink-0 border-success/30 text-success gap-0.5">
+                        <Badge variant="outline" className="text-[10px] shrink-0 border-success/30 text-success gap-0.5 rounded-full">
                           <MessageCircle className="h-2.5 w-2.5" />
                           Vía chat
                         </Badge>
@@ -107,7 +108,7 @@ export default function Pacientes() {
                     {p.conditions.length > 0 && (
                       <div className="flex gap-1.5 mt-1.5 flex-wrap">
                         {p.conditions.map((c) => (
-                          <Badge key={c} variant="outline" className="text-[10px]">{c}</Badge>
+                          <Badge key={c} variant="outline" className="text-[10px] rounded-full border-border/40">{c}</Badge>
                         ))}
                       </div>
                     )}

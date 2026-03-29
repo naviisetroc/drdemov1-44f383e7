@@ -192,17 +192,17 @@ export default function PacienteChat() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-muted/30">
+    <div className="flex flex-col h-screen gradient-bg">
       {/* Header */}
-      <header className="bg-primary text-primary-foreground px-4 py-3 flex items-center gap-3 shadow-md">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-foreground/20">
+      <header className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-4 py-3 flex items-center gap-3 shadow-elevated">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-foreground/20 backdrop-blur-sm">
           <Stethoscope className="h-5 w-5" />
         </div>
         <div className="flex-1">
           <h1 className="font-semibold text-sm">Dr. Alejandro Ramírez</h1>
           <p className="text-xs opacity-80">Asistente virtual • En línea</p>
         </div>
-        <Badge variant="secondary" className="text-[10px]">Demo</Badge>
+        <Badge variant="secondary" className="text-[10px] bg-primary-foreground/15 text-primary-foreground border-0">Demo</Badge>
       </header>
 
       {/* Messages */}
@@ -213,8 +213,8 @@ export default function PacienteChat() {
               <div
                 className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-line ${
                   msg.sender === "user"
-                    ? "bg-primary text-primary-foreground rounded-br-md"
-                    : "bg-card text-card-foreground rounded-bl-md shadow-sm border border-border"
+                    ? "bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-br-md shadow-md"
+                    : "glass-strong rounded-bl-md shadow-sm"
                 }`}
               >
                 {msg.text.split(/(\*\*.*?\*\*)/).map((part, i) =>
@@ -231,7 +231,7 @@ export default function PacienteChat() {
                     <button
                       key={opt}
                       onClick={() => handleOption(opt)}
-                      className="rounded-full border border-primary bg-card px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                      className="rounded-full glass border-primary/30 px-4 py-2 text-xs font-medium text-primary hover:bg-primary/15 hover:border-primary/50 transition-all"
                     >
                       {opt}
                     </button>
@@ -248,13 +248,13 @@ export default function PacienteChat() {
 
         {typing && (
           <div className="flex justify-start">
-            <div className="bg-card border border-border rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
+            <div className="glass-strong rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
               <div className="flex items-center gap-1.5">
                 <Bot className="h-3.5 w-3.5 text-primary animate-pulse" />
                 <div className="flex gap-1">
-                  <span className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <span className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <span className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "300ms" }} />
+                  <span className="h-2 w-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <span className="h-2 w-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <span className="h-2 w-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "300ms" }} />
                 </div>
               </div>
             </div>
@@ -265,7 +265,7 @@ export default function PacienteChat() {
 
       {/* Input */}
       {!completed ? (
-        <div className="border-t border-border bg-card p-3">
+        <div className="border-t border-border/40 glass p-3">
           <form
             onSubmit={(e) => { e.preventDefault(); handleSend(); }}
             className="flex gap-2"
@@ -274,19 +274,19 @@ export default function PacienteChat() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Escribe tu respuesta..."
-              className="flex-1 rounded-full"
+              className="flex-1 rounded-full bg-muted/30 border-border/40 focus:border-primary/50"
               disabled={typing}
             />
-            <Button type="submit" size="icon" className="rounded-full shrink-0" disabled={typing || !input.trim()}>
+            <Button type="submit" size="icon" className="rounded-full shrink-0 bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={typing || !input.trim()}>
               <Send className="h-4 w-4" />
             </Button>
           </form>
         </div>
       ) : (
-        <div className="border-t border-border bg-card p-4 text-center space-y-3">
+        <div className="border-t border-border/40 glass p-4 text-center space-y-3">
           <p className="text-sm text-muted-foreground">Tu registro ha sido completado exitosamente</p>
           <Link to="/dashboard">
-            <Badge variant="outline" className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors py-2 px-4">
+            <Badge variant="outline" className="cursor-pointer hover:bg-primary/15 hover:text-primary hover:border-primary/30 transition-all py-2 px-4 rounded-xl">
               👨‍⚕️ Ver panel del médico (demo)
             </Badge>
           </Link>

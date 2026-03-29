@@ -220,12 +220,12 @@ export default function NotasMedicas() {
         </div>
         <Dialog open={newNoteOpen} onOpenChange={(open) => { setNewNoteOpen(open); if (!open) { setGeneratedNote(null); setNoteText(""); setGenProgress(0); } }}>
           <DialogTrigger asChild>
-            <Button className="gap-2">
+            <Button className="gap-2 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all">
               <Plus className="h-4 w-4" />
               Nueva nota clínica
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto glass-strong rounded-2xl border-border/40">
             <DialogHeader>
               <DialogTitle className="font-display flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-primary" />
@@ -239,7 +239,7 @@ export default function NotasMedicas() {
                   <select
                     value={selectedPatient}
                     onChange={(e) => setSelectedPatient(e.target.value)}
-                    className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="mt-1 flex h-10 w-full rounded-xl border border-border/40 bg-muted/30 px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <option value="">Seleccionar paciente...</option>
                     {patients.map((p) => (
@@ -281,12 +281,12 @@ export default function NotasMedicas() {
                     ? "Ejemplo: Paciente masculino 41 años con asma bronquial, acude por aumento de disnea y sibilancias de 3 días, asociado a exposición a polvo. Salbutamol de rescate 4-5 veces al día. Signos vitales: TA 120/78, FC 88, sat 94 por ciento..."
                     : "Describe los hallazgos de la consulta: motivo, síntomas, exploración, impresión diagnóstica..."
                   }
-                  className="mt-1 min-h-[120px]"
+                  className="mt-1 min-h-[120px] bg-muted/30 border-border/40 rounded-xl"
                 />
               </div>
 
               {/* Generate button */}
-              <Button onClick={handleGenerate} className="w-full gap-2 h-11" disabled={generating || !noteText.trim()}>
+              <Button onClick={handleGenerate} className="w-full gap-2 h-11 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={generating || !noteText.trim()}>
                 {generating ? (
                   <><Loader2 className="h-4 w-4 animate-spin" /> {genStep}</>
                 ) : (
@@ -304,7 +304,7 @@ export default function NotasMedicas() {
 
               {/* Generated note */}
               {generatedNote && (
-                <div className="rounded-xl bg-muted/50 border border-primary/20 p-5 space-y-3 animate-fade-in">
+                <div className="rounded-2xl glass border-primary/20 p-5 space-y-3 animate-fade-in">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
@@ -316,7 +316,7 @@ export default function NotasMedicas() {
                   </div>
 
                   <div
-                    className="text-sm whitespace-pre-line leading-relaxed bg-background rounded-lg p-4 border border-border max-h-[400px] overflow-y-auto"
+                    className="text-sm whitespace-pre-line leading-relaxed bg-muted/30 rounded-xl p-4 border border-border/30 max-h-[400px] overflow-y-auto"
                     dangerouslySetInnerHTML={{
                       __html: generatedNote
                         .replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>')
@@ -356,14 +356,14 @@ export default function NotasMedicas() {
           placeholder="Buscar por paciente o contenido..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9"
+          className="pl-9 bg-muted/30 border-border/40 rounded-xl focus:border-primary/50"
         />
       </div>
 
       {/* Notes list */}
       <div className="space-y-4">
         {filtered.map((note) => (
-          <Card key={note.id} className="shadow-card">
+          <Card key={note.id} className="glass border-border/40 hover:border-primary/20 transition-all">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="font-display text-base">{note.patientName}</CardTitle>
@@ -380,7 +380,7 @@ export default function NotasMedicas() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="rounded-lg bg-muted/50 p-4">
+              <div className="rounded-xl bg-muted/20 p-4 border border-border/20">
                 <p className="text-xs text-muted-foreground mb-2 font-medium">📋 Nota generada por IA:</p>
                 <div
                   className="text-sm whitespace-pre-line leading-relaxed"

@@ -192,12 +192,12 @@ export default function Referencias() {
         </div>
         <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (!o) { setGeneratedRef(null); setNotes(""); setGenProgress(0); } }}>
           <DialogTrigger asChild>
-            <Button className="gap-2">
+            <Button className="gap-2 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all">
               <Plus className="h-4 w-4" />
               Nueva referencia
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto glass-strong rounded-2xl border-border/40">
             <DialogHeader>
               <DialogTitle className="font-display flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-primary" />
@@ -211,7 +211,7 @@ export default function Referencias() {
                   <select
                     value={selectedPatient}
                     onChange={(e) => setSelectedPatient(e.target.value)}
-                    className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="mt-1 flex h-10 w-full rounded-xl border border-border/40 bg-muted/30 px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <option value="">Seleccionar paciente...</option>
                     {patients.map((p) => (
@@ -221,15 +221,15 @@ export default function Referencias() {
                 </div>
                 <div>
                   <label className="text-sm font-medium">Especialidad destino</label>
-                  <Input value={specialty} onChange={(e) => setSpecialty(e.target.value)} placeholder="Ej: Neumología, Cardiología..." className="mt-1" />
+                  <Input value={specialty} onChange={(e) => setSpecialty(e.target.value)} placeholder="Ej: Neumología, Cardiología..." className="mt-1 bg-muted/30 border-border/40 rounded-xl" />
                 </div>
               </div>
               <div>
                 <label className="text-sm font-medium">Motivo de referencia y contexto clínico</label>
-                <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Describe el motivo de la referencia, antecedentes relevantes, tratamiento actual y lo que esperas de la valoración del especialista..." className="mt-1 min-h-[120px]" />
+                <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Describe el motivo de la referencia..." className="mt-1 min-h-[120px] bg-muted/30 border-border/40 rounded-xl" />
               </div>
 
-              <Button onClick={handleGenerate} className="w-full gap-2 h-11" disabled={generating || !notes.trim()}>
+              <Button onClick={handleGenerate} className="w-full gap-2 h-11 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={generating || !notes.trim()}>
                 {generating ? (
                   <><Loader2 className="h-4 w-4 animate-spin" /> {genStep}</>
                 ) : (
@@ -245,7 +245,7 @@ export default function Referencias() {
               )}
 
               {generatedRef && (
-                <div className="rounded-xl bg-muted/50 border border-primary/20 p-5 space-y-3 animate-fade-in">
+                <div className="rounded-2xl glass border-primary/20 p-5 space-y-3 animate-fade-in">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
@@ -256,7 +256,7 @@ export default function Referencias() {
                     <Badge variant="secondary" className="text-[10px]">Formato Profesional</Badge>
                   </div>
 
-                  <div className="bg-background rounded-lg p-4 border border-border max-h-[400px] overflow-y-auto">
+                  <div className="bg-muted/30 rounded-xl p-4 border border-border/30 max-h-[400px] overflow-y-auto">
                     {renderRefContent(generatedRef)}
                   </div>
 
@@ -281,7 +281,7 @@ export default function Referencias() {
 
       <div className="space-y-4">
         {allRefs.map((ref) => (
-          <Card key={ref.id} className="shadow-card">
+          <Card key={ref.id} className="glass border-border/40 hover:border-primary/20 transition-all">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="font-display text-base">{ref.patientName}</CardTitle>
@@ -297,7 +297,7 @@ export default function Referencias() {
                 <p className="text-sm">{ref.notes}</p>
               </div>
               <Separator />
-              <div className="rounded-lg bg-muted/50 p-4">
+              <div className="rounded-xl bg-muted/20 p-4 border border-border/20">
                 <p className="text-xs text-muted-foreground font-medium mb-2">📋 Resumen clínico adjunto:</p>
                 {renderRefContent(ref.summary)}
               </div>

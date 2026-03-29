@@ -103,17 +103,17 @@ export default function DoctorAssistantChat({ open, onClose }: { open: boolean; 
   if (!open) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[500px] max-h-[calc(100vh-6rem)] flex flex-col rounded-2xl border border-border bg-card shadow-2xl overflow-hidden">
+    <div className="fixed bottom-4 right-4 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[500px] max-h-[calc(100vh-6rem)] flex flex-col rounded-2xl glass-strong shadow-elevated overflow-hidden border-primary/20">
       {/* Header */}
-      <div className="bg-primary text-primary-foreground px-4 py-3 flex items-center gap-3">
-        <div className="h-8 w-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+      <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-4 py-3 flex items-center gap-3">
+        <div className="h-8 w-8 rounded-xl bg-primary-foreground/20 flex items-center justify-center">
           <Sparkles className="h-4 w-4" />
         </div>
         <div className="flex-1">
           <p className="text-sm font-semibold">Asistente IA</p>
           <p className="text-[10px] opacity-80">Administración inteligente</p>
         </div>
-        <button onClick={onClose} className="hover:bg-primary-foreground/20 rounded-lg p-1 transition-colors">
+        <button onClick={onClose} className="hover:bg-primary-foreground/20 rounded-xl p-1.5 transition-colors">
           <X className="h-4 w-4" />
         </button>
       </div>
@@ -125,8 +125,8 @@ export default function DoctorAssistantChat({ open, onClose }: { open: boolean; 
             <div
               className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm whitespace-pre-line ${
                 msg.sender === "user"
-                  ? "bg-primary text-primary-foreground rounded-br-md"
-                  : "bg-muted text-foreground rounded-bl-md"
+                  ? "bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-br-md shadow-md"
+                  : "bg-muted/50 text-foreground rounded-bl-md border border-border/30"
               }`}
             >
               {msg.text.split(/(\*\*.*?\*\*)/).map((part, i) =>
@@ -143,11 +143,11 @@ export default function DoctorAssistantChat({ open, onClose }: { open: boolean; 
         ))}
         {typing && (
           <div className="flex justify-start">
-            <div className="bg-muted rounded-2xl rounded-bl-md px-3 py-2.5">
+            <div className="bg-muted/50 rounded-2xl rounded-bl-md px-3 py-2.5 border border-border/30">
               <div className="flex gap-1">
-                <span className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "0ms" }} />
-                <span className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "150ms" }} />
-                <span className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "300ms" }} />
+                <span className="h-2 w-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="h-2 w-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "150ms" }} />
+                <span className="h-2 w-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: "300ms" }} />
               </div>
             </div>
           </div>
@@ -156,16 +156,16 @@ export default function DoctorAssistantChat({ open, onClose }: { open: boolean; 
       </div>
 
       {/* Input */}
-      <div className="border-t border-border p-2">
+      <div className="border-t border-border/30 p-2 bg-card/50">
         <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex gap-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Pregunta algo..."
-            className="flex-1 rounded-full text-sm h-9"
+            className="flex-1 rounded-full text-sm h-9 bg-muted/30 border-border/40"
             disabled={typing}
           />
-          <Button type="submit" size="icon" className="rounded-full h-9 w-9 shrink-0" disabled={typing || !input.trim()}>
+          <Button type="submit" size="icon" className="rounded-full h-9 w-9 shrink-0 bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={typing || !input.trim()}>
             <Send className="h-3.5 w-3.5" />
           </Button>
         </form>

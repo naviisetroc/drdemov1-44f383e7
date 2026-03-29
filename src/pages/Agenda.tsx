@@ -40,7 +40,7 @@ export default function Agenda() {
         </div>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button className="gap-2">
+            <Button className="gap-2 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all">
               <Plus className="h-4 w-4" />
               Nueva cita
             </Button>
@@ -51,27 +51,29 @@ export default function Agenda() {
 
       {/* Summary badges */}
       <div className="flex gap-2 flex-wrap">
-        <Badge variant="default" className="gap-1 py-1 px-3">
+        <Badge variant="default" className="gap-1 py-1.5 px-3 rounded-xl bg-primary/15 text-primary border border-primary/20">
           <CheckCircle2 className="h-3 w-3" /> {upcoming.filter(a => a.status === "confirmada").length} confirmadas
         </Badge>
-        <Badge variant="outline" className="gap-1 py-1 px-3">
+        <Badge variant="outline" className="gap-1 py-1.5 px-3 rounded-xl border-warning/30 text-warning">
           <AlertCircle className="h-3 w-3" /> {upcoming.filter(a => a.status === "programada").length} pendientes
         </Badge>
-        <Badge variant="secondary" className="gap-1 py-1 px-3">
+        <Badge variant="secondary" className="gap-1 py-1.5 px-3 rounded-xl bg-muted/50">
           <CheckCircle2 className="h-3 w-3" /> {past.filter(a => a.status === "completada").length} completadas
         </Badge>
         {chatAppointments.length > 0 && (
-          <Badge variant="outline" className="gap-1 py-1 px-3 border-success/50 text-success">
+          <Badge variant="outline" className="gap-1 py-1.5 px-3 rounded-xl border-success/30 text-success">
             <MessageCircle className="h-3 w-3" /> {chatAppointments.length} vía chat
           </Badge>
         )}
       </div>
 
       {/* Upcoming */}
-      <Card className="shadow-card">
+      <Card className="glass border-border/40">
         <CardHeader className="pb-3">
           <CardTitle className="font-display text-base flex items-center gap-2">
-            <Clock className="h-4 w-4 text-primary" />
+            <div className="h-7 w-7 rounded-lg bg-primary/15 flex items-center justify-center">
+              <Clock className="h-3.5 w-3.5 text-primary" />
+            </div>
             Próximas citas
           </CardTitle>
         </CardHeader>
@@ -80,13 +82,13 @@ export default function Agenda() {
             const config = statusConfig[apt.status] || statusConfig.programada;
             const fromChat = chatAptIds.has(apt.id);
             return (
-              <div key={apt.id} className={`flex items-center justify-between rounded-lg border p-4 hover:bg-muted/30 transition-colors ${fromChat ? "border-success/30 bg-success/5" : "border-border"}`}>
+              <div key={apt.id} className={`flex items-center justify-between rounded-xl border p-4 hover:bg-muted/20 transition-all ${fromChat ? "border-success/30 bg-success/5" : "border-border/40 bg-muted/10"}`}>
                 <div className="flex items-center gap-4">
-                  <div className="text-center min-w-[48px]">
+                  <div className="text-center min-w-[52px] rounded-xl bg-primary/10 py-2 px-3">
                     <p className={`font-display text-lg font-bold ${config.color} leading-none`}>
                       {new Date(apt.datetime).getDate()}
                     </p>
-                    <p className="text-[10px] text-muted-foreground uppercase">
+                    <p className="text-[9px] text-muted-foreground uppercase mt-0.5">
                       {new Date(apt.datetime).toLocaleDateString("es-MX", { month: "short" })}
                     </p>
                   </div>
@@ -94,7 +96,7 @@ export default function Agenda() {
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium">{apt.patientName}</p>
                       {fromChat && (
-                        <Badge variant="outline" className="text-[9px] border-success/30 text-success gap-0.5 py-0 px-1.5">
+                        <Badge variant="outline" className="text-[9px] border-success/30 text-success gap-0.5 py-0 px-1.5 rounded-full">
                           <MessageCircle className="h-2.5 w-2.5" />
                           Chat
                         </Badge>
@@ -111,14 +113,14 @@ export default function Agenda() {
                   {apt.status === "programada" && (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="ghost" size="sm" className="text-xs" onClick={() => handleConfirm(apt.patientName)}>
+                        <Button variant="ghost" size="sm" className="text-xs rounded-xl hover:bg-primary/10 hover:text-primary" onClick={() => handleConfirm(apt.patientName)}>
                           📲 Recordar
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>Enviar recordatorio por WhatsApp</TooltipContent>
                     </Tooltip>
                   )}
-                  <Badge variant={config.variant} className="text-[10px] gap-1 shrink-0">
+                  <Badge variant={config.variant} className="text-[10px] gap-1 shrink-0 rounded-full">
                     <config.icon className="h-2.5 w-2.5" />
                     {config.label}
                   </Badge>
@@ -130,10 +132,12 @@ export default function Agenda() {
       </Card>
 
       {/* Past */}
-      <Card className="shadow-card">
+      <Card className="glass border-border/40">
         <CardHeader className="pb-3">
           <CardTitle className="font-display text-base flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <div className="h-7 w-7 rounded-lg bg-muted/30 flex items-center justify-center">
+              <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+            </div>
             Citas anteriores
           </CardTitle>
         </CardHeader>
@@ -141,14 +145,14 @@ export default function Agenda() {
           {past.map((apt) => {
             const config = statusConfig[apt.status] || statusConfig.completada;
             return (
-              <div key={apt.id} className="flex items-center justify-between rounded-lg border border-border p-3 opacity-70">
+              <div key={apt.id} className="flex items-center justify-between rounded-xl border border-border/30 p-3 opacity-60 bg-muted/10">
                 <div>
                   <p className="text-sm font-medium">{apt.patientName}</p>
                   <p className="text-xs text-muted-foreground">
                     {new Date(apt.datetime).toLocaleDateString("es-MX", { day: "numeric", month: "short" })} — {apt.reason}
                   </p>
                 </div>
-                <Badge variant={config.variant} className="text-[10px] gap-1">
+                <Badge variant={config.variant} className="text-[10px] gap-1 rounded-full">
                   <config.icon className="h-2.5 w-2.5" />
                   {config.label}
                 </Badge>

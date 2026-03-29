@@ -228,9 +228,9 @@ export default function Chat() {
   return (
     <div className="flex flex-col h-[calc(100vh-3.5rem)] lg:h-screen max-w-3xl mx-auto">
       {/* WhatsApp-style Header */}
-      <div className="flex items-center gap-3 bg-primary px-4 py-3 text-primary-foreground">
+      <div className="flex items-center gap-3 bg-gradient-to-r from-primary to-accent px-4 py-3 text-primary-foreground">
         <div className="relative">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-foreground/20">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-foreground/20 backdrop-blur-sm">
             <Bot className="h-5 w-5" />
           </div>
           <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-green-400 border-2 border-primary" />
@@ -263,13 +263,12 @@ export default function Chat() {
       <div
         className="flex-1 overflow-y-auto p-3 space-y-1"
         style={{
-          backgroundColor: "hsl(var(--muted) / 0.3)",
-          backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
+          backgroundColor: "hsl(222 47% 9% / 0.5)",
         }}
       >
         {/* Date separator */}
         <div className="flex justify-center py-2">
-          <span className="bg-card/90 backdrop-blur-sm text-[11px] text-muted-foreground px-3 py-1 rounded-md shadow-sm border border-border/50">
+          <span className="glass text-[11px] text-muted-foreground px-3 py-1 rounded-xl shadow-sm">
             Hoy
           </span>
         </div>
@@ -277,10 +276,10 @@ export default function Chat() {
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === "patient" ? "justify-end" : "justify-start"} mb-1`}>
             <div
-              className={`max-w-[85%] sm:max-w-[75%] rounded-lg px-3 py-2 shadow-sm relative ${
+              className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-3 py-2 shadow-sm relative ${
                 msg.role === "patient"
-                  ? "bg-primary/10 border border-primary/20 rounded-tr-none"
-                  : "bg-card border border-border rounded-tl-none"
+                  ? "bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/20 rounded-tr-none"
+                  : "glass-strong rounded-tl-none"
               }`}
             >
               {(msg.content) && renderContent(msg.content)}
@@ -291,7 +290,7 @@ export default function Chat() {
                       key={opt.action}
                       onClick={() => handleOption(opt)}
                       disabled={typing || appointmentCreated}
-                      className="flex items-center gap-2 w-full rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-left text-sm font-medium text-primary hover:bg-primary/10 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 w-full rounded-xl glass border-primary/30 px-3 py-2.5 text-left text-sm font-medium text-primary hover:bg-primary/10 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Calendar className="h-3.5 w-3.5 shrink-0" />
                       {opt.label}
@@ -313,7 +312,7 @@ export default function Chat() {
 
         {typing && (
           <div className="flex justify-start mb-1">
-            <div className="bg-card border border-border rounded-lg rounded-tl-none px-4 py-3 shadow-sm">
+            <div className="glass-strong rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
               <div className="flex gap-1.5 items-center">
                 <span className="h-2 w-2 rounded-full bg-muted-foreground/60 animate-bounce" style={{ animationDelay: "0ms", animationDuration: "0.6s" }} />
                 <span className="h-2 w-2 rounded-full bg-muted-foreground/60 animate-bounce" style={{ animationDelay: "150ms", animationDuration: "0.6s" }} />
@@ -327,7 +326,7 @@ export default function Chat() {
 
       {/* Prompt hint */}
       {messages.length <= 2 && (
-        <div className="px-4 py-2 bg-muted/50 border-t border-border">
+        <div className="px-4 py-2 glass border-t border-border/30">
           <p className="text-xs text-muted-foreground text-center">
             💡 Prueba escribir: <strong>"Quiero agendar una cita"</strong>, <strong>"¿Cuánto cuesta la consulta?"</strong>, <strong>"Me duele la cabeza"</strong>, o <strong>"¿Dónde queda el consultorio?"</strong>
           </p>
@@ -335,7 +334,7 @@ export default function Chat() {
       )}
 
       {/* WhatsApp-style input */}
-      <div className="border-t border-border bg-card p-2">
+      <div className="border-t border-border/30 glass p-2">
         <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="flex items-center gap-2">
           <Button type="button" variant="ghost" size="icon" className="shrink-0 h-9 w-9 text-muted-foreground">
             <Smile className="h-5 w-5" />
@@ -345,7 +344,7 @@ export default function Chat() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Escribe un mensaje..."
-              className="pr-20 bg-muted/50 border-muted"
+              className="pr-20 bg-muted/30 border-border/40 rounded-xl"
               disabled={typing}
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
@@ -357,7 +356,7 @@ export default function Chat() {
               </button>
             </div>
           </div>
-          <Button type="submit" size="icon" className="shrink-0 h-9 w-9 rounded-full" disabled={!input.trim() || typing}>
+          <Button type="submit" size="icon" className="shrink-0 h-9 w-9 rounded-full bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={!input.trim() || typing}>
             <Send className="h-4 w-4" />
           </Button>
         </form>
