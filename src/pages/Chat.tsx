@@ -292,7 +292,7 @@ export default function Chat() {
                       key={opt.action}
                       onClick={() => handleOption(opt)}
                       disabled={typing || appointmentCreated}
-                      className="flex items-center gap-2 w-full rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-left text-sm font-medium text-primary hover:bg-primary/10 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 w-full rounded-xl glass border-primary/30 px-3 py-2.5 text-left text-sm font-medium text-primary hover:bg-primary/10 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Calendar className="h-3.5 w-3.5 shrink-0" />
                       {opt.label}
