@@ -270,7 +270,7 @@ export default function Chat() {
       >
         {/* Date separator */}
         <div className="flex justify-center py-2">
-          <span className="bg-card/90 backdrop-blur-sm text-[11px] text-muted-foreground px-3 py-1 rounded-md shadow-sm border border-border/50">
+          <span className="glass text-[11px] text-muted-foreground px-3 py-1 rounded-xl shadow-sm">
             Hoy
           </span>
         </div>
