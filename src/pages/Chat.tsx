@@ -358,7 +358,7 @@ export default function Chat() {
               </button>
             </div>
           </div>
-          <Button type="submit" size="icon" className="shrink-0 h-9 w-9 rounded-full" disabled={!input.trim() || typing}>
+          <Button type="submit" size="icon" className="shrink-0 h-9 w-9 rounded-full bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={!input.trim() || typing}>
             <Send className="h-4 w-4" />
           </Button>
         </form>
