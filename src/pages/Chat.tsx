@@ -230,7 +230,7 @@ export default function Chat() {
       {/* WhatsApp-style Header */}
       <div className="flex items-center gap-3 bg-gradient-to-r from-primary to-accent px-4 py-3 text-primary-foreground">
         <div className="relative">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-foreground/20">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-foreground/20 backdrop-blur-sm">
             <Bot className="h-5 w-5" />
           </div>
           <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-green-400 border-2 border-primary" />
