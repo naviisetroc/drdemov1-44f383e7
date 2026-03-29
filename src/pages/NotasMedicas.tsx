@@ -281,7 +281,7 @@ export default function NotasMedicas() {
                     ? "Ejemplo: Paciente masculino 41 años con asma bronquial, acude por aumento de disnea y sibilancias de 3 días, asociado a exposición a polvo. Salbutamol de rescate 4-5 veces al día. Signos vitales: TA 120/78, FC 88, sat 94 por ciento..."
                     : "Describe los hallazgos de la consulta: motivo, síntomas, exploración, impresión diagnóstica..."
                   }
-                  className="mt-1 min-h-[120px]"
+                  className="mt-1 min-h-[120px] bg-muted/30 border-border/40 rounded-xl"
                 />
               </div>
 
