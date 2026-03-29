@@ -34,19 +34,19 @@ export default function PacienteDetalle() {
 
   return (
     <div className="p-4 lg:p-8 space-y-6 max-w-5xl mx-auto">
-      <Link to="/pacientes" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+      <Link to="/pacientes" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
         <ArrowLeft className="h-4 w-4" /> Volver a pacientes
       </Link>
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 font-display text-lg font-bold text-primary">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 font-display text-lg font-bold text-primary">
           {isNewPatient ? <UserPlus className="h-6 w-6" /> : patient.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h1 className="font-display text-xl font-bold">{patient.name}</h1>
-            <Badge variant={patient.status === "activo" ? "default" : "secondary"}>{patient.status}</Badge>
+            <Badge variant={patient.status === "activo" ? "default" : "secondary"} className="rounded-full bg-primary/15 text-primary border-primary/20">{patient.status}</Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-0.5">
             {isNewPatient
@@ -59,13 +59,13 @@ export default function PacienteDetalle() {
           <div className="flex gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-1.5"><Phone className="h-3.5 w-3.5" /> Llamar</Button>
+                <Button variant="outline" size="sm" className="gap-1.5 rounded-xl border-border/40 hover:border-primary/30"><Phone className="h-3.5 w-3.5" /> Llamar</Button>
               </TooltipTrigger>
               <TooltipContent>{patient.phone}</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-1.5"><Mail className="h-3.5 w-3.5" /> Email</Button>
+                <Button variant="outline" size="sm" className="gap-1.5 rounded-xl border-border/40 hover:border-primary/30"><Mail className="h-3.5 w-3.5" /> Email</Button>
               </TooltipTrigger>
               <TooltipContent>{patient.email}</TooltipContent>
             </Tooltip>
@@ -75,15 +75,16 @@ export default function PacienteDetalle() {
 
       {/* New patient banner */}
       {isNewPatient && (
-        <Card className="shadow-card border-primary/20 bg-primary/5">
-          <CardContent className="p-4 flex items-center gap-3">
-            <UserPlus className="h-5 w-5 text-primary shrink-0" />
-            <div>
+        <Card className="glass border-primary/20 overflow-hidden">
+          <CardContent className="p-4 flex items-center gap-3 relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent" />
+            <UserPlus className="h-5 w-5 text-primary shrink-0 relative" />
+            <div className="relative">
               <p className="text-sm font-semibold">Paciente nuevo</p>
               <p className="text-xs text-muted-foreground">Este paciente aún no tiene historial clínico. Comienza registrando su primera consulta.</p>
             </div>
-            <Link to="/notas" className="ml-auto">
-              <Button size="sm" className="gap-1.5 shrink-0"><FileText className="h-3.5 w-3.5" /> Crear nota</Button>
+            <Link to="/notas" className="ml-auto relative">
+              <Button size="sm" className="gap-1.5 shrink-0 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90"><FileText className="h-3.5 w-3.5" /> Crear nota</Button>
             </Link>
           </CardContent>
         </Card>
@@ -92,55 +93,44 @@ export default function PacienteDetalle() {
       {/* Info cards */}
       {!isNewPatient && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="shadow-card">
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground flex items-center gap-1"><Phone className="h-3 w-3" /> Teléfono</p>
-              <p className="text-sm font-medium mt-0.5">{patient.phone}</p>
-            </CardContent>
-          </Card>
-          <Card className="shadow-card">
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" /> Última visita</p>
-              <p className="text-sm font-medium mt-0.5">{new Date(patient.lastVisit).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</p>
-            </CardContent>
-          </Card>
-          <Card className="shadow-card">
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground flex items-center gap-1"><Shield className="h-3 w-3" /> Seguro médico</p>
-              <p className="text-sm font-medium mt-0.5">{patient.insuranceProvider || "No registrado"}</p>
-            </CardContent>
-          </Card>
-          <Card className="shadow-card">
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground flex items-center gap-1"><Heart className="h-3 w-3" /> Contacto de emergencia</p>
-              <p className="text-sm font-medium mt-0.5 truncate">{patient.emergencyContact || "No registrado"}</p>
-            </CardContent>
-          </Card>
+          {[
+            { icon: Phone, label: "Teléfono", value: patient.phone },
+            { icon: Calendar, label: "Última visita", value: new Date(patient.lastVisit).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" }) },
+            { icon: Shield, label: "Seguro médico", value: patient.insuranceProvider || "No registrado" },
+            { icon: Heart, label: "Contacto de emergencia", value: patient.emergencyContact || "No registrado" },
+          ].map((item) => (
+            <Card key={item.label} className="glass border-border/40">
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground flex items-center gap-1"><item.icon className="h-3 w-3 text-primary/60" /> {item.label}</p>
+                <p className="text-sm font-medium mt-1 truncate">{item.value}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
 
-      {/* Conditions & Allergies row */}
+      {/* Conditions & Allergies */}
       {!isNewPatient && (
         <div className="grid sm:grid-cols-2 gap-4">
-          <Card className="shadow-card">
+          <Card className="glass border-border/40">
             <CardContent className="p-4">
               <p className="text-xs text-muted-foreground font-medium mb-2">Condiciones activas</p>
               <div className="flex gap-1.5 flex-wrap">
                 {patient.conditions.length > 0
-                  ? patient.conditions.map(c => <Badge key={c} variant="outline" className="text-[11px]">{c}</Badge>)
+                  ? patient.conditions.map(c => <Badge key={c} variant="outline" className="text-[11px] rounded-full border-border/40">{c}</Badge>)
                   : <span className="text-sm text-muted-foreground">Ninguna registrada</span>
                 }
               </div>
             </CardContent>
           </Card>
-          <Card className="shadow-card">
+          <Card className="glass border-border/40">
             <CardContent className="p-4">
               <p className="text-xs text-muted-foreground font-medium mb-2 flex items-center gap-1">
                 <AlertTriangle className="h-3 w-3 text-warning" /> Alergias
               </p>
               <div className="flex gap-1.5 flex-wrap">
                 {patient.allergies && patient.allergies.length > 0
-                  ? patient.allergies.map(a => <Badge key={a} variant="destructive" className="text-[11px]">{a}</Badge>)
+                  ? patient.allergies.map(a => <Badge key={a} variant="destructive" className="text-[11px] rounded-full">{a}</Badge>)
                   : <span className="text-sm text-muted-foreground">Sin alergias conocidas</span>
                 }
               </div>
@@ -150,12 +140,14 @@ export default function PacienteDetalle() {
       )}
 
       {/* Clinical notes */}
-      <Card className="shadow-card">
+      <Card className="glass border-border/40">
         <CardHeader className="pb-3">
           <CardTitle className="font-display text-base flex items-center gap-2">
-            <FileText className="h-4 w-4 text-primary" />
+            <div className="h-7 w-7 rounded-lg bg-primary/15 flex items-center justify-center">
+              <FileText className="h-3.5 w-3.5 text-primary" />
+            </div>
             Notas Clínicas
-            <Badge variant="secondary" className="text-[10px] ml-auto">{patientNotes.length} notas</Badge>
+            <Badge variant="secondary" className="text-[10px] ml-auto bg-primary/10 text-primary border-primary/20">{patientNotes.length} notas</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -164,16 +156,16 @@ export default function PacienteDetalle() {
               <FileText className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
               <p className="text-sm text-muted-foreground">No hay notas clínicas registradas.</p>
               <Link to="/notas">
-                <Button variant="outline" size="sm" className="mt-3 gap-1.5"><FileText className="h-3.5 w-3.5" /> Crear primera nota</Button>
+                <Button variant="outline" size="sm" className="mt-3 gap-1.5 rounded-xl border-border/40"><FileText className="h-3.5 w-3.5" /> Crear primera nota</Button>
               </Link>
             </div>
           ) : (
             patientNotes.map((note) => (
-              <div key={note.id} className="rounded-lg border border-border p-4 space-y-2">
+              <div key={note.id} className="rounded-xl border border-border/30 p-4 space-y-2 bg-muted/10">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-[10px]">{note.format}</Badge>
-                    <Badge variant="outline" className="text-[10px]">{note.inputType}</Badge>
+                    <Badge variant="secondary" className="text-[10px] rounded-full bg-muted/50">{note.format}</Badge>
+                    <Badge variant="outline" className="text-[10px] rounded-full border-border/40">{note.inputType}</Badge>
                   </div>
                   <span className="text-xs text-muted-foreground">
                     {new Date(note.date).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" })}
@@ -184,7 +176,7 @@ export default function PacienteDetalle() {
                   dangerouslySetInnerHTML={{
                     __html: note.aiOutput
                       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                      .replace(/━+/g, '<hr class="border-border my-1"/>')
+                      .replace(/━+/g, '<hr class="border-border/30 my-1"/>')
                       .replace(/→/g, '<span class="text-primary">→</span>')
                   }}
                 />
@@ -195,12 +187,14 @@ export default function PacienteDetalle() {
       </Card>
 
       {/* Appointments */}
-      <Card className="shadow-card">
+      <Card className="glass border-border/40">
         <CardHeader className="pb-3">
           <CardTitle className="font-display text-base flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-primary" />
+            <div className="h-7 w-7 rounded-lg bg-primary/15 flex items-center justify-center">
+              <Calendar className="h-3.5 w-3.5 text-primary" />
+            </div>
             Historial de Citas
-            <Badge variant="secondary" className="text-[10px] ml-auto">{patientAppts.length} citas</Badge>
+            <Badge variant="secondary" className="text-[10px] ml-auto bg-primary/10 text-primary border-primary/20">{patientAppts.length} citas</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -214,14 +208,14 @@ export default function PacienteDetalle() {
               {patientAppts.map((apt) => {
                 const config = statusConfig[apt.status] || statusConfig.programada;
                 return (
-                  <div key={apt.id} className="flex items-center justify-between rounded-lg border border-border p-3">
+                  <div key={apt.id} className="flex items-center justify-between rounded-xl border border-border/30 p-3 bg-muted/10">
                     <div>
                       <p className="text-sm font-medium">{apt.reason}</p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(apt.datetime).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" })} — {new Date(apt.datetime).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
-                    <Badge variant={config.variant} className="text-[10px]">{config.label}</Badge>
+                    <Badge variant={config.variant} className="text-[10px] rounded-full">{config.label}</Badge>
                   </div>
                 );
               })}
@@ -232,22 +226,24 @@ export default function PacienteDetalle() {
 
       {/* Referrals */}
       {patientRefs.length > 0 && (
-        <Card className="shadow-card">
+        <Card className="glass border-border/40">
           <CardHeader className="pb-3">
             <CardTitle className="font-display text-base flex items-center gap-2">
-              <ArrowRightLeft className="h-4 w-4 text-primary" />
+              <div className="h-7 w-7 rounded-lg bg-accent/15 flex items-center justify-center">
+                <ArrowRightLeft className="h-3.5 w-3.5 text-accent" />
+              </div>
               Referencias Médicas
-              <Badge variant="secondary" className="text-[10px] ml-auto">{patientRefs.length}</Badge>
+              <Badge variant="secondary" className="text-[10px] ml-auto bg-accent/10 text-accent border-accent/20">{patientRefs.length}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {patientRefs.map((ref) => (
-              <div key={ref.id} className="rounded-lg border border-border p-4 space-y-2">
+              <div key={ref.id} className="rounded-xl border border-border/30 p-4 space-y-2 bg-muted/10">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Badge>{ref.toSpecialty}</Badge>
+                    <Badge className="rounded-full bg-accent/15 text-accent border-accent/20">{ref.toSpecialty}</Badge>
                     {ref.status && (
-                      <Badge variant={ref.status === "enviada" ? "default" : ref.status === "aceptada" ? "secondary" : "outline"} className="text-[10px]">
+                      <Badge variant={ref.status === "enviada" ? "default" : ref.status === "aceptada" ? "secondary" : "outline"} className="text-[10px] rounded-full">
                         {ref.status === "enviada" ? "📨 Enviada" : ref.status === "aceptada" ? "✅ Aceptada" : "🕐 Pendiente"}
                       </Badge>
                     )}
@@ -255,7 +251,7 @@ export default function PacienteDetalle() {
                   <span className="text-xs text-muted-foreground">{new Date(ref.date).toLocaleDateString("es-MX")}</span>
                 </div>
                 <p className="text-sm">{ref.notes}</p>
-                <Separator />
+                <Separator className="bg-border/30" />
                 <p className="text-sm text-muted-foreground">{ref.summary}</p>
               </div>
             ))}
