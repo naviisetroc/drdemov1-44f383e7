@@ -363,7 +363,7 @@ export default function NotasMedicas() {
       {/* Notes list */}
       <div className="space-y-4">
         {filtered.map((note) => (
-          <Card key={note.id} className="shadow-card">
+          <Card key={note.id} className="glass border-border/40 hover:border-primary/20 transition-all">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="font-display text-base">{note.patientName}</CardTitle>
