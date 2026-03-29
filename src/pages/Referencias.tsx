@@ -256,7 +256,7 @@ export default function Referencias() {
                     <Badge variant="secondary" className="text-[10px]">Formato Profesional</Badge>
                   </div>
 
-                  <div className="bg-background rounded-lg p-4 border border-border max-h-[400px] overflow-y-auto">
+                  <div className="bg-muted/30 rounded-xl p-4 border border-border/30 max-h-[400px] overflow-y-auto">
                     {renderRefContent(generatedRef)}
                   </div>
 
