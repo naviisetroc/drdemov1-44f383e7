@@ -278,10 +278,10 @@ export default function Chat() {
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === "patient" ? "justify-end" : "justify-start"} mb-1`}>
             <div
-              className={`max-w-[85%] sm:max-w-[75%] rounded-lg px-3 py-2 shadow-sm relative ${
+              className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-3 py-2 shadow-sm relative ${
                 msg.role === "patient"
-                  ? "bg-primary/10 border border-primary/20 rounded-tr-none"
-                  : "bg-card border border-border rounded-tl-none"
+                  ? "bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/20 rounded-tr-none"
+                  : "glass-strong rounded-tl-none"
               }`}
             >
               {(msg.content) && renderContent(msg.content)}
