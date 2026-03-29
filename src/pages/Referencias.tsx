@@ -221,7 +221,7 @@ export default function Referencias() {
                 </div>
                 <div>
                   <label className="text-sm font-medium">Especialidad destino</label>
-                  <Input value={specialty} onChange={(e) => setSpecialty(e.target.value)} placeholder="Ej: Neumología, Cardiología..." className="mt-1" />
+                  <Input value={specialty} onChange={(e) => setSpecialty(e.target.value)} placeholder="Ej: Neumología, Cardiología..." className="mt-1 bg-muted/30 border-border/40 rounded-xl" />
                 </div>
               </div>
               <div>
