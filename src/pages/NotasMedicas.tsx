@@ -380,7 +380,7 @@ export default function NotasMedicas() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="rounded-lg bg-muted/50 p-4">
+              <div className="rounded-xl bg-muted/20 p-4 border border-border/20">
                 <p className="text-xs text-muted-foreground mb-2 font-medium">📋 Nota generada por IA:</p>
                 <div
                   className="text-sm whitespace-pre-line leading-relaxed"
