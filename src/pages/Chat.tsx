@@ -328,7 +328,7 @@ export default function Chat() {
 
       {/* Prompt hint */}
       {messages.length <= 2 && (
-        <div className="px-4 py-2 bg-muted/50 border-t border-border">
+        <div className="px-4 py-2 glass border-t border-border/30">
           <p className="text-xs text-muted-foreground text-center">
             💡 Prueba escribir: <strong>"Quiero agendar una cita"</strong>, <strong>"¿Cuánto cuesta la consulta?"</strong>, <strong>"Me duele la cabeza"</strong>, o <strong>"¿Dónde queda el consultorio?"</strong>
           </p>
