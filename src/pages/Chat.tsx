@@ -346,7 +346,7 @@ export default function Chat() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Escribe un mensaje..."
-              className="pr-20 bg-muted/50 border-muted"
+              className="pr-20 bg-muted/30 border-border/40 rounded-xl"
               disabled={typing}
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
