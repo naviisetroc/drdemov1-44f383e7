@@ -297,7 +297,7 @@ export default function Referencias() {
                 <p className="text-sm">{ref.notes}</p>
               </div>
               <Separator />
-              <div className="rounded-lg bg-muted/50 p-4">
+              <div className="rounded-xl bg-muted/20 p-4 border border-border/20">
                 <p className="text-xs text-muted-foreground font-medium mb-2">📋 Resumen clínico adjunto:</p>
                 {renderRefContent(ref.summary)}
               </div>
