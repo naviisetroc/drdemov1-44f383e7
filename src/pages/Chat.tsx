@@ -336,7 +336,7 @@ export default function Chat() {
       )}
 
       {/* WhatsApp-style input */}
-      <div className="border-t border-border bg-card p-2">
+      <div className="border-t border-border/30 glass p-2">
         <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="flex items-center gap-2">
           <Button type="button" variant="ghost" size="icon" className="shrink-0 h-9 w-9 text-muted-foreground">
             <Smile className="h-5 w-5" />
