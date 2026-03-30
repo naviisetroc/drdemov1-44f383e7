@@ -12,21 +12,21 @@ import {
   Stethoscope,
   MessageCircle,
   LogOut,
-  User,
-} from "lucide-react";
+  User } from
+"lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const navItems = [
-  { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/pacientes", icon: Users, label: "Pacientes" },
-  { to: "/notas", icon: FileText, label: "Notas Médicas" },
-  { to: "/agenda", icon: Calendar, label: "Agenda" },
-  { to: "/chat", icon: MessageCircle, label: "Chat IA" },
-  { to: "/referencias", icon: ArrowRightLeft, label: "Referencias" },
-  { to: "/configuracion", icon: Settings, label: "Configuración" },
-];
+{ to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+{ to: "/pacientes", icon: Users, label: "Pacientes" },
+{ to: "/notas", icon: FileText, label: "Notas Médicas" },
+{ to: "/agenda", icon: Calendar, label: "Agenda" },
+{ to: "/chat", icon: MessageCircle, label: "Chat IA" },
+{ to: "/referencias", icon: ArrowRightLeft, label: "Referencias" },
+{ to: "/configuracion", icon: Settings, label: "Configuración" }];
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+
+export default function AppLayout({ children }: {children: React.ReactNode;}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -39,19 +39,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden gradient-bg">
       {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      {sidebarOpen &&
+      <div
+        className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm lg:hidden"
+        onClick={() => setSidebarOpen(false)} />
+
+      }
 
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-sidebar/95 backdrop-blur-xl text-sidebar-foreground border-r border-sidebar-border transition-transform duration-200 lg:static lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
+        sidebarOpen ? "translate-x-0" : "-translate-x-full"}`
+        }>
+        
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 border-b border-sidebar-border px-5">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent shadow-lg">
@@ -78,15 +78,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 to={item.to}
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-                  active
-                    ? "bg-primary/15 text-primary border border-primary/20 shadow-sm glow-primary"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                }`}
-              >
+                active ?
+                "bg-primary/15 text-primary border border-primary/20 shadow-sm glow-primary" :
+                "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"}`
+                }>
+                
                 <item.icon className={`h-[18px] w-[18px] ${active ? "text-primary" : ""}`} />
                 {item.label}
-              </Link>
-            );
+              </Link>);
+
           })}
         </nav>
 
@@ -95,8 +95,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <Link
             to="/paciente"
             target="_blank"
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent/20 to-primary/20 border border-accent/20 px-3 py-2.5 text-xs font-medium text-sidebar-foreground hover:border-accent/40 transition-all"
-          >
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent/20 to-primary/20 border border-accent/20 px-3 py-2.5 text-xs font-medium text-sidebar-foreground hover:border-accent/40 transition-all">
+            
             <User className="h-3.5 w-3.5 text-accent" />
             Vista paciente (demo)
           </Link>
@@ -117,8 +117,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <button
               onClick={handleLogout}
               className="text-sidebar-muted hover:text-destructive transition-colors"
-              title="Cerrar sesión"
-            >
+              title="Cerrar sesión">
+              
               <LogOut className="h-4 w-4" />
             </button>
           </div>
@@ -139,9 +139,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         <main className="flex-1 overflow-y-auto">
-          <div className="animate-fade-in">{children}</div>
+          <div className="animate-fade-in bg-slate-400">{children}</div>
         </main>
       </div>
-    </div>
-  );
+    </div>);
+
 }
