@@ -188,7 +188,7 @@ export default function Referencias() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold">Referencias Médicas</h1>
-          <p className="text-sm text-muted-foreground">{allRefs.length} referencias generadas — Formato profesional listo para enviar</p>
+          <p className="text-sm text-destructive-foreground">{allRefs.length} referencias generadas — Formato profesional listo para enviar</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (!o) { setGeneratedRef(null); setNotes(""); setGenProgress(0); } }}>
           <DialogTrigger asChild>
