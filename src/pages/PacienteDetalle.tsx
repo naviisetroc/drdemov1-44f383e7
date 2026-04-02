@@ -23,6 +23,12 @@ const statusConfig: Record<string, { label: string; variant: "default" | "second
 export default function PacienteDetalle() {
   const { id } = useParams();
   const patient = patients.find((p) => p.id === id);
+  const [extraFiles, setExtraFiles] = useState<PatientFile[]>([]);
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [fileName, setFileName] = useState("");
+  const [fileType, setFileType] = useState<PatientFile["type"]>("estudio");
+  const [fileNotes, setFileNotes] = useState("");
+  const patient = patients.find((p) => p.id === id);
 
   if (!patient) {
     return (
