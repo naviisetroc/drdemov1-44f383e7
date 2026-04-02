@@ -359,6 +359,9 @@ export default function Referencias() {
                 {renderRefContent(ref.summary)}
               </div>
               <div className="flex gap-2 pt-1">
+                <Button variant="outline" size="sm" className="gap-1.5" onClick={() => handleEditRef(ref)}>
+                  <Pencil className="h-3.5 w-3.5" /> Editar
+                </Button>
                 <Button variant="outline" size="sm" className="gap-1.5">
                   <Copy className="h-3.5 w-3.5" /> Copiar
                 </Button>
@@ -370,6 +373,37 @@ export default function Referencias() {
           </Card>
         ))}
       </div>
+
+      {/* Edit reference dialog */}
+      <Dialog open={editOpen} onOpenChange={(o) => { setEditOpen(o); if (!o) setEditingRef(null); }}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto glass-strong rounded-2xl border-border/40">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <Pencil className="h-5 w-5 text-primary" />
+              Editar Referencia Médica
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            {editingRef && (
+              <p className="text-sm text-muted-foreground">Paciente: <strong>{editingRef.patientName}</strong> — {editingRef.toSpecialty}</p>
+            )}
+            <div>
+              <label className="text-sm font-medium">Motivo de referencia</label>
+              <EditTextarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)} className="mt-1 min-h-[80px] bg-muted/30 border-border/40 rounded-xl" />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Resumen clínico</label>
+              <EditTextarea value={editSummary} onChange={(e) => setEditSummary(e.target.value)} className="mt-1 min-h-[200px] bg-muted/30 border-border/40 rounded-xl font-mono text-sm" />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleSaveEdit} className="flex-1 gap-2 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90">
+                <CheckCircle2 className="h-4 w-4" /> Guardar cambios
+              </Button>
+              <Button variant="outline" onClick={() => setEditOpen(false)} className="rounded-xl">Cancelar</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
