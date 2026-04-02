@@ -108,6 +108,11 @@ export default function Referencias() {
   const [generatedRef, setGeneratedRef] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [extraRefs, setExtraRefs] = useState<Referral[]>([]);
+  const [attachments, setAttachments] = useState<string[]>([]);
+  const [editingRef, setEditingRef] = useState<Referral | null>(null);
+  const [editNotes, setEditNotes] = useState("");
+  const [editSummary, setEditSummary] = useState("");
+  const [editOpen, setEditOpen] = useState(false);
 
   const allRefs = [...referrals, ...extraRefs];
 
