@@ -1,11 +1,17 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Phone, Mail, Calendar, FileText, ArrowRightLeft, Heart, AlertTriangle, Shield, UserPlus } from "lucide-react";
+import { ArrowLeft, Phone, Mail, Calendar, FileText, ArrowRightLeft, Heart, AlertTriangle, Shield, UserPlus, FolderOpen, Upload, File, Trash2, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { patients, clinicalNotes, appointments, referrals } from "@/data/mockData";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { patients, clinicalNotes, appointments, referrals, patientFiles, type PatientFile } from "@/data/mockData";
+import { toast } from "@/hooks/use-toast";
 
 const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   confirmada: { label: "✅ Confirmada", variant: "default" },

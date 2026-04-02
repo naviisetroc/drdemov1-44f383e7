@@ -46,7 +46,29 @@ export interface Referral {
   notes: string;
   summary: string;
   status?: "enviada" | "pendiente" | "aceptada";
+  attachments?: PatientFile[];
 }
+
+export interface PatientFile {
+  id: string;
+  patientId: string;
+  name: string;
+  type: "estudio" | "análisis" | "receta" | "imagen" | "otro";
+  date: string;
+  size: string;
+  notes?: string;
+}
+
+export const patientFiles: PatientFile[] = [
+  { id: "f1", patientId: "1", name: "Hemoglobina_glucosilada_Mar2026.pdf", type: "análisis", date: "2026-03-15", size: "245 KB", notes: "HbA1c: 8.2%" },
+  { id: "f2", patientId: "1", name: "Perfil_lipídico_Feb2026.pdf", type: "análisis", date: "2026-02-18", size: "180 KB", notes: "Colesterol total: 240, Triglicéridos: 198" },
+  { id: "f3", patientId: "1", name: "Electrocardiograma_Ene2026.pdf", type: "estudio", date: "2026-01-10", size: "1.2 MB" },
+  { id: "f4", patientId: "6", name: "Espirometria_Ago2024.pdf", type: "estudio", date: "2024-08-15", size: "890 KB", notes: "FEV1 72% del predicho" },
+  { id: "f5", patientId: "6", name: "Rx_torax_Ene2025.jpg", type: "imagen", date: "2025-01-20", size: "3.4 MB", notes: "Hiperinsuflación leve, sin infiltrados" },
+  { id: "f6", patientId: "9", name: "Creatinina_Mar2026.pdf", type: "análisis", date: "2026-03-17", size: "120 KB", notes: "Creatinina: 1.8 mg/dL" },
+  { id: "f7", patientId: "5", name: "Densitometria_osea_2025.pdf", type: "estudio", date: "2025-03-10", size: "2.1 MB", notes: "Osteopenia en columna lumbar" },
+  { id: "f8", patientId: "3", name: "Diario_cefaleas_Feb2026.pdf", type: "otro", date: "2026-02-28", size: "85 KB" },
+];
 
 export const patients: Patient[] = [
   {
