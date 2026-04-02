@@ -8,7 +8,7 @@ export default function Configuracion() {
     <div className="p-4 lg:p-8 space-y-6 max-w-3xl mx-auto">
       <div>
         <h1 className="font-display text-2xl font-bold">Configuración</h1>
-        <p className="text-sm text-muted-foreground">Administra tu perfil y preferencias</p>
+        <p className="text-sm text-destructive-foreground">Administra tu perfil y preferencias</p>
       </div>
 
       <Card className="glass border-border/40">
