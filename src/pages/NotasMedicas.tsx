@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { FileText, Plus, Mic, Type, Search, Sparkles, Loader2, Wand2, Download, Copy, CheckCircle2 } from "lucide-react";
+import { FileText, Plus, Mic, Type, Search, Sparkles, Loader2, Wand2, Download, Copy, CheckCircle2, Pencil, Upload, Paperclip, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
