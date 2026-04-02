@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRightLeft, Plus, FileDown, Sparkles, Loader2, Copy, CheckCircle2, Wand2 } from "lucide-react";
+import { ArrowRightLeft, Plus, FileDown, Sparkles, Loader2, Copy, CheckCircle2, Wand2, Pencil, Paperclip, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { referrals, patients, type Referral } from "@/data/mockData";
+import { Textarea as EditTextarea } from "@/components/ui/textarea";
+import { toast } from "@/hooks/use-toast";
 
 const referralTemplates: Record<string, string> = {
   neumologia: `**REFERENCIA MÉDICA**
@@ -106,6 +108,11 @@ export default function Referencias() {
   const [generatedRef, setGeneratedRef] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [extraRefs, setExtraRefs] = useState<Referral[]>([]);
+  const [attachments, setAttachments] = useState<string[]>([]);
+  const [editingRef, setEditingRef] = useState<Referral | null>(null);
+  const [editNotes, setEditNotes] = useState("");
+  const [editSummary, setEditSummary] = useState("");
+  const [editOpen, setEditOpen] = useState(false);
 
   const allRefs = [...referrals, ...extraRefs];
 
@@ -171,6 +178,33 @@ export default function Referencias() {
     setGenProgress(0);
   };
 
+  const handleAddAttachment = () => {
+    const fakeNames = ["Estudio_laboratorio.pdf", "Radiografia.jpg", "Analisis_sangre.pdf", "TAC.dcm", "Resonancia.pdf"];
+    const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+    setAttachments((prev) => [...prev, name]);
+  };
+
+  const handleRemoveAttachment = (idx: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleEditRef = (ref: Referral) => {
+    setEditingRef(ref);
+    setEditNotes(ref.notes);
+    setEditSummary(ref.summary);
+    setEditOpen(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingRef) return;
+    setExtraRefs((prev) =>
+      prev.map((r) => r.id === editingRef.id ? { ...r, notes: editNotes, summary: editSummary } : r)
+    );
+    setEditOpen(false);
+    setEditingRef(null);
+    toast({ title: "Referencia actualizada", description: "Los cambios se guardaron correctamente." });
+  };
+
   const renderRefContent = (content: string) => (
     <div
       className="text-sm whitespace-pre-line leading-relaxed"
@@ -227,6 +261,29 @@ export default function Referencias() {
               <div>
                 <label className="text-sm font-medium">Motivo de referencia y contexto clínico</label>
                 <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Describe el motivo de la referencia..." className="mt-1 min-h-[120px] bg-muted/30 border-border/40 rounded-xl" />
+              </div>
+
+              {/* File attachments */}
+              <div>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">Archivos adjuntos</label>
+                  <Button type="button" variant="outline" size="sm" className="gap-1.5 rounded-xl border-border/40" onClick={handleAddAttachment}>
+                    <Paperclip className="h-3.5 w-3.5" /> Adjuntar archivo
+                  </Button>
+                </div>
+                {attachments.length > 0 && (
+                  <div className="mt-2 space-y-1.5">
+                    {attachments.map((att, idx) => (
+                      <div key={idx} className="flex items-center gap-2 rounded-lg border border-border/30 bg-muted/20 px-3 py-1.5 text-sm">
+                        <Paperclip className="h-3.5 w-3.5 text-primary shrink-0" />
+                        <span className="flex-1 truncate">{att}</span>
+                        <button onClick={() => handleRemoveAttachment(idx)} className="text-muted-foreground hover:text-destructive transition-colors">
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <Button onClick={handleGenerate} className="w-full gap-2 h-11 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={generating || !notes.trim()}>
@@ -302,6 +359,9 @@ export default function Referencias() {
                 {renderRefContent(ref.summary)}
               </div>
               <div className="flex gap-2 pt-1">
+                <Button variant="outline" size="sm" className="gap-1.5" onClick={() => handleEditRef(ref)}>
+                  <Pencil className="h-3.5 w-3.5" /> Editar
+                </Button>
                 <Button variant="outline" size="sm" className="gap-1.5">
                   <Copy className="h-3.5 w-3.5" /> Copiar
                 </Button>
@@ -313,6 +373,37 @@ export default function Referencias() {
           </Card>
         ))}
       </div>
+
+      {/* Edit reference dialog */}
+      <Dialog open={editOpen} onOpenChange={(o) => { setEditOpen(o); if (!o) setEditingRef(null); }}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto glass-strong rounded-2xl border-border/40">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <Pencil className="h-5 w-5 text-primary" />
+              Editar Referencia Médica
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            {editingRef && (
+              <p className="text-sm text-muted-foreground">Paciente: <strong>{editingRef.patientName}</strong> — {editingRef.toSpecialty}</p>
+            )}
+            <div>
+              <label className="text-sm font-medium">Motivo de referencia</label>
+              <EditTextarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)} className="mt-1 min-h-[80px] bg-muted/30 border-border/40 rounded-xl" />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Resumen clínico</label>
+              <EditTextarea value={editSummary} onChange={(e) => setEditSummary(e.target.value)} className="mt-1 min-h-[200px] bg-muted/30 border-border/40 rounded-xl font-mono text-sm" />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleSaveEdit} className="flex-1 gap-2 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90">
+                <CheckCircle2 className="h-4 w-4" /> Guardar cambios
+              </Button>
+              <Button variant="outline" onClick={() => setEditOpen(false)} className="rounded-xl">Cancelar</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

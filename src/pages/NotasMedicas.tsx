@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { FileText, Plus, Mic, Type, Search, Sparkles, Loader2, Wand2, Download, Copy, CheckCircle2 } from "lucide-react";
+import { FileText, Plus, Mic, Type, Search, Sparkles, Loader2, Wand2, Download, Copy, CheckCircle2, Pencil, Upload, Paperclip, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { clinicalNotes, patients, type ClinicalNote } from "@/data/mockData";
+import { toast } from "@/hooks/use-toast";
 
 const noteTemplates: Record<string, string> = {
   asma: `📋 **NOTA MÉDICA — Generada por IA**
@@ -126,6 +127,10 @@ export default function NotasMedicas() {
   const [optimizing, setOptimizing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [extraNotes, setExtraNotes] = useState<ClinicalNote[]>([]);
+  const [attachments, setAttachments] = useState<string[]>([]);
+  const [editingNote, setEditingNote] = useState<ClinicalNote | null>(null);
+  const [editText, setEditText] = useState("");
+  const [editOpen, setEditOpen] = useState(false);
   const progressRef = useRef<ReturnType<typeof setInterval>>();
 
   const allNotes = [...clinicalNotes, ...extraNotes];
@@ -211,6 +216,33 @@ export default function NotasMedicas() {
     return () => { if (progressRef.current) clearInterval(progressRef.current); };
   }, []);
 
+  const handleAddAttachment = () => {
+    const fakeNames = ["Estudio_laboratorio.pdf", "Radiografia.jpg", "Analisis_sangre.pdf", "Electrocardiograma.pdf", "TAC_craneo.dcm"];
+    const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+    setAttachments((prev) => [...prev, name]);
+  };
+
+  const handleRemoveAttachment = (idx: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleEditNote = (note: ClinicalNote) => {
+    setEditingNote(note);
+    setEditText(note.aiOutput);
+    setEditOpen(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingNote) return;
+    // Update in extraNotes if it's there, otherwise we'd need to handle mockData
+    setExtraNotes((prev) =>
+      prev.map((n) => n.id === editingNote.id ? { ...n, aiOutput: editText } : n)
+    );
+    setEditOpen(false);
+    setEditingNote(null);
+    toast({ title: "Nota actualizada", description: "Los cambios se guardaron correctamente." });
+  };
+
   return (
     <div className="p-4 lg:p-8 space-y-6 max-w-5xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -283,6 +315,29 @@ export default function NotasMedicas() {
                   }
                   className="mt-1 min-h-[120px] bg-muted/30 border-border/40 rounded-xl"
                 />
+              </div>
+
+              {/* File attachments */}
+              <div>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">Archivos adjuntos</label>
+                  <Button type="button" variant="outline" size="sm" className="gap-1.5 rounded-xl border-border/40" onClick={handleAddAttachment}>
+                    <Paperclip className="h-3.5 w-3.5" /> Adjuntar archivo
+                  </Button>
+                </div>
+                {attachments.length > 0 && (
+                  <div className="mt-2 space-y-1.5">
+                    {attachments.map((att, idx) => (
+                      <div key={idx} className="flex items-center gap-2 rounded-lg border border-border/30 bg-muted/20 px-3 py-1.5 text-sm">
+                        <Paperclip className="h-3.5 w-3.5 text-primary shrink-0" />
+                        <span className="flex-1 truncate">{att}</span>
+                        <button onClick={() => handleRemoveAttachment(idx)} className="text-muted-foreground hover:text-destructive transition-colors">
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Generate button */}
@@ -398,6 +453,9 @@ export default function NotasMedicas() {
                   <p className="text-sm text-muted-foreground italic">{note.rawInput}</p>
                 </div>
                 <div className="flex gap-1 shrink-0">
+                  <Button variant="ghost" size="sm" className="gap-1 text-xs h-7" onClick={() => handleEditNote(note)}>
+                    <Pencil className="h-3 w-3" /> Editar
+                  </Button>
                   <Button variant="ghost" size="sm" className="gap-1 text-xs h-7">
                     <Copy className="h-3 w-3" /> Copiar
                   </Button>
@@ -410,6 +468,34 @@ export default function NotasMedicas() {
           </Card>
         ))}
       </div>
+
+      {/* Edit note dialog */}
+      <Dialog open={editOpen} onOpenChange={(o) => { setEditOpen(o); if (!o) setEditingNote(null); }}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto glass-strong rounded-2xl border-border/40">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <Pencil className="h-5 w-5 text-primary" />
+              Editar Nota Médica
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            {editingNote && (
+              <p className="text-sm text-muted-foreground">Paciente: <strong>{editingNote.patientName}</strong> — {new Date(editingNote.date).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</p>
+            )}
+            <Textarea
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              className="min-h-[300px] bg-muted/30 border-border/40 rounded-xl font-mono text-sm"
+            />
+            <div className="flex gap-2">
+              <Button onClick={handleSaveEdit} className="flex-1 gap-2 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90">
+                <CheckCircle2 className="h-4 w-4" /> Guardar cambios
+              </Button>
+              <Button variant="outline" onClick={() => setEditOpen(false)} className="rounded-xl">Cancelar</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

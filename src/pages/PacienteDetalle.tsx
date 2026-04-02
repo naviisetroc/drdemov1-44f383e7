@@ -1,11 +1,17 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Phone, Mail, Calendar, FileText, ArrowRightLeft, Heart, AlertTriangle, Shield, UserPlus } from "lucide-react";
+import { ArrowLeft, Phone, Mail, Calendar, FileText, ArrowRightLeft, Heart, AlertTriangle, Shield, UserPlus, FolderOpen, Upload, File, Trash2, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { patients, clinicalNotes, appointments, referrals } from "@/data/mockData";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { patients, clinicalNotes, appointments, referrals, patientFiles, type PatientFile } from "@/data/mockData";
+import { toast } from "@/hooks/use-toast";
 
 const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   confirmada: { label: "✅ Confirmada", variant: "default" },
@@ -17,6 +23,11 @@ const statusConfig: Record<string, { label: string; variant: "default" | "second
 export default function PacienteDetalle() {
   const { id } = useParams();
   const patient = patients.find((p) => p.id === id);
+  const [extraFiles, setExtraFiles] = useState<PatientFile[]>([]);
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [fileName, setFileName] = useState("");
+  const [fileType, setFileType] = useState<PatientFile["type"]>("estudio");
+  const [fileNotes, setFileNotes] = useState("");
 
   if (!patient) {
     return (
@@ -31,6 +42,31 @@ export default function PacienteDetalle() {
   const patientNotes = clinicalNotes.filter((n) => n.patientId === id);
   const patientAppts = appointments.filter((a) => a.patientId === id);
   const patientRefs = referrals.filter((r) => r.patientId === id);
+  const allFiles = [...patientFiles.filter((f) => f.patientId === id), ...extraFiles];
+
+  const handleUploadFile = () => {
+    if (!fileName.trim()) return;
+    const newFile: PatientFile = {
+      id: Date.now().toString(),
+      patientId: id || "",
+      name: fileName,
+      type: fileType,
+      date: new Date().toISOString().split("T")[0],
+      size: `${Math.floor(Math.random() * 5000 + 100)} KB`,
+      notes: fileNotes || undefined,
+    };
+    setExtraFiles((prev) => [newFile, ...prev]);
+    setUploadOpen(false);
+    setFileName("");
+    setFileNotes("");
+    setFileType("estudio");
+    toast({ title: "Archivo subido", description: `${fileName} se agregó al expediente del paciente.` });
+  };
+
+  const handleDeleteFile = (fileId: string) => {
+    setExtraFiles((prev) => prev.filter((f) => f.id !== fileId));
+    toast({ title: "Archivo eliminado", description: "El archivo fue removido del expediente." });
+  };
 
   return (
     <div className="p-4 lg:p-8 space-y-6 max-w-5xl mx-auto">
@@ -255,6 +291,118 @@ export default function PacienteDetalle() {
                 <p className="text-sm text-muted-foreground">{ref.summary}</p>
               </div>
             ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Expedientes / Files */}
+      {!isNewPatient && (
+        <Card className="glass border-border/40">
+          <CardHeader className="pb-3">
+            <CardTitle className="font-display text-base flex items-center gap-2">
+              <div className="h-7 w-7 rounded-lg bg-primary/15 flex items-center justify-center">
+                <FolderOpen className="h-3.5 w-3.5 text-primary" />
+              </div>
+              Expedientes y Archivos
+              <Badge variant="secondary" className="text-[10px] ml-auto bg-primary/10 text-primary border-primary/20">{allFiles.length} archivos</Badge>
+              <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-1.5 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 ml-2">
+                    <Upload className="h-3.5 w-3.5" /> Subir archivo
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md glass-strong rounded-2xl border-border/40">
+                  <DialogHeader>
+                    <DialogTitle className="font-display flex items-center gap-2">
+                      <Upload className="h-5 w-5 text-primary" />
+                      Subir archivo al expediente
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-2">
+                    <div>
+                      <label className="text-sm font-medium">Nombre del archivo</label>
+                      <Input value={fileName} onChange={(e) => setFileName(e.target.value)} placeholder="Ej: Hemoglobina_glucosilada.pdf" className="mt-1 bg-muted/30 border-border/40 rounded-xl" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Tipo de documento</label>
+                      <Select value={fileType} onValueChange={(v) => setFileType(v as PatientFile["type"])}>
+                        <SelectTrigger className="mt-1 bg-muted/30 border-border/40 rounded-xl">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="estudio">📊 Estudio</SelectItem>
+                          <SelectItem value="análisis">🧪 Análisis</SelectItem>
+                          <SelectItem value="receta">💊 Receta</SelectItem>
+                          <SelectItem value="imagen">🖼️ Imagen médica</SelectItem>
+                          <SelectItem value="otro">📄 Otro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Notas (opcional)</label>
+                      <Textarea value={fileNotes} onChange={(e) => setFileNotes(e.target.value)} placeholder="Descripción o resultados relevantes..." className="mt-1 min-h-[80px] bg-muted/30 border-border/40 rounded-xl" />
+                    </div>
+                    <div className="rounded-xl border-2 border-dashed border-border/40 p-6 text-center hover:border-primary/40 transition-colors cursor-pointer">
+                      <Upload className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">Arrastra un archivo aquí o haz clic para seleccionar</p>
+                      <p className="text-xs text-muted-foreground/60 mt-1">PDF, JPG, PNG, DICOM — Máx. 20 MB</p>
+                    </div>
+                    <Button onClick={handleUploadFile} className="w-full gap-2 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={!fileName.trim()}>
+                      <Upload className="h-4 w-4" /> Subir archivo
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {allFiles.length === 0 ? (
+              <div className="text-center py-8">
+                <FolderOpen className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No hay archivos en el expediente.</p>
+                <Button variant="outline" size="sm" className="mt-3 gap-1.5 rounded-xl border-border/40" onClick={() => setUploadOpen(true)}>
+                  <Upload className="h-3.5 w-3.5" /> Subir primer archivo
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {allFiles.map((file) => {
+                  const typeIcons: Record<string, string> = { estudio: "📊", "análisis": "🧪", receta: "💊", imagen: "🖼️", otro: "📄" };
+                  return (
+                    <div key={file.id} className="flex items-center gap-3 rounded-xl border border-border/30 p-3 bg-muted/10 hover:border-primary/20 transition-all">
+                      <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center text-lg shrink-0">
+                        {typeIcons[file.type] || "📄"}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{file.name}</p>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span>{new Date(file.date).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" })}</span>
+                          <span>·</span>
+                          <span>{file.size}</span>
+                          {file.notes && <><span>·</span><span className="truncate">{file.notes}</span></>}
+                        </div>
+                      </div>
+                      <div className="flex gap-1 shrink-0">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Eye className="h-3.5 w-3.5" /></Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Ver archivo</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive hover:text-destructive" onClick={() => handleDeleteFile(file.id)}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Eliminar</TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
