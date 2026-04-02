@@ -453,6 +453,9 @@ export default function NotasMedicas() {
                   <p className="text-sm text-muted-foreground italic">{note.rawInput}</p>
                 </div>
                 <div className="flex gap-1 shrink-0">
+                  <Button variant="ghost" size="sm" className="gap-1 text-xs h-7" onClick={() => handleEditNote(note)}>
+                    <Pencil className="h-3 w-3" /> Editar
+                  </Button>
                   <Button variant="ghost" size="sm" className="gap-1 text-xs h-7">
                     <Copy className="h-3 w-3" /> Copiar
                   </Button>
