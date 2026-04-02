@@ -216,7 +216,7 @@ export default function NotasMedicas() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold">Notas Médicas</h1>
-          <p className="text-sm text-muted-foreground">Notas clínicas asistidas por IA — Formato estructurado profesional</p>
+          <p className="text-sm text-destructive-foreground">Notas clínicas asistidas por IA — Formato estructurado profesional</p>
         </div>
         <Dialog open={newNoteOpen} onOpenChange={(open) => { setNewNoteOpen(open); if (!open) { setGeneratedNote(null); setNoteText(""); setGenProgress(0); } }}>
           <DialogTrigger asChild>
