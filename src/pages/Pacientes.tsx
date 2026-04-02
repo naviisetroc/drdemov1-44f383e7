@@ -32,7 +32,7 @@ export default function Pacientes() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold">Pacientes</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-destructive-foreground">
             {patients.filter(p => p.status === "activo" && p.id !== "10").length} registrados · {chatPats.length} nuevos vía chat
           </p>
         </div>
@@ -50,7 +50,7 @@ export default function Pacientes() {
       {/* Search & filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-secondary-foreground" />
           <Input
             placeholder="Buscar por nombre o condición..."
             value={search}
@@ -70,7 +70,7 @@ export default function Pacientes() {
               variant={filter === f.key ? "default" : "outline"}
               size="sm"
               onClick={() => setFilter(f.key as typeof filter)}
-              className={`rounded-xl ${filter === f.key ? "bg-primary/20 text-primary border-primary/30 hover:bg-primary/30" : "border-border/40 hover:border-primary/30"}`}
+              className={`rounded-xl ${filter === f.key ? "bg-primary/20 text-destructive-foreground border-primary/30 hover:bg-primary/30" : "border-border/40 hover:border-primary/30"}`}
             >
               {f.label}
             </Button>
