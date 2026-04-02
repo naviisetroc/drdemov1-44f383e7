@@ -216,6 +216,33 @@ export default function NotasMedicas() {
     return () => { if (progressRef.current) clearInterval(progressRef.current); };
   }, []);
 
+  const handleAddAttachment = () => {
+    const fakeNames = ["Estudio_laboratorio.pdf", "Radiografia.jpg", "Analisis_sangre.pdf", "Electrocardiograma.pdf", "TAC_craneo.dcm"];
+    const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+    setAttachments((prev) => [...prev, name]);
+  };
+
+  const handleRemoveAttachment = (idx: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleEditNote = (note: ClinicalNote) => {
+    setEditingNote(note);
+    setEditText(note.aiOutput);
+    setEditOpen(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingNote) return;
+    // Update in extraNotes if it's there, otherwise we'd need to handle mockData
+    setExtraNotes((prev) =>
+      prev.map((n) => n.id === editingNote.id ? { ...n, aiOutput: editText } : n)
+    );
+    setEditOpen(false);
+    setEditingNote(null);
+    toast({ title: "Nota actualizada", description: "Los cambios se guardaron correctamente." });
+  };
+
   return (
     <div className="p-4 lg:p-8 space-y-6 max-w-5xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
