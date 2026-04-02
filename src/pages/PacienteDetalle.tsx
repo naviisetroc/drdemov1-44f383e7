@@ -28,7 +28,6 @@ export default function PacienteDetalle() {
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState<PatientFile["type"]>("estudio");
   const [fileNotes, setFileNotes] = useState("");
-  const patient = patients.find((p) => p.id === id);
 
   if (!patient) {
     return (
