@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { clinicalNotes, patients, type ClinicalNote } from "@/data/mockData";
+import { toast } from "@/hooks/use-toast";
 
 const noteTemplates: Record<string, string> = {
   asma: `📋 **NOTA MÉDICA — Generada por IA**
