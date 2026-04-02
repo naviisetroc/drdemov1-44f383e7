@@ -205,6 +205,7 @@ export default function Referencias() {
     toast({ title: "Referencia actualizada", description: "Los cambios se guardaron correctamente." });
   };
 
+  const renderRefContent = (content: string) => (
     <div
       className="text-sm whitespace-pre-line leading-relaxed"
       dangerouslySetInnerHTML={{
