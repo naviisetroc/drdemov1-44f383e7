@@ -42,6 +42,31 @@ export default function PacienteDetalle() {
   const patientNotes = clinicalNotes.filter((n) => n.patientId === id);
   const patientAppts = appointments.filter((a) => a.patientId === id);
   const patientRefs = referrals.filter((r) => r.patientId === id);
+  const allFiles = [...patientFiles.filter((f) => f.patientId === id), ...extraFiles];
+
+  const handleUploadFile = () => {
+    if (!fileName.trim()) return;
+    const newFile: PatientFile = {
+      id: Date.now().toString(),
+      patientId: id || "",
+      name: fileName,
+      type: fileType,
+      date: new Date().toISOString().split("T")[0],
+      size: `${Math.floor(Math.random() * 5000 + 100)} KB`,
+      notes: fileNotes || undefined,
+    };
+    setExtraFiles((prev) => [newFile, ...prev]);
+    setUploadOpen(false);
+    setFileName("");
+    setFileNotes("");
+    setFileType("estudio");
+    toast({ title: "Archivo subido", description: `${fileName} se agregó al expediente del paciente.` });
+  };
+
+  const handleDeleteFile = (fileId: string) => {
+    setExtraFiles((prev) => prev.filter((f) => f.id !== fileId));
+    toast({ title: "Archivo eliminado", description: "El archivo fue removido del expediente." });
+  };
 
   return (
     <div className="p-4 lg:p-8 space-y-6 max-w-5xl mx-auto">
