@@ -468,6 +468,34 @@ export default function NotasMedicas() {
           </Card>
         ))}
       </div>
+
+      {/* Edit note dialog */}
+      <Dialog open={editOpen} onOpenChange={(o) => { setEditOpen(o); if (!o) setEditingNote(null); }}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto glass-strong rounded-2xl border-border/40">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <Pencil className="h-5 w-5 text-primary" />
+              Editar Nota Médica
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            {editingNote && (
+              <p className="text-sm text-muted-foreground">Paciente: <strong>{editingNote.patientName}</strong> — {new Date(editingNote.date).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</p>
+            )}
+            <Textarea
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              className="min-h-[300px] bg-muted/30 border-border/40 rounded-xl font-mono text-sm"
+            />
+            <div className="flex gap-2">
+              <Button onClick={handleSaveEdit} className="flex-1 gap-2 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90">
+                <CheckCircle2 className="h-4 w-4" /> Guardar cambios
+              </Button>
+              <Button variant="outline" onClick={() => setEditOpen(false)} className="rounded-xl">Cancelar</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
