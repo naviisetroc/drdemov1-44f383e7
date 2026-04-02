@@ -178,7 +178,33 @@ export default function Referencias() {
     setGenProgress(0);
   };
 
-  const renderRefContent = (content: string) => (
+  const handleAddAttachment = () => {
+    const fakeNames = ["Estudio_laboratorio.pdf", "Radiografia.jpg", "Analisis_sangre.pdf", "TAC.dcm", "Resonancia.pdf"];
+    const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+    setAttachments((prev) => [...prev, name]);
+  };
+
+  const handleRemoveAttachment = (idx: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleEditRef = (ref: Referral) => {
+    setEditingRef(ref);
+    setEditNotes(ref.notes);
+    setEditSummary(ref.summary);
+    setEditOpen(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingRef) return;
+    setExtraRefs((prev) =>
+      prev.map((r) => r.id === editingRef.id ? { ...r, notes: editNotes, summary: editSummary } : r)
+    );
+    setEditOpen(false);
+    setEditingRef(null);
+    toast({ title: "Referencia actualizada", description: "Los cambios se guardaron correctamente." });
+  };
+
     <div
       className="text-sm whitespace-pre-line leading-relaxed"
       dangerouslySetInnerHTML={{
