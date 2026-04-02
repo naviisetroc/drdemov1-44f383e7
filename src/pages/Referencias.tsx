@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { referrals, patients, type Referral } from "@/data/mockData";
+import { Textarea as EditTextarea } from "@/components/ui/textarea";
+import { toast } from "@/hooks/use-toast";
 
 const referralTemplates: Record<string, string> = {
   neumologia: `**REFERENCIA MÉDICA**
