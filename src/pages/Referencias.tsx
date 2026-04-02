@@ -263,6 +263,29 @@ export default function Referencias() {
                 <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Describe el motivo de la referencia..." className="mt-1 min-h-[120px] bg-muted/30 border-border/40 rounded-xl" />
               </div>
 
+              {/* File attachments */}
+              <div>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">Archivos adjuntos</label>
+                  <Button type="button" variant="outline" size="sm" className="gap-1.5 rounded-xl border-border/40" onClick={handleAddAttachment}>
+                    <Paperclip className="h-3.5 w-3.5" /> Adjuntar archivo
+                  </Button>
+                </div>
+                {attachments.length > 0 && (
+                  <div className="mt-2 space-y-1.5">
+                    {attachments.map((att, idx) => (
+                      <div key={idx} className="flex items-center gap-2 rounded-lg border border-border/30 bg-muted/20 px-3 py-1.5 text-sm">
+                        <Paperclip className="h-3.5 w-3.5 text-primary shrink-0" />
+                        <span className="flex-1 truncate">{att}</span>
+                        <button onClick={() => handleRemoveAttachment(idx)} className="text-muted-foreground hover:text-destructive transition-colors">
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <Button onClick={handleGenerate} className="w-full gap-2 h-11 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={generating || !notes.trim()}>
                 {generating ? (
                   <><Loader2 className="h-4 w-4 animate-spin" /> {genStep}</>
