@@ -127,6 +127,10 @@ export default function NotasMedicas() {
   const [optimizing, setOptimizing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [extraNotes, setExtraNotes] = useState<ClinicalNote[]>([]);
+  const [attachments, setAttachments] = useState<string[]>([]);
+  const [editingNote, setEditingNote] = useState<ClinicalNote | null>(null);
+  const [editText, setEditText] = useState("");
+  const [editOpen, setEditOpen] = useState(false);
   const progressRef = useRef<ReturnType<typeof setInterval>>();
 
   const allNotes = [...clinicalNotes, ...extraNotes];
