@@ -34,7 +34,7 @@ export default function Agenda() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold">Agenda</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-destructive-foreground">
             {upcoming.length} citas próximas · Semana del 23 al 29 de marzo
           </p>
         </div>
@@ -51,7 +51,7 @@ export default function Agenda() {
 
       {/* Summary badges */}
       <div className="flex gap-2 flex-wrap">
-        <Badge variant="default" className="gap-1 py-1.5 px-3 rounded-xl bg-primary/15 text-primary border border-primary/20">
+        <Badge variant="outline" className="gap-1 py-1.5 px-3 rounded-xl border border-primary/20 bg-primary text-destructive-foreground">
           <CheckCircle2 className="h-3 w-3" /> {upcoming.filter(a => a.status === "confirmada").length} confirmadas
         </Badge>
         <Badge variant="outline" className="gap-1 py-1.5 px-3 rounded-xl border-warning/30 text-warning">
@@ -61,7 +61,7 @@ export default function Agenda() {
           <CheckCircle2 className="h-3 w-3" /> {past.filter(a => a.status === "completada").length} completadas
         </Badge>
         {chatAppointments.length > 0 && (
-          <Badge variant="outline" className="gap-1 py-1.5 px-3 rounded-xl border-success/30 text-success">
+          <Badge variant="outline" className="gap-1 py-1.5 px-3 rounded-xl border border-primary/20 text-amber-400 bg-primary">
             <MessageCircle className="h-3 w-3" /> {chatAppointments.length} vía chat
           </Badge>
         )}
