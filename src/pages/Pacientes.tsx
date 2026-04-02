@@ -36,13 +36,36 @@ export default function Pacientes() {
             {patients.filter(p => p.status === "activo" && p.id !== "10").length} registrados · {chatPats.length} nuevos vía chat
           </p>
         </div>
-...
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button className="gap-2 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all">
+              <Plus className="h-4 w-4" />
+              Nuevo paciente
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Registrar un nuevo paciente</TooltipContent>
+        </Tooltip>
+      </div>
+
       {/* Search & filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-secondary-foreground" />
           <Input
-...
+            placeholder="Buscar por nombre o condición..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 bg-muted/30 border-border/40 rounded-xl focus:border-primary/50"
+          />
+        </div>
+        <div className="flex gap-2">
+          {([
+            { key: "todos", label: "Todos" },
+            { key: "activo", label: "Activos" },
+            { key: "nuevo", label: `Nuevos (${chatPats.length})` },
+            { key: "inactivo", label: "Inactivos" },
+          ] as const).map((f) => (
+            <Button
               key={f.key}
               variant={filter === f.key ? "default" : "outline"}
               size="sm"
