@@ -76,7 +76,7 @@ export default function PacienteDetalle() {
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 font-display text-lg font-bold text-primary">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 font-display text-lg font-bold text-destructive-foreground bg-muted-foreground">
           {isNewPatient ? <UserPlus className="h-6 w-6" /> : patient.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
         </div>
         <div className="flex-1">
