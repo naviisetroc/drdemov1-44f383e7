@@ -84,7 +84,7 @@ export default function PacienteDetalle() {
             <h1 className="font-display text-xl font-bold">{patient.name}</h1>
             <Badge variant={patient.status === "activo" ? "default" : "secondary"} className="rounded-full bg-primary/15 text-primary border-primary/20">{patient.status}</Badge>
           </div>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-sm mt-0.5 text-lime-300">
             {isNewPatient
               ? "Paciente nuevo — Sin información registrada"
               : `${patient.age} años · ${patient.sex === "M" ? "Masculino" : "Femenino"}${patient.bloodType ? ` · Tipo ${patient.bloodType}` : ""}`
