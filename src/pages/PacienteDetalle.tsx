@@ -70,7 +70,7 @@ export default function PacienteDetalle() {
 
   return (
     <div className="p-4 lg:p-8 space-y-6 max-w-5xl mx-auto">
-      <Link to="/pacientes" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
+      <Link to="/pacientes" className="inline-flex items-center gap-1 text-sm transition-colors text-destructive-foreground">
         <ArrowLeft className="h-4 w-4" /> Volver a pacientes
       </Link>
 
