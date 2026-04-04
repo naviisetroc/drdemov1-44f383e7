@@ -70,13 +70,13 @@ export default function PacienteDetalle() {
 
   return (
     <div className="p-4 lg:p-8 space-y-6 max-w-5xl mx-auto">
-      <Link to="/pacientes" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
+      <Link to="/pacientes" className="inline-flex items-center gap-1 text-sm transition-colors text-destructive-foreground">
         <ArrowLeft className="h-4 w-4" /> Volver a pacientes
       </Link>
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 font-display text-lg font-bold text-primary">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 font-display text-lg font-bold text-destructive-foreground bg-muted-foreground">
           {isNewPatient ? <UserPlus className="h-6 w-6" /> : patient.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
         </div>
         <div className="flex-1">
@@ -84,7 +84,7 @@ export default function PacienteDetalle() {
             <h1 className="font-display text-xl font-bold">{patient.name}</h1>
             <Badge variant={patient.status === "activo" ? "default" : "secondary"} className="rounded-full bg-primary/15 text-primary border-primary/20">{patient.status}</Badge>
           </div>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-sm mt-0.5 text-lime-300">
             {isNewPatient
               ? "Paciente nuevo — Sin información registrada"
               : `${patient.age} años · ${patient.sex === "M" ? "Masculino" : "Femenino"}${patient.bloodType ? ` · Tipo ${patient.bloodType}` : ""}`
@@ -265,7 +265,7 @@ export default function PacienteDetalle() {
         <Card className="glass border-border/40">
           <CardHeader className="pb-3">
             <CardTitle className="font-display text-base flex items-center gap-2">
-              <div className="h-7 w-7 rounded-lg bg-accent/15 flex items-center justify-center">
+              <div className="h-7 w-7 rounded-lg flex items-center justify-center bg-yellow-400">
                 <ArrowRightLeft className="h-3.5 w-3.5 text-accent" />
               </div>
               Referencias Médicas
@@ -277,7 +277,7 @@ export default function PacienteDetalle() {
               <div key={ref.id} className="rounded-xl border border-border/30 p-4 space-y-2 bg-muted/10">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Badge className="rounded-full bg-accent/15 text-accent border-accent/20">{ref.toSpecialty}</Badge>
+                    <Badge className="rounded-full bg-accent/15 border-accent/20 text-yellow-300">{ref.toSpecialty}</Badge>
                     {ref.status && (
                       <Badge variant={ref.status === "enviada" ? "default" : ref.status === "aceptada" ? "secondary" : "outline"} className="text-[10px] rounded-full">
                         {ref.status === "enviada" ? "📨 Enviada" : ref.status === "aceptada" ? "✅ Aceptada" : "🕐 Pendiente"}
