@@ -265,7 +265,7 @@ export default function PacienteDetalle() {
         <Card className="glass border-border/40">
           <CardHeader className="pb-3">
             <CardTitle className="font-display text-base flex items-center gap-2">
-              <div className="h-7 w-7 rounded-lg bg-accent/15 flex items-center justify-center">
+              <div className="h-7 w-7 rounded-lg flex items-center justify-center bg-yellow-400">
                 <ArrowRightLeft className="h-3.5 w-3.5 text-accent" />
               </div>
               Referencias Médicas
