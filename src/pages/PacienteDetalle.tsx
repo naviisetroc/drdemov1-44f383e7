@@ -277,7 +277,7 @@ export default function PacienteDetalle() {
               <div key={ref.id} className="rounded-xl border border-border/30 p-4 space-y-2 bg-muted/10">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Badge className="rounded-full bg-accent/15 text-accent border-accent/20">{ref.toSpecialty}</Badge>
+                    <Badge className="rounded-full bg-accent/15 border-accent/20 text-yellow-300">{ref.toSpecialty}</Badge>
                     {ref.status && (
                       <Badge variant={ref.status === "enviada" ? "default" : ref.status === "aceptada" ? "secondary" : "outline"} className="text-[10px] rounded-full">
                         {ref.status === "enviada" ? "📨 Enviada" : ref.status === "aceptada" ? "✅ Aceptada" : "🕐 Pendiente"}
