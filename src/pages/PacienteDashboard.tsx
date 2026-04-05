@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getChatPatients, getChatAppointments, ChatPatient } from "@/stores/patientChatStore";
 import { Appointment } from "@/data/mockData";
+import { getPatientPrescriptions, getPatientIndications } from "@/stores/patientMockPrescriptions";
+import PatientChatWidget from "@/components/PatientChatWidget";
 
 interface PatientSession {
   id: string;
