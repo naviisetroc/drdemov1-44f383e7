@@ -135,7 +135,7 @@ function generatePatientResponse(q: string, patient: ChatPatient): string {
 
   // --- Help ---
   if (lower.includes("ayuda") || lower.includes("qué puedes") || lower.includes("que puedes") || lower.includes("opciones") || lower.includes("menú") || lower.includes("menu")) {
-    return "Puedo ayudarte con:\n\n• 📅 **\"¿Cuándo es mi cita?\"** — Ver tus citas\n• 📅 **\"Quiero una cita\"** — Agendar nueva cita\n• 🔄 **\"Quiero reagendar\"** — Cambiar fecha de cita\n• 💊 **\"¿Qué me recetaron?\"** — Ver tus recetas\n• 📋 **\"Indicaciones\"** — Ver cuidados e instrucciones\n• 👤 **\"Mi historial\"** — Ver tu información médica\n\n¿En qué te puedo ayudar? 😊";
+    return "Puedo ayudarte con:\n\n• 📅 **\"¿Cuándo es mi cita?\"** — Ver tus citas\n• 📅 **\"Quiero una cita\"** — Agendar nueva cita\n• 🔄 **\"Quiero reagendar\"** — Cambiar fecha de cita\n• 💊 **\"¿Qué me recetaron?\"** — Ver tus recetas\n• 📋 **\"Indicaciones\"** — Ver cuidados e instrucciones\n• 📊 **\"Mis síntomas\"** — Ver tus registros de síntomas\n• 👤 **\"Mi historial\"** — Ver tu información médica\n\n¿En qué te puedo ayudar? 😊";
   }
 
   // --- Greetings ---
