@@ -20,6 +20,8 @@ export default function PacienteDashboard() {
   const [session, setSession] = useState<PatientSession | null>(null);
   const [patient, setPatient] = useState<ChatPatient | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const prescriptions = patient ? getPatientPrescriptions(patient.id) : [];
+  const indications = patient ? getPatientIndications(patient.id) : [];
 
   useEffect(() => {
     const raw = localStorage.getItem("medisec_patient_session");
