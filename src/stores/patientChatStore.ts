@@ -1,16 +1,21 @@
 import { Patient, Appointment } from "@/data/mockData";
 
+export type PatientAccountType = "temporal" | "registrado";
+
 export interface ChatPatient {
   id: string;
   name: string;
   age: number;
   sex: "M" | "F";
   phone: string;
+  email?: string;
   reason: string;
   symptoms: string;
   history: string;
   summary: string;
   createdAt: string;
+  accountType: PatientAccountType;
+  password?: string; // mock-only, never do this in production
 }
 
 interface PatientChatStore {
