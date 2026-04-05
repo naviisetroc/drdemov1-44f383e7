@@ -23,6 +23,7 @@ import { getPatientPrescriptions, getPatientIndications } from "@/stores/patient
 import PatientChatWidget from "@/components/PatientChatWidget";
 import PatientAppointments from "@/components/PatientAppointments";
 import PatientMedicalHistory from "@/components/PatientMedicalHistory";
+import PatientFiles from "@/components/PatientFiles";
 
 interface PatientSession {
   id: string;
@@ -203,23 +204,7 @@ export default function PacienteDashboard() {
         />
 
         {/* ─── ARCHIVOS ─── */}
-        <Card className="glass-strong border-border/30 shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Folder className="h-4 w-4 text-primary" />
-              Archivos y estudios
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center text-center py-6 text-muted-foreground">
-              <Folder className="h-10 w-10 mb-2 opacity-30" />
-              <p className="text-sm">Sin archivos por el momento</p>
-              <p className="text-xs mt-1">
-                Aquí aparecerán tus estudios, análisis y documentos médicos.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <PatientFiles patientId={patient.id} />
       </div>
 
       {/* Floating Chat Widget */}
