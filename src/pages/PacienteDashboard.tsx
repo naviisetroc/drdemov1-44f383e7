@@ -1,6 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, FileText, LogOut, Stethoscope, Clock, User } from "lucide-react";
+import {
+  Calendar,
+  FileText,
+  LogOut,
+  Stethoscope,
+  Clock,
+  User,
+  MessageCircle,
+  AlertCircle,
+  CheckCircle2,
+  Activity,
+  ChevronRight,
+  Folder,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,11 +28,41 @@ interface PatientSession {
   email: string;
 }
 
+function getPatientStatus(appointments: Appointment[]): {
+  label: string;
+  color: string;
+  icon: React.ReactNode;
+} {
+  const upcoming = appointments.filter(
+    (a) => a.status === "programada" || a.status === "confirmada"
+  );
+  if (upcoming.length > 0)
+    return {
+      label: "En tratamiento",
+      color: "bg-amber-500/15 text-amber-600 border-amber-500/20",
+      icon: <Activity className="h-3.5 w-3.5" />,
+    };
+  const completed = appointments.filter((a) => a.status === "completada");
+  if (completed.length > 0)
+    return {
+      label: "Finalizado",
+      color: "bg-green-500/15 text-green-600 border-green-500/20",
+      icon: <CheckCircle2 className="h-3.5 w-3.5" />,
+    };
+  return {
+    label: "Pendiente",
+    color: "bg-blue-500/15 text-blue-600 border-blue-500/20",
+    icon: <AlertCircle className="h-3.5 w-3.5" />,
+  };
+}
+
 export default function PacienteDashboard() {
   const navigate = useNavigate();
   const [session, setSession] = useState<PatientSession | null>(null);
   const [patient, setPatient] = useState<ChatPatient | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [chatOpen, setChatOpen] = useState(false);
+
   const prescriptions = patient ? getPatientPrescriptions(patient.id) : [];
   const indications = patient ? getPatientIndications(patient.id) : [];
 
@@ -47,6 +90,12 @@ export default function PacienteDashboard() {
 
   if (!session || !patient) return null;
 
+  const status = getPatientStatus(appointments);
+  const nextAppointment = appointments
+    .filter((a) => a.status === "programada" || a.status === "confirmada")
+    .sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime())[0];
+  const lastIndication = indications.length > 0 ? indications[indications.length - 1] : null;
+
   return (
     <div className="min-h-screen gradient-bg">
       {/* Header */}
@@ -56,55 +105,104 @@ export default function PacienteDashboard() {
         </div>
         <div className="flex-1">
           <h1 className="font-semibold text-sm">Portal del Paciente</h1>
-          <p className="text-xs opacity-80">Bienvenido/a, {patient.name}</p>
+          <p className="text-xs opacity-80">Bienvenido/a, {patient.name.split(" ")[0]}</p>
         </div>
-        <Button variant="ghost" size="icon" onClick={handleLogout} className="text-primary-foreground hover:bg-primary-foreground/20 rounded-xl">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleLogout}
+          className="text-primary-foreground hover:bg-primary-foreground/20 rounded-xl"
+        >
           <LogOut className="h-4 w-4" />
         </Button>
       </header>
 
       <div className="max-w-2xl mx-auto p-4 space-y-4">
-        {/* Patient Info */}
-        <Card className="glass-strong border-border/30 shadow-sm">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20">
-                <User className="h-6 w-6 text-primary" />
+        {/* ─── HERO SUMMARY ─── */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* Next appointment */}
+          <Card className="glass-strong border-border/30 shadow-sm sm:col-span-2">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="h-12 w-12 rounded-2xl bg-primary/15 flex items-center justify-center shrink-0">
+                <Calendar className="h-6 w-6 text-primary" />
               </div>
-              <div>
-                <CardTitle className="text-lg font-display">{patient.name}</CardTitle>
-                <p className="text-sm text-muted-foreground">{patient.age} años • {patient.sex === "F" ? "Femenino" : "Masculino"}</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-muted-foreground font-medium mb-0.5">Próxima cita</p>
+                {nextAppointment ? (
+                  <>
+                    <p className="text-sm font-semibold truncate">{nextAppointment.reason}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(nextAppointment.datetime).toLocaleDateString("es-MX", {
+                        weekday: "long",
+                        day: "numeric",
+                        month: "long",
+                      })}{" "}
+                      —{" "}
+                      {new Date(nextAppointment.datetime).toLocaleTimeString("es-MX", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Sin citas programadas</p>
+                )}
               </div>
-              <Badge className="ml-auto rounded-full bg-green-500/15 text-green-500 border-green-500/20">
-                Cuenta activa
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-              <div className="p-3 rounded-xl bg-muted/30">
-                <p className="text-muted-foreground text-xs mb-1">📧 Correo</p>
-                <p className="font-medium">{patient.email}</p>
-              </div>
-              <div className="p-3 rounded-xl bg-muted/30">
-                <p className="text-muted-foreground text-xs mb-1">🩺 Motivo de registro</p>
-                <p className="font-medium">{patient.reason}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Appointments */}
+          {/* Patient status */}
+          <Card className="glass-strong border-border/30 shadow-sm">
+            <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full gap-2">
+              <Badge className={`rounded-full ${status.color} gap-1.5 px-3 py-1`}>
+                {status.icon}
+                {status.label}
+              </Badge>
+              <p className="text-[11px] text-muted-foreground">Estado actual</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Last indication highlight */}
+        {lastIndication && (
+          <Card className="glass-strong border-primary/20 shadow-sm border-l-4 border-l-primary">
+            <CardContent className="p-4 flex items-start gap-3">
+              <div className="h-9 w-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0 mt-0.5">
+                <FileText className="h-4 w-4 text-accent" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-muted-foreground font-medium mb-0.5">Última indicación</p>
+                <p className="text-sm font-semibold">{lastIndication.title}</p>
+                <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+                  {lastIndication.details.split("\n")[0]}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* ─── CTA ─── */}
+        <Button
+          onClick={() => setChatOpen(true)}
+          className="w-full gap-2 h-13 rounded-2xl bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all text-primary-foreground font-semibold text-sm shadow-lg glow-primary"
+        >
+          <MessageCircle className="h-5 w-5" />
+          Hablar con mi asistente
+        </Button>
+
+        {/* ─── CITAS ─── */}
         <Card className="glass-strong border-border/30 shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <Calendar className="h-4 w-4 text-primary" />
-              Mis citas
+              Citas
             </CardTitle>
           </CardHeader>
           <CardContent>
             {appointments.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">No tienes citas programadas.</p>
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No tienes citas programadas.
+              </p>
             ) : (
               <div className="space-y-3">
                 {appointments.map((apt) => (
@@ -115,7 +213,16 @@ export default function PacienteDashboard() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium">{apt.reason}</p>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(apt.datetime).toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" })} — {new Date(apt.datetime).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
+                        {new Date(apt.datetime).toLocaleDateString("es-MX", {
+                          weekday: "long",
+                          day: "numeric",
+                          month: "long",
+                        })}{" "}
+                        —{" "}
+                        {new Date(apt.datetime).toLocaleTimeString("es-MX", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </p>
                     </div>
                     <Badge className="rounded-full bg-accent/15 text-accent border-accent/20 shrink-0">
@@ -128,76 +235,108 @@ export default function PacienteDashboard() {
           </CardContent>
         </Card>
 
-        {/* Prescriptions */}
-        {prescriptions.length > 0 && (
-          <Card className="glass-strong border-border/30 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                💊 Mis recetas
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {prescriptions.map((rx) => (
-                <div key={rx.id} className="p-3 rounded-xl bg-muted/30 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium">{rx.doctorName}</p>
-                    <Badge variant="outline" className="text-xs rounded-full">{new Date(rx.date).toLocaleDateString("es-MX")}</Badge>
-                  </div>
-                  {rx.medications.map((m, i) => (
-                    <p key={i} className="text-sm text-muted-foreground">• <strong>{m.name}</strong> {m.dose} — {m.frequency} ({m.duration})</p>
-                  ))}
-                  {rx.notes && <p className="text-xs text-muted-foreground italic">📝 {rx.notes}</p>}
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Indications */}
-        {indications.length > 0 && (
-          <Card className="glass-strong border-border/30 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                📋 Indicaciones médicas
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {indications.map((ind) => (
-                <div key={ind.id} className="p-3 rounded-xl bg-muted/30 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium">{ind.title}</p>
-                    <Badge variant="outline" className="text-xs rounded-full">{new Date(ind.date).toLocaleDateString("es-MX")}</Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground whitespace-pre-line">{ind.details}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Medical Summary */}
+        {/* ─── HISTORIAL ─── */}
         <Card className="glass-strong border-border/30 shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <FileText className="h-4 w-4 text-primary" />
-              Mi información médica
+              Historial médico
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
+            {/* Patient info */}
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 shrink-0">
+                <User className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold">{patient.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {patient.age} años • {patient.sex === "F" ? "Femenino" : "Masculino"} • {patient.email}
+                </p>
+              </div>
+            </div>
+
             <div className="p-3 rounded-xl bg-muted/30">
-              <p className="text-muted-foreground text-xs mb-1">Síntomas reportados</p>
+              <p className="text-muted-foreground text-xs mb-1">🩺 Motivo de registro</p>
+              <p className="text-sm">{patient.reason}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-muted/30">
+              <p className="text-muted-foreground text-xs mb-1">📝 Síntomas reportados</p>
               <p className="text-sm">{patient.symptoms}</p>
             </div>
             <div className="p-3 rounded-xl bg-muted/30">
-              <p className="text-muted-foreground text-xs mb-1">Antecedentes médicos</p>
+              <p className="text-muted-foreground text-xs mb-1">📂 Antecedentes</p>
               <p className="text-sm">{patient.history}</p>
+            </div>
+
+            {/* Prescriptions inline */}
+            {prescriptions.length > 0 && (
+              <div className="space-y-2 pt-2">
+                <p className="text-sm font-medium flex items-center gap-1.5">💊 Recetas</p>
+                {prescriptions.map((rx) => (
+                  <div key={rx.id} className="p-3 rounded-xl bg-muted/30 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium">{rx.doctorName}</p>
+                      <Badge variant="outline" className="text-xs rounded-full">
+                        {new Date(rx.date).toLocaleDateString("es-MX")}
+                      </Badge>
+                    </div>
+                    {rx.medications.map((m, i) => (
+                      <p key={i} className="text-sm text-muted-foreground">
+                        • <strong>{m.name}</strong> {m.dose} — {m.frequency} ({m.duration})
+                      </p>
+                    ))}
+                    {rx.notes && (
+                      <p className="text-xs text-muted-foreground italic">📝 {rx.notes}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Indications inline */}
+            {indications.length > 0 && (
+              <div className="space-y-2 pt-2">
+                <p className="text-sm font-medium flex items-center gap-1.5">📋 Indicaciones</p>
+                {indications.map((ind) => (
+                  <div key={ind.id} className="p-3 rounded-xl bg-muted/30 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium">{ind.title}</p>
+                      <Badge variant="outline" className="text-xs rounded-full">
+                        {new Date(ind.date).toLocaleDateString("es-MX")}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground whitespace-pre-line">{ind.details}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* ─── ARCHIVOS ─── */}
+        <Card className="glass-strong border-border/30 shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Folder className="h-4 w-4 text-primary" />
+              Archivos y estudios
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col items-center text-center py-6 text-muted-foreground">
+              <Folder className="h-10 w-10 mb-2 opacity-30" />
+              <p className="text-sm">Sin archivos por el momento</p>
+              <p className="text-xs mt-1">
+                Aquí aparecerán tus estudios, análisis y documentos médicos.
+              </p>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Floating Chat Widget */}
-      <PatientChatWidget patient={patient} />
+      <PatientChatWidget patient={patient} forceOpen={chatOpen} onOpenChange={setChatOpen} />
     </div>
   );
 }
