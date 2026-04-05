@@ -24,6 +24,7 @@ import PatientChatWidget from "@/components/PatientChatWidget";
 import PatientAppointments from "@/components/PatientAppointments";
 import PatientMedicalHistory from "@/components/PatientMedicalHistory";
 import PatientFiles from "@/components/PatientFiles";
+import PatientSymptomTracker from "@/components/PatientSymptomTracker";
 
 interface PatientSession {
   id: string;
@@ -202,6 +203,9 @@ export default function PacienteDashboard() {
           prescriptions={prescriptions}
           indications={indications}
         />
+
+        {/* ─── SÍNTOMAS ─── */}
+        <PatientSymptomTracker patientId={patient.id} />
 
         {/* ─── ARCHIVOS ─── */}
         <PatientFiles patientId={patient.id} />
