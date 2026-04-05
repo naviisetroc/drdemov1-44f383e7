@@ -40,6 +40,7 @@ const SEED_DATA: PatientChatStore = {
       history: "Gastritis hace 3 años tratada con omeprazol. Sin alergias conocidas. Toma ibuprofeno frecuentemente por dolor de espalda.",
       summary: "Paciente masculino de 52 años.\n\n**Motivo de consulta:** Dolor estomacal recurrente\n**Síntomas:** Dolor epigástrico ardoroso 2 semanas, acidez, náuseas\n**Antecedentes:** Gastritis previa, uso frecuente de AINEs",
       createdAt: "2026-03-23T14:30:00.000Z",
+      accountType: "temporal",
     },
     {
       id: "chat-seed-2",
@@ -52,6 +53,7 @@ const SEED_DATA: PatientChatStore = {
       history: "Sana. Sin enfermedades crónicas. Sin alergias. Sin cirugías previas. Última revisión ginecológica hace 2 años.",
       summary: "Paciente femenina de 29 años.\n\n**Motivo de consulta:** Revisión general y planificación familiar\n**Síntomas:** Asintomática\n**Antecedentes:** Sana, sin patologías conocidas",
       createdAt: "2026-03-23T16:45:00.000Z",
+      accountType: "temporal",
     },
     {
       id: "chat-seed-3",
@@ -64,6 +66,7 @@ const SEED_DATA: PatientChatStore = {
       history: "EPOC diagnosticado hace 2 años. Hipertensión arterial controlada con amlodipino 5mg. Exfumador. Sin alergias medicamentosas.",
       summary: "Paciente masculino de 67 años.\n\n**Motivo de consulta:** Disnea progresiva\n**Síntomas:** Disnea de esfuerzo, tos seca, fatiga\n**Antecedentes:** EPOC, HAS, exfumador 30 años",
       createdAt: "2026-03-24T08:15:00.000Z",
+      accountType: "temporal",
     },
   ],
   chatAppointments: [
