@@ -103,6 +103,15 @@ const SEED_DATA: PatientChatStore = {
       reason: "Dificultad respiratoria — EPOC en seguimiento",
       notes: "Registrado vía chat. Disnea progresiva, exfumador, EPOC conocido.",
     },
+    {
+      id: "apt-seed-demo",
+      patientId: "chat-seed-demo",
+      patientName: "Laura Méndez García",
+      datetime: "2026-04-07T10:00",
+      status: "programada",
+      reason: "Seguimiento post-operatorio — revisión de rodilla",
+      notes: "Control a 4 semanas de artroscopia. Evaluar rango de movimiento y dolor.",
+    },
   ],
 };
 
