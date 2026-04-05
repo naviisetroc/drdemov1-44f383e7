@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getChatPatients, getChatAppointments, ChatPatient } from "@/stores/patientChatStore";
 import { Appointment } from "@/data/mockData";
+import { getPatientPrescriptions, getPatientIndications } from "@/stores/patientMockPrescriptions";
+import PatientChatWidget from "@/components/PatientChatWidget";
 
 interface PatientSession {
   id: string;
@@ -18,6 +20,8 @@ export default function PacienteDashboard() {
   const [session, setSession] = useState<PatientSession | null>(null);
   const [patient, setPatient] = useState<ChatPatient | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const prescriptions = patient ? getPatientPrescriptions(patient.id) : [];
+  const indications = patient ? getPatientIndications(patient.id) : [];
 
   useEffect(() => {
     const raw = localStorage.getItem("medisec_patient_session");
@@ -124,6 +128,53 @@ export default function PacienteDashboard() {
           </CardContent>
         </Card>
 
+        {/* Prescriptions */}
+        {prescriptions.length > 0 && (
+          <Card className="glass-strong border-border/30 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                💊 Mis recetas
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {prescriptions.map((rx) => (
+                <div key={rx.id} className="p-3 rounded-xl bg-muted/30 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">{rx.doctorName}</p>
+                    <Badge variant="outline" className="text-xs rounded-full">{new Date(rx.date).toLocaleDateString("es-MX")}</Badge>
+                  </div>
+                  {rx.medications.map((m, i) => (
+                    <p key={i} className="text-sm text-muted-foreground">• <strong>{m.name}</strong> {m.dose} — {m.frequency} ({m.duration})</p>
+                  ))}
+                  {rx.notes && <p className="text-xs text-muted-foreground italic">📝 {rx.notes}</p>}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Indications */}
+        {indications.length > 0 && (
+          <Card className="glass-strong border-border/30 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                📋 Indicaciones médicas
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {indications.map((ind) => (
+                <div key={ind.id} className="p-3 rounded-xl bg-muted/30 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">{ind.title}</p>
+                    <Badge variant="outline" className="text-xs rounded-full">{new Date(ind.date).toLocaleDateString("es-MX")}</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground whitespace-pre-line">{ind.details}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
         {/* Medical Summary */}
         <Card className="glass-strong border-border/30 shadow-sm">
           <CardHeader className="pb-3">
@@ -144,6 +195,9 @@ export default function PacienteDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Floating Chat Widget */}
+      <PatientChatWidget patient={patient} />
     </div>
   );
 }
