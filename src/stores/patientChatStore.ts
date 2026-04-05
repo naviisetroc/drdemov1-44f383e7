@@ -120,8 +120,24 @@ function load(): PatientChatStore {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as PatientChatStore;
-      // Ensure seeded patients exist
-      if (parsed.chatPatients && parsed.chatPatients.length > 0) return parsed;
+      if (parsed.chatPatients && parsed.chatPatients.length > 0) {
+        // Merge any missing seed patients/appointments into existing data
+        let updated = false;
+        for (const seedPatient of SEED_DATA.chatPatients) {
+          if (!parsed.chatPatients.find((p) => p.id === seedPatient.id)) {
+            parsed.chatPatients.push(seedPatient);
+            updated = true;
+          }
+        }
+        for (const seedApt of SEED_DATA.chatAppointments) {
+          if (!parsed.chatAppointments.find((a) => a.id === seedApt.id)) {
+            parsed.chatAppointments.push(seedApt);
+            updated = true;
+          }
+        }
+        if (updated) save(parsed);
+        return parsed;
+      }
     }
   } catch {}
   // Initialize with seed data
