@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, CheckCheck, Stethoscope } from "lucide-react";
+import { Send, Bot, User, CheckCheck, Stethoscope, UserPlus, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { addChatPatient, addChatAppointment, ChatPatient } from "@/stores/patientChatStore";
+import { addChatPatient, addChatAppointment, ChatPatient, convertToRegistered } from "@/stores/patientChatStore";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -15,7 +15,10 @@ interface Message {
   options?: string[];
 }
 
-type Step = "welcome" | "nombre" | "edad" | "sexo" | "motivo" | "sintomas" | "historial" | "confirm_appointment" | "select_time" | "summary" | "done";
+type Step =
+  | "welcome" | "nombre" | "edad" | "sexo" | "motivo" | "sintomas"
+  | "historial" | "confirm_appointment" | "select_time" | "summary"
+  | "offer_account" | "register_email" | "register_password" | "done";
 
 const timeSlots = [
   "Lunes 24 Mar — 11:00 AM",
@@ -43,6 +46,8 @@ export default function PacienteChat() {
   const [patientData, setPatientData] = useState<Partial<ChatPatient>>({});
   const [selectedTime, setSelectedTime] = useState("");
   const [completed, setCompleted] = useState(false);
+  const [createdPatientId, setCreatedPatientId] = useState("");
+  const [registerEmail, setRegisterEmail] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -135,6 +140,48 @@ export default function PacienteChat() {
         setStep("summary");
         finalize(patientData, msg);
         break;
+
+      // --- Account conversion flow ---
+      case "offer_account":
+        if (msg.toLowerCase().includes("sí") || msg.toLowerCase().includes("si") || msg.toLowerCase().includes("crear")) {
+          setStep("register_email");
+          addBot("¡Perfecto! Para crear tu cuenta necesito tu **correo electrónico**:");
+        } else {
+          setStep("done");
+          setCompleted(true);
+          addBot("¡Sin problema! Tu información ya quedó registrada como paciente temporal. Puedes crear tu cuenta en cualquier momento. 👋\n\n¡Gracias por confiar en nosotros!");
+        }
+        break;
+      case "register_email": {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(msg)) {
+          addBot("Por favor, ingresa un correo electrónico válido.");
+          return;
+        }
+        setRegisterEmail(msg);
+        setStep("register_password");
+        addBot("Ahora elige una **contraseña** para tu cuenta (mínimo 6 caracteres):");
+        break;
+      }
+      case "register_password": {
+        if (msg.length < 6) {
+          addBot("La contraseña debe tener al menos 6 caracteres. Inténtalo de nuevo:");
+          return;
+        }
+        const success = convertToRegistered(createdPatientId, registerEmail, msg);
+        if (success) {
+          toast.success("🎉 ¡Cuenta creada exitosamente!", {
+            description: `${patientData.name} ahora tiene acceso completo al portal de pacientes`,
+            duration: 5000,
+          });
+          addBot(`🎉 **¡Cuenta creada exitosamente!**\n\nTu cuenta ha sido registrada con:\n📧 **Correo:** ${registerEmail}\n\nAhora puedes iniciar sesión en el portal de pacientes para:\n• 📅 Ver y gestionar tus citas\n• 📋 Consultar tu historial médico\n• 💬 Comunicarte con el consultorio\n• 📄 Acceder a tus recetas y estudios\n\n¡Bienvenido/a al portal! 💙`);
+        } else {
+          addBot("Hubo un error al crear tu cuenta. Tu información se mantendrá como paciente temporal.");
+        }
+        setStep("done");
+        setCompleted(true);
+        break;
+      }
       default:
         addBot("Gracias por usar nuestro servicio. ¡Nos vemos pronto! 👋");
     }
@@ -142,6 +189,7 @@ export default function PacienteChat() {
 
   function finalize(data: Partial<ChatPatient>, time: string) {
     const id = `chat-${Date.now()}`;
+    setCreatedPatientId(id);
     const summary = `Paciente ${data.sex === "F" ? "femenina" : "masculino"} de ${data.age} años.\n\n**Motivo de consulta:** ${data.reason}\n**Síntomas:** ${data.symptoms}\n**Antecedentes:** ${data.history}`;
 
     const patient: ChatPatient = {
@@ -155,6 +203,7 @@ export default function PacienteChat() {
       history: data.history || "",
       summary,
       createdAt: new Date().toISOString(),
+      accountType: "temporal",
     };
 
     addChatPatient(patient);
@@ -180,14 +229,32 @@ export default function PacienteChat() {
 
     setTyping(true);
     setTimeout(() => {
-      const summaryMsg = `✅ **¡Listo!** He registrado toda tu información.\n\n📋 **Resumen de tu registro:**\n\n👤 **Nombre:** ${patient.name}\n🎂 **Edad:** ${patient.age} años\n🩺 **Motivo:** ${patient.reason}\n📝 **Síntomas:** ${patient.symptoms}\n📂 **Antecedentes:** ${patient.history}${time ? `\n\n📅 **Cita agendada:** ${time}` : ""}\n\nEl Dr. Ramírez revisará tu información antes de la consulta. ${time ? "Recibirás un recordatorio antes de tu cita." : ""}\n\n¡Gracias por confiar en nosotros! 💙`;
+      const summaryMsg = `✅ **¡Listo!** He registrado toda tu información.\n\n📋 **Resumen de tu registro:**\n\n👤 **Nombre:** ${patient.name}\n🎂 **Edad:** ${patient.age} años\n🩺 **Motivo:** ${patient.reason}\n📝 **Síntomas:** ${patient.symptoms}\n📂 **Antecedentes:** ${patient.history}${time ? `\n\n📅 **Cita agendada:** ${time}` : ""}\n\nEl Dr. Ramírez revisará tu información antes de la consulta. ${time ? "Recibirás un recordatorio antes de tu cita." : ""}`;
 
       setMessages((prev) => [
         ...prev,
         { id: String(Date.now()), text: summaryMsg, sender: "bot", time: now() },
       ]);
       setTyping(false);
-      setCompleted(true);
+
+      // After summary, offer account creation
+      setStep("offer_account");
+      setTimeout(() => {
+        setTyping(true);
+        setTimeout(() => {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: String(Date.now() + 2),
+              text: "💡 **¿Deseas guardar tu información para futuras consultas?**\n\nAl crear una cuenta podrás:\n• Ver tus citas y resultados\n• Seguir tu tratamiento\n• Comunicarte con el consultorio",
+              sender: "bot",
+              time: now(),
+              options: ["Sí, crear cuenta", "No, continuar"],
+            },
+          ]);
+          setTyping(false);
+        }, 1200);
+      }, 1500);
     }, 2000);
   }
 
@@ -285,11 +352,19 @@ export default function PacienteChat() {
       ) : (
         <div className="border-t border-border/40 glass p-4 text-center space-y-3">
           <p className="text-sm text-muted-foreground">Tu registro ha sido completado exitosamente</p>
-          <Link to="/dashboard">
-            <Badge variant="outline" className="cursor-pointer hover:bg-primary/15 hover:text-primary hover:border-primary/30 transition-all py-2 px-4 rounded-xl">
-              👨‍⚕️ Ver panel del médico (demo)
-            </Badge>
-          </Link>
+          <div className="flex flex-wrap gap-2 justify-center">
+            <Link to="/paciente/login">
+              <Badge variant="outline" className="cursor-pointer hover:bg-primary/15 hover:text-primary hover:border-primary/30 transition-all py-2 px-4 rounded-xl">
+                <LogIn className="h-3 w-3 mr-1" />
+                Iniciar sesión
+              </Badge>
+            </Link>
+            <Link to="/dashboard">
+              <Badge variant="outline" className="cursor-pointer hover:bg-primary/15 hover:text-primary hover:border-primary/30 transition-all py-2 px-4 rounded-xl">
+                👨‍⚕️ Ver panel del médico (demo)
+              </Badge>
+            </Link>
+          </div>
         </div>
       )}
     </div>
