@@ -122,8 +122,24 @@ function generatePatientResponse(q: string, patient: ChatPatient): string {
   return `Entendido. ¿Podrías reformular tu pregunta? Puedo ayudarte con citas, recetas, indicaciones médicas y más.\n\nEscribe **"ayuda"** para ver todas las opciones.`;
 }
 
-export default function PatientChatWidget({ patient }: { patient: ChatPatient }) {
-  const [open, setOpen] = useState(false);
+interface PatientChatWidgetProps {
+  patient: ChatPatient;
+  forceOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export default function PatientChatWidget({ patient, forceOpen, onOpenChange }: PatientChatWidgetProps) {
+  const [open, setOpenState] = useState(false);
+
+  const setOpen = (v: boolean) => {
+    setOpenState(v);
+    onOpenChange?.(v);
+  };
+
+  useEffect(() => {
+    if (forceOpen && !open) setOpenState(true);
+  }, [forceOpen]);
+
   const [messages, setMessages] = useState<Msg[]>([
     {
       id: "1",
