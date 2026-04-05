@@ -21,6 +21,7 @@ import { getChatPatients, getChatAppointments, ChatPatient } from "@/stores/pati
 import { Appointment } from "@/data/mockData";
 import { getPatientPrescriptions, getPatientIndications } from "@/stores/patientMockPrescriptions";
 import PatientChatWidget from "@/components/PatientChatWidget";
+import PatientAppointments from "@/components/PatientAppointments";
 
 interface PatientSession {
   id: string;
@@ -191,49 +192,7 @@ export default function PacienteDashboard() {
         </Button>
 
         {/* ─── CITAS ─── */}
-        <Card className="glass-strong border-border/30 shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-primary" />
-              Citas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {appointments.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                No tienes citas programadas.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {appointments.map((apt) => (
-                  <div key={apt.id} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
-                    <div className="h-9 w-9 rounded-lg bg-primary/15 flex items-center justify-center shrink-0">
-                      <Clock className="h-4 w-4 text-primary" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">{apt.reason}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(apt.datetime).toLocaleDateString("es-MX", {
-                          weekday: "long",
-                          day: "numeric",
-                          month: "long",
-                        })}{" "}
-                        —{" "}
-                        {new Date(apt.datetime).toLocaleTimeString("es-MX", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                    </div>
-                    <Badge className="rounded-full bg-accent/15 text-accent border-accent/20 shrink-0">
-                      {apt.status}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <PatientAppointments appointments={appointments} />
 
         {/* ─── HISTORIAL ─── */}
         <Card className="glass-strong border-border/30 shadow-sm">
