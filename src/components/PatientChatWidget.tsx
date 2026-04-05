@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatPatient, getChatAppointments } from "@/stores/patientChatStore";
 import { getPatientPrescriptions, getPatientIndications } from "@/stores/patientMockPrescriptions";
+import { getPatientSymptoms } from "@/stores/patientSymptomStore";
 import { Appointment } from "@/data/mockData";
 
 interface Msg {
@@ -23,6 +24,33 @@ function generatePatientResponse(q: string, patient: ChatPatient): string {
   const appts = getChatAppointments().filter((a) => a.patientId === patient.id);
   const prescriptions = getPatientPrescriptions(patient.id);
   const indications = getPatientIndications(patient.id);
+  const symptoms = getPatientSymptoms(patient.id);
+
+  // --- Symptom-aware responses ---
+  if (lower.includes("duele") || lower.includes("dolor") || lower.includes("molest") || lower.includes("mal") && (lower.includes("siento") || lower.includes("estoy") || lower.includes("sigue"))) {
+    if (symptoms.length > 0) {
+      const last = symptoms[0];
+      const daysAgo = Math.floor((Date.now() - new Date(last.date).getTime()) / 86400000);
+      const timeStr = daysAgo === 0 ? "hoy" : daysAgo === 1 ? "ayer" : `hace ${daysAgo} días`;
+      return `Veo que registraste un síntoma ${timeStr}: **"${last.text}"** con intensidad **${last.intensity}/10**.\n\n${
+        last.intensity >= 7
+          ? "⚠️ La intensidad reportada es alta. Te recomiendo comunicarte directamente con el consultorio al **(55) 1234-5678** o acudir a urgencias si el dolor es insoportable."
+          : "Te sugiero seguir registrando tus síntomas para que tu médico pueda dar seguimiento. Si el dolor aumenta, no dudes en contactarnos."
+      }\n\n¿Necesitas ayuda con algo más?`;
+    }
+    return "Lamento que no te sientas bien. 😔 Te recomiendo **registrar tus síntomas** en la sección de seguimiento de tu dashboard para que tu médico pueda revisarlos.\n\n¿Necesitas ayuda con algo más?";
+  }
+
+  if (lower.includes("síntoma") || lower.includes("sintoma") || lower.includes("registro") && lower.includes("síntoma") || lower.includes("cómo me") && lower.includes("sentido")) {
+    if (symptoms.length === 0) return "No tienes registros de síntomas aún. Usa la sección **\"Seguimiento de síntomas\"** en tu dashboard para registrar cómo te sientes. 📝";
+    let res = `📊 **Tus últimos registros de síntomas:**\n\n`;
+    symptoms.slice(0, 5).forEach((s) => {
+      const d = new Date(s.date);
+      res += `• **${d.toLocaleDateString("es-MX", { day: "numeric", month: "short" })}** — ${s.text} (${s.intensity}/10)\n`;
+    });
+    if (symptoms.length > 5) res += `\n_...y ${symptoms.length - 5} registros más._`;
+    return res;
+  }
 
   // --- Appointments ---
   if (lower.includes("cita") && (lower.includes("cuándo") || lower.includes("cuando") || lower.includes("tengo") || lower.includes("próxima") || lower.includes("proxima") || lower.includes("ver"))) {
@@ -107,7 +135,7 @@ function generatePatientResponse(q: string, patient: ChatPatient): string {
 
   // --- Help ---
   if (lower.includes("ayuda") || lower.includes("qué puedes") || lower.includes("que puedes") || lower.includes("opciones") || lower.includes("menú") || lower.includes("menu")) {
-    return "Puedo ayudarte con:\n\n• 📅 **\"¿Cuándo es mi cita?\"** — Ver tus citas\n• 📅 **\"Quiero una cita\"** — Agendar nueva cita\n• 🔄 **\"Quiero reagendar\"** — Cambiar fecha de cita\n• 💊 **\"¿Qué me recetaron?\"** — Ver tus recetas\n• 📋 **\"Indicaciones\"** — Ver cuidados e instrucciones\n• 👤 **\"Mi historial\"** — Ver tu información médica\n\n¿En qué te puedo ayudar? 😊";
+    return "Puedo ayudarte con:\n\n• 📅 **\"¿Cuándo es mi cita?\"** — Ver tus citas\n• 📅 **\"Quiero una cita\"** — Agendar nueva cita\n• 🔄 **\"Quiero reagendar\"** — Cambiar fecha de cita\n• 💊 **\"¿Qué me recetaron?\"** — Ver tus recetas\n• 📋 **\"Indicaciones\"** — Ver cuidados e instrucciones\n• 📊 **\"Mis síntomas\"** — Ver tus registros de síntomas\n• 👤 **\"Mi historial\"** — Ver tu información médica\n\n¿En qué te puedo ayudar? 😊";
   }
 
   // --- Greetings ---
