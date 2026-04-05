@@ -68,6 +68,21 @@ const SEED_DATA: PatientChatStore = {
       createdAt: "2026-03-24T08:15:00.000Z",
       accountType: "temporal",
     },
+    {
+      id: "chat-seed-demo",
+      name: "Laura Méndez García",
+      age: 34,
+      sex: "F",
+      phone: "+52 55 1111 4444",
+      email: "paciente@demo.com",
+      password: "demo1234",
+      reason: "Seguimiento post-operatorio — cirugía de rodilla",
+      symptoms: "Dolor leve en rodilla derecha al flexionar, inflamación moderada. Rehabilitación en curso, 3 semanas post-artroscopia.",
+      history: "Artroscopia de rodilla derecha (marzo 2026). Sin alergias. Sin enfermedades crónicas.",
+      summary: "Paciente femenina de 34 años.\n\n**Motivo de consulta:** Seguimiento post-operatorio\n**Síntomas:** Dolor leve rodilla, inflamación moderada\n**Antecedentes:** Artroscopia reciente",
+      createdAt: "2026-03-20T10:00:00.000Z",
+      accountType: "registrado",
+    },
   ],
   chatAppointments: [
     {
