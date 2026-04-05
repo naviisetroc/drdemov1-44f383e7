@@ -133,6 +133,24 @@ export function getChatAppointments(): Appointment[] {
 
 export const STORE_UPDATE_EVENT = STORE_EVENT;
 
+export function convertToRegistered(patientId: string, email: string, password: string): boolean {
+  const store = load();
+  const patient = store.chatPatients.find((p) => p.id === patientId);
+  if (!patient) return false;
+  patient.accountType = "registrado";
+  patient.email = email;
+  patient.password = password;
+  save(store);
+  return true;
+}
+
+export function getRegisteredPatient(email: string, password: string): ChatPatient | null {
+  const store = load();
+  return store.chatPatients.find(
+    (p) => p.accountType === "registrado" && p.email === email && p.password === password
+  ) || null;
+}
+
 export function chatPatientToPatient(cp: ChatPatient): Patient {
   return {
     id: cp.id,
