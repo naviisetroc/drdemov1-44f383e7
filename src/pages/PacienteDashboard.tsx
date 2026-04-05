@@ -22,6 +22,7 @@ import { Appointment } from "@/data/mockData";
 import { getPatientPrescriptions, getPatientIndications } from "@/stores/patientMockPrescriptions";
 import PatientChatWidget from "@/components/PatientChatWidget";
 import PatientAppointments from "@/components/PatientAppointments";
+import PatientMedicalHistory from "@/components/PatientMedicalHistory";
 
 interface PatientSession {
   id: string;
@@ -195,84 +196,11 @@ export default function PacienteDashboard() {
         <PatientAppointments appointments={appointments} />
 
         {/* ─── HISTORIAL ─── */}
-        <Card className="glass-strong border-border/30 shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <FileText className="h-4 w-4 text-primary" />
-              Historial médico
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {/* Patient info */}
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 shrink-0">
-                <User className="h-5 w-5 text-primary" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold">{patient.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {patient.age} años • {patient.sex === "F" ? "Femenino" : "Masculino"} • {patient.email}
-                </p>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-muted/30">
-              <p className="text-muted-foreground text-xs mb-1">🩺 Motivo de registro</p>
-              <p className="text-sm">{patient.reason}</p>
-            </div>
-            <div className="p-3 rounded-xl bg-muted/30">
-              <p className="text-muted-foreground text-xs mb-1">📝 Síntomas reportados</p>
-              <p className="text-sm">{patient.symptoms}</p>
-            </div>
-            <div className="p-3 rounded-xl bg-muted/30">
-              <p className="text-muted-foreground text-xs mb-1">📂 Antecedentes</p>
-              <p className="text-sm">{patient.history}</p>
-            </div>
-
-            {/* Prescriptions inline */}
-            {prescriptions.length > 0 && (
-              <div className="space-y-2 pt-2">
-                <p className="text-sm font-medium flex items-center gap-1.5">💊 Recetas</p>
-                {prescriptions.map((rx) => (
-                  <div key={rx.id} className="p-3 rounded-xl bg-muted/30 space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium">{rx.doctorName}</p>
-                      <Badge variant="outline" className="text-xs rounded-full">
-                        {new Date(rx.date).toLocaleDateString("es-MX")}
-                      </Badge>
-                    </div>
-                    {rx.medications.map((m, i) => (
-                      <p key={i} className="text-sm text-muted-foreground">
-                        • <strong>{m.name}</strong> {m.dose} — {m.frequency} ({m.duration})
-                      </p>
-                    ))}
-                    {rx.notes && (
-                      <p className="text-xs text-muted-foreground italic">📝 {rx.notes}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Indications inline */}
-            {indications.length > 0 && (
-              <div className="space-y-2 pt-2">
-                <p className="text-sm font-medium flex items-center gap-1.5">📋 Indicaciones</p>
-                {indications.map((ind) => (
-                  <div key={ind.id} className="p-3 rounded-xl bg-muted/30 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium">{ind.title}</p>
-                      <Badge variant="outline" className="text-xs rounded-full">
-                        {new Date(ind.date).toLocaleDateString("es-MX")}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground whitespace-pre-line">{ind.details}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <PatientMedicalHistory
+          patient={patient}
+          prescriptions={prescriptions}
+          indications={indications}
+        />
 
         {/* ─── ARCHIVOS ─── */}
         <Card className="glass-strong border-border/30 shadow-sm">
