@@ -14,6 +14,8 @@ import Chat from "@/pages/Chat";
 import Referencias from "@/pages/Referencias";
 import Configuracion from "@/pages/Configuracion";
 import PacienteChat from "@/pages/PacienteChat";
+import PacienteLogin from "@/pages/PacienteLogin";
+import PacienteDashboard from "@/pages/PacienteDashboard";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
