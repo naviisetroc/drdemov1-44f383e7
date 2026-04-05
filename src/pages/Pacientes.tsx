@@ -1,23 +1,30 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, Plus, UserPlus, AlertTriangle, MessageCircle } from "lucide-react";
+import { Search, Plus, AlertTriangle, MessageCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { patients, Patient } from "@/data/mockData";
 import { chatPatientToPatient } from "@/stores/patientChatStore";
 import { useStoreSync } from "@/hooks/useStoreSync";
+import { toast } from "sonner";
 
 export default function Pacientes() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"todos" | "activo" | "inactivo" | "nuevo">("todos");
   const { chatPatients } = useStoreSync();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [newPatient, setNewPatient] = useState({ name: "", age: "", sex: "M", phone: "", email: "", condition: "" });
+  const [localPatients, setLocalPatients] = useState<Patient[]>([]);
 
   const chatPats = chatPatients.map(chatPatientToPatient);
   const chatIds = new Set(chatPats.map(p => p.id));
-  const allPatients: Patient[] = [...patients.filter(p => p.id !== "10"), ...chatPats];
+  const allPatients: Patient[] = [...patients.filter(p => p.id !== "10"), ...localPatients, ...chatPats];
 
   const filtered = allPatients.filter((p) => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -27,18 +34,40 @@ export default function Pacientes() {
     return matchSearch && matchFilter;
   });
 
+  const handleAddPatient = () => {
+    if (!newPatient.name.trim()) {
+      toast.error("El nombre es obligatorio");
+      return;
+    }
+    const p: Patient = {
+      id: `local-${Date.now()}`,
+      name: newPatient.name,
+      age: parseInt(newPatient.age) || 0,
+      sex: newPatient.sex as "M" | "F",
+      phone: newPatient.phone,
+      email: newPatient.email,
+      lastVisit: new Date().toISOString().split("T")[0],
+      status: "activo",
+      conditions: newPatient.condition ? [newPatient.condition] : [],
+    };
+    setLocalPatients(prev => [...prev, p]);
+    setDialogOpen(false);
+    setNewPatient({ name: "", age: "", sex: "M", phone: "", email: "", condition: "" });
+    toast.success("Paciente registrado", { description: `${p.name} fue agregado exitosamente` });
+  };
+
   return (
     <div className="p-4 lg:p-8 space-y-6 max-w-5xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold">Pacientes</h1>
           <p className="text-sm text-destructive-foreground">
-            {patients.filter(p => p.status === "activo" && p.id !== "10").length} registrados · {chatPats.length} nuevos vía chat
+            {patients.filter(p => p.status === "activo" && p.id !== "10").length + localPatients.length} registrados · {chatPats.length} nuevos vía chat
           </p>
         </div>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button className="gap-2 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all">
+            <Button onClick={() => setDialogOpen(true)} className="gap-2 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all">
               <Plus className="h-4 w-4" />
               Nuevo paciente
             </Button>
@@ -46,6 +75,55 @@ export default function Pacientes() {
           <TooltipContent>Registrar un nuevo paciente</TooltipContent>
         </Tooltip>
       </div>
+
+      {/* New patient dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display">Registrar nuevo paciente</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-2">
+            <div className="grid sm:grid-cols-2 gap-3">
+              <div>
+                <Label>Nombre completo *</Label>
+                <Input value={newPatient.name} onChange={e => setNewPatient(p => ({ ...p, name: e.target.value }))} placeholder="Nombre del paciente" className="mt-1 rounded-xl" />
+              </div>
+              <div>
+                <Label>Edad</Label>
+                <Input type="number" value={newPatient.age} onChange={e => setNewPatient(p => ({ ...p, age: e.target.value }))} placeholder="Edad" className="mt-1 rounded-xl" />
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <div>
+                <Label>Sexo</Label>
+                <Select value={newPatient.sex} onValueChange={v => setNewPatient(p => ({ ...p, sex: v }))}>
+                  <SelectTrigger className="mt-1 rounded-xl"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="M">Masculino</SelectItem>
+                    <SelectItem value="F">Femenino</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Teléfono</Label>
+                <Input value={newPatient.phone} onChange={e => setNewPatient(p => ({ ...p, phone: e.target.value }))} placeholder="+52 55 ..." className="mt-1 rounded-xl" />
+              </div>
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input type="email" value={newPatient.email} onChange={e => setNewPatient(p => ({ ...p, email: e.target.value }))} placeholder="correo@ejemplo.com" className="mt-1 rounded-xl" />
+            </div>
+            <div>
+              <Label>Condición principal (opcional)</Label>
+              <Input value={newPatient.condition} onChange={e => setNewPatient(p => ({ ...p, condition: e.target.value }))} placeholder="Ej: Diabetes mellitus tipo 2" className="mt-1 rounded-xl" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)} className="rounded-xl">Cancelar</Button>
+            <Button onClick={handleAddPatient} className="rounded-xl bg-gradient-to-r from-primary to-accent">Registrar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Search & filters */}
       <div className="flex flex-col sm:flex-row gap-3">

@@ -7,61 +7,78 @@ import { useStoreSync } from "@/hooks/useStoreSync";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import DoctorAssistantChat from "@/components/DoctorAssistantChat";
 
 const getStats = (activeCount: number, apptCount: number, chatCount: number) => [
-{
-  label: "Pacientes activos",
-  value: activeCount,
-  icon: Users,
-  gradient: "from-primary/20 to-primary/5",
-  iconColor: "text-primary",
-  tooltip: `${activeCount - chatCount} registrados + ${chatCount} nuevos vía chat`
-},
-{
-  label: "Citas hoy",
-  value: apptCount,
-  icon: Calendar,
-  gradient: "from-success/20 to-success/5",
-  iconColor: "text-success",
-  tooltip: "Citas confirmadas y programadas"
-},
-{
-  label: "Notas esta semana",
-  value: clinicalNotes.length,
-  icon: FileText,
-  gradient: "from-warning/20 to-warning/5",
-  iconColor: "text-warning",
-  tooltip: "Notas clínicas generadas en los últimos 7 días"
-},
-{
-  label: "Referencias activas",
-  value: referrals.length,
-  icon: ArrowRightLeft,
-  gradient: "from-accent/20 to-accent/5",
-  iconColor: "text-accent",
-  tooltip: "Referencias enviadas pendientes de respuesta del especialista"
-}];
+  {
+    label: "Pacientes activos",
+    value: activeCount,
+    icon: Users,
+    gradient: "from-primary/20 to-primary/5",
+    iconColor: "text-primary",
+    tooltip: `${activeCount - chatCount} registrados + ${chatCount} nuevos vía chat`
+  },
+  {
+    label: "Citas hoy",
+    value: apptCount,
+    icon: Calendar,
+    gradient: "from-success/20 to-success/5",
+    iconColor: "text-success",
+    tooltip: "Citas confirmadas y programadas"
+  },
+  {
+    label: "Notas esta semana",
+    value: clinicalNotes.length,
+    icon: FileText,
+    gradient: "from-warning/20 to-warning/5",
+    iconColor: "text-warning",
+    tooltip: "Notas clínicas generadas en los últimos 7 días"
+  },
+  {
+    label: "Referencias activas",
+    value: referrals.length,
+    icon: ArrowRightLeft,
+    gradient: "from-accent/20 to-accent/5",
+    iconColor: "text-accent",
+    tooltip: "Referencias enviadas pendientes de respuesta del especialista"
+  }
+];
 
-
-const statusConfig: Record<string, {label: string;variant: "default" | "secondary" | "destructive" | "outline";icon: typeof CheckCircle2;}> = {
+const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon: typeof CheckCircle2 }> = {
   confirmada: { label: "Confirmada", variant: "default", icon: CheckCircle2 },
   programada: { label: "Pendiente", variant: "outline", icon: AlertCircle },
   completada: { label: "Completada", variant: "secondary", icon: CheckCircle2 },
   cancelada: { label: "Cancelada", variant: "destructive", icon: AlertCircle }
 };
 
+interface Notification {
+  id: string;
+  text: string;
+  time: string;
+  read: boolean;
+}
+
+const INITIAL_NOTIFICATIONS: Notification[] = [
+  { id: "n1", text: "Laura Pérez Vega confirmó su cita para mañana a las 9:00 AM", time: "Hace 5 min", read: false },
+  { id: "n2", text: "Nuevo resultado de laboratorio disponible para María García López", time: "Hace 30 min", read: false },
+  { id: "n3", text: "Recordatorio: Carlos Hernández Ruiz tiene cita el 27 de marzo", time: "Hace 1 hora", read: true },
+];
+
 export default function Dashboard() {
   const [showNotif, setShowNotif] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>(INITIAL_NOTIFICATIONS);
   const [chatOpen, setChatOpen] = useState(false);
   const { chatPatients, chatAppointments } = useStoreSync();
+  const notifRef = useRef<HTMLDivElement>(null);
 
   const allAppointments = [...appointments, ...chatAppointments];
   const upcoming = allAppointments.filter((a) => a.status === "programada" || a.status === "confirmada").slice(0, 5);
   const allPatientCount = patients.filter((p) => p.status === "activo").length + chatPatients.length;
   const recentPatients = patients.filter((p) => p.status === "activo" && p.id !== "10").slice(0, 5);
   const chatAptIds = new Set(chatAppointments.map((a) => a.id));
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -74,6 +91,20 @@ export default function Dashboard() {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotifOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const markAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
+
   return (
     <div className="p-4 lg:p-8 space-y-6 max-w-7xl mx-auto">
       <div className="flex items-start justify-between">
@@ -83,25 +114,57 @@ export default function Dashboard() {
           </h1>
           <p className="text-sm mt-1 text-secondary-foreground">Resumen de tu consultorio — Lunes 24 de marzo, 2026</p>
         </div>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button className="relative p-2.5 rounded-xl glass hover:border-primary/30 transition-all">
-              <Bell className="h-5 w-5 text-muted-foreground" />
-              {(showNotif || chatPatients.length > 0) && <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary animate-pulse" />}
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>
-            {chatPatients.length > 0 ?
-            `${chatPatients.length} pacientes nuevos vía chat` :
-            "Notificaciones"}
-          </TooltipContent>
-        </Tooltip>
+        <div className="relative" ref={notifRef}>
+          <button
+            onClick={() => setNotifOpen(!notifOpen)}
+            className="relative p-2.5 rounded-xl glass hover:border-primary/30 transition-all"
+          >
+            <Bell className="h-5 w-5 text-muted-foreground" />
+            {(unreadCount > 0 || chatPatients.length > 0) && (
+              <span className="absolute top-1.5 right-1.5 h-4 w-4 rounded-full bg-primary text-[9px] text-primary-foreground flex items-center justify-center font-bold animate-pulse">
+                {unreadCount + (chatPatients.length > 0 ? 1 : 0)}
+              </span>
+            )}
+          </button>
+          {notifOpen && (
+            <div className="absolute right-0 top-12 w-80 rounded-xl border border-border/40 bg-card shadow-elevated z-50 overflow-hidden">
+              <div className="flex items-center justify-between p-3 border-b border-border/30">
+                <p className="text-sm font-semibold">Notificaciones</p>
+                {unreadCount > 0 && (
+                  <button onClick={markAllRead} className="text-[11px] text-primary hover:underline">
+                    Marcar todo como leído
+                  </button>
+                )}
+              </div>
+              <div className="max-h-72 overflow-y-auto">
+                {chatPatients.length > 0 && (
+                  <div className="flex items-start gap-2 p-3 border-b border-border/20 bg-success/5">
+                    <MessageCircle className="h-4 w-4 text-success mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-xs font-medium">{chatPatients.length} pacientes nuevos vía chat</p>
+                      <p className="text-[10px] text-muted-foreground">Revisa la sección de pacientes</p>
+                    </div>
+                  </div>
+                )}
+                {notifications.map(n => (
+                  <div key={n.id} className={`flex items-start gap-2 p-3 border-b border-border/20 ${!n.read ? "bg-primary/5" : ""}`}>
+                    <div className={`h-2 w-2 rounded-full mt-1.5 shrink-0 ${!n.read ? "bg-primary" : "bg-transparent"}`} />
+                    <div>
+                      <p className="text-xs">{n.text}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{n.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {getStats(allPatientCount, allAppointments.filter((a) => a.status === "confirmada" || a.status === "programada").length, chatPatients.length).map((s) =>
-        <Tooltip key={s.label}>
+          <Tooltip key={s.label}>
             <TooltipTrigger asChild>
               <Card className="glass border-border/40 hover:border-primary/30 transition-all duration-300 hover:shadow-glow cursor-default overflow-hidden">
                 <CardContent className="p-4 relative">
@@ -154,7 +217,7 @@ export default function Dashboard() {
                       <div className="flex items-center gap-1.5">
                         <p className="text-sm font-medium">{apt.patientName}</p>
                         {fromChat &&
-                        <Badge variant="outline" className="text-[9px] border-success/30 text-success gap-0.5 py-0 px-1">
+                          <Badge variant="outline" className="text-[9px] border-success/30 text-success gap-0.5 py-0 px-1">
                             <MessageCircle className="h-2 w-2" /> Chat
                           </Badge>
                         }
@@ -171,8 +234,8 @@ export default function Dashboard() {
                       {config.label}
                     </Badge>
                   </div>
-                </div>);
-
+                </div>
+              );
             })}
             <Link to="/agenda" className="block text-center text-sm text-primary font-medium hover:text-primary/80 pt-2 transition-colors">
               Ver toda la agenda →
@@ -193,11 +256,11 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-2">
             {recentPatients.map((p) =>
-            <Link
-              key={p.id}
-              to={`/pacientes/${p.id}`}
-              className="flex items-center justify-between rounded-xl border border-border/40 bg-muted/20 p-3 hover:bg-muted/40 hover:border-primary/20 transition-all">
-              
+              <Link
+                key={p.id}
+                to={`/pacientes/${p.id}`}
+                className="flex items-center justify-between rounded-xl border border-border/40 bg-muted/20 p-3 hover:bg-muted/40 hover:border-primary/20 transition-all"
+              >
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 text-xs font-semibold text-primary">
                     {p.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
@@ -212,10 +275,10 @@ export default function Dashboard() {
                     {p.age} años
                   </Badge>
                   {p.nextAppointment &&
-                <p className="text-[10px] text-muted-foreground mt-1">
+                    <p className="text-[10px] text-muted-foreground mt-1">
                       Próxima: {new Date(p.nextAppointment).toLocaleDateString("es-MX", { day: "numeric", month: "short" })}
                     </p>
-                }
+                  }
                 </div>
               </Link>
             )}
@@ -228,7 +291,7 @@ export default function Dashboard() {
 
       {/* Chat patients */}
       {chatPatients.length > 0 &&
-      <Card className="glass border-success/20 bg-success/5">
+        <Card className="glass border-success/20 bg-success/5">
           <CardHeader className="pb-3">
             <CardTitle className="font-display text-base flex items-center gap-2">
               <div className="h-7 w-7 rounded-lg bg-success/15 flex items-center justify-center">
@@ -240,7 +303,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-2">
             {chatPatients.map((p) =>
-          <div key={p.id} className="flex items-center justify-between rounded-xl border border-border/40 p-3 bg-muted/20">
+              <div key={p.id} className="flex items-center justify-between rounded-xl border border-border/40 p-3 bg-muted/20">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-success/15 text-xs font-semibold text-success">
                     {p.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
@@ -258,7 +321,7 @@ export default function Dashboard() {
                   <span className="text-[10px] text-muted-foreground">{p.age} años · {p.sex === "F" ? "F" : "M"}</span>
                 </div>
               </div>
-          )}
+            )}
           </CardContent>
         </Card>
       }
@@ -281,11 +344,6 @@ export default function Dashboard() {
                   📝 Nueva nota
                 </Badge>
               </Link>
-              <Link to="/chat">
-                <Badge variant="outline" className="cursor-pointer hover:bg-primary/20 hover:text-primary hover:border-primary/30 transition-all py-1.5 px-3 rounded-xl">
-                  💬 Chat IA
-                </Badge>
-              </Link>
               <Link to="/referencias">
                 <Badge variant="outline" className="cursor-pointer hover:bg-primary/20 hover:text-primary hover:border-primary/30 transition-all py-1.5 px-3 rounded-xl">
                   📋 Referencia
@@ -299,12 +357,12 @@ export default function Dashboard() {
       {/* Floating assistant button */}
       <button
         onClick={() => setChatOpen(!chatOpen)}
-        className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-elevated hover:shadow-glow transition-all flex items-center justify-center hover:scale-105 animate-glow-pulse">
-        
+        className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-elevated hover:shadow-glow transition-all flex items-center justify-center hover:scale-105 animate-glow-pulse"
+      >
         <Sparkles className="h-6 w-6" />
       </button>
 
       <DoctorAssistantChat open={chatOpen} onClose={() => setChatOpen(false)} />
-    </div>);
-
+    </div>
+  );
 }
