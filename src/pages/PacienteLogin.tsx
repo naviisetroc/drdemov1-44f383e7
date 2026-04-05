@@ -8,8 +8,8 @@ import { getRegisteredPatient } from "@/stores/patientChatStore";
 import { toast } from "sonner";
 
 export default function PacienteLogin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("paciente@demo.com");
+  const [password, setPassword] = useState("demo1234");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
