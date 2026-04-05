@@ -21,7 +21,7 @@ const navItems = [
 { to: "/pacientes", icon: Users, label: "Pacientes" },
 { to: "/notas", icon: FileText, label: "Notas Médicas" },
 { to: "/agenda", icon: Calendar, label: "Agenda" },
-{ to: "/chat", icon: MessageCircle, label: "Chat IA" },
+
 { to: "/referencias", icon: ArrowRightLeft, label: "Referencias" },
 { to: "/configuracion", icon: Settings, label: "Configuración" }];
 
