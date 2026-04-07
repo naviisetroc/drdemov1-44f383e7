@@ -62,7 +62,6 @@ export default function Agenda() {
   const upcoming = filtered.filter(a => a.status === "programada" || a.status === "confirmada");
   const past = filtered.filter(a => a.status === "completada" || a.status === "cancelada");
 
-  const chatAptIds = new Set(chatAppointments.map(a => a.id));
 
   const handleConfirm = (name: string) => {
     toast.success("Recordatorio enviado", {
