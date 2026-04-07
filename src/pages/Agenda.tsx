@@ -31,6 +31,7 @@ export default function Agenda() {
   const { chatAppointments } = useStoreSync();
   const [localAppointments, setLocalAppointments] = useState<Appointment[]>([]);
   const [overrides, setOverrides] = useState<Record<string, Partial<Appointment>>>({});
+  const [filter, setFilter] = useState<string | null>(null);
 
   // Dialogs
   const [newDialogOpen, setNewDialogOpen] = useState(false);
