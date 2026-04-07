@@ -128,36 +128,36 @@ export default function Agenda() {
 
       {/* Summary badges — clickable filters */}
       <div className="flex gap-2 flex-wrap">
-        <button onClick={() => setFilter(filter === null ? null : null)}>
-          <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === null ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/30" : "border-border/40 text-muted-foreground hover:border-primary/30"}`}>
+        <button onClick={() => setFilter(null)}>
+          <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === null ? "border-primary bg-primary/20 text-primary ring-2 ring-primary/30" : "border-primary/30 bg-primary/10 text-primary hover:bg-primary/20"}`}>
             📋 {sorted.length} todas
           </Badge>
         </button>
         <button onClick={() => setFilter(filter === "confirmada" ? null : "confirmada")}>
-          <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "confirmada" ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/30" : "border-border/40 text-muted-foreground hover:border-primary/30"}`}>
+          <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "confirmada" ? "border-blue-500 bg-blue-500/20 text-blue-400 ring-2 ring-blue-500/30" : "border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"}`}>
             <CheckCircle2 className="h-3 w-3" /> {sorted.filter(a => a.status === "confirmada").length} confirmadas
           </Badge>
         </button>
         <button onClick={() => setFilter(filter === "programada" ? null : "programada")}>
-          <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "programada" ? "border-warning bg-warning/15 text-warning ring-2 ring-warning/30" : "border-border/40 text-muted-foreground hover:border-warning/30"}`}>
+          <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "programada" ? "border-yellow-500 bg-yellow-500/20 text-yellow-400 ring-2 ring-yellow-500/30" : "border-yellow-500/30 bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20"}`}>
             <AlertCircle className="h-3 w-3" /> {sorted.filter(a => a.status === "programada").length} pendientes
           </Badge>
         </button>
         <button onClick={() => setFilter(filter === "completada" ? null : "completada")}>
-          <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "completada" ? "border-muted-foreground bg-muted/30 text-foreground ring-2 ring-muted-foreground/30" : "border-border/40 text-muted-foreground hover:border-muted-foreground/30"}`}>
+          <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "completada" ? "border-foreground/50 bg-foreground/10 text-foreground ring-2 ring-foreground/20" : "border-foreground/20 bg-foreground/5 text-foreground/70 hover:bg-foreground/10"}`}>
             <CheckCircle2 className="h-3 w-3" /> {sorted.filter(a => a.status === "completada").length} completadas
           </Badge>
         </button>
         {sorted.filter(a => a.status === "cancelada").length > 0 && (
           <button onClick={() => setFilter(filter === "cancelada" ? null : "cancelada")}>
-            <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "cancelada" ? "border-destructive bg-destructive/15 text-destructive ring-2 ring-destructive/30" : "border-border/40 text-muted-foreground hover:border-destructive/30"}`}>
+            <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "cancelada" ? "border-red-500 bg-red-500/20 text-red-400 ring-2 ring-red-500/30" : "border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20"}`}>
               <XCircle className="h-3 w-3" /> {sorted.filter(a => a.status === "cancelada").length} canceladas
             </Badge>
           </button>
         )}
         {chatAppointments.length > 0 && (
           <button onClick={() => setFilter(filter === "chat" ? null : "chat")}>
-            <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "chat" ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/30" : "border-border/40 text-muted-foreground hover:border-primary/30"}`}>
+            <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "chat" ? "border-green-500 bg-green-500/20 text-green-400 ring-2 ring-green-500/30" : "border-green-500/30 bg-green-500/10 text-green-400 hover:bg-green-500/20"}`}>
               <MessageCircle className="h-3 w-3" /> {chatAppointments.length} vía chat
             </Badge>
           </button>
