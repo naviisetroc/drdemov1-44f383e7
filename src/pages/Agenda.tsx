@@ -31,6 +31,7 @@ export default function Agenda() {
   const { chatAppointments } = useStoreSync();
   const [localAppointments, setLocalAppointments] = useState<Appointment[]>([]);
   const [overrides, setOverrides] = useState<Record<string, Partial<Appointment>>>({});
+  const [filter, setFilter] = useState<string | null>(null);
 
   // Dialogs
   const [newDialogOpen, setNewDialogOpen] = useState(false);
@@ -50,10 +51,17 @@ export default function Agenda() {
     ...(overrides[a.id] || {}),
   }));
   const sorted = [...allAppointments].sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime());
-  const upcoming = sorted.filter(a => a.status === "programada" || a.status === "confirmada");
-  const past = sorted.filter(a => a.status === "completada" || a.status === "cancelada");
-
   const chatAptIds = new Set(chatAppointments.map(a => a.id));
+
+  const filtered = filter === "chat"
+    ? sorted.filter(a => chatAptIds.has(a.id))
+    : filter
+      ? sorted.filter(a => a.status === filter)
+      : sorted;
+
+  const upcoming = filtered.filter(a => a.status === "programada" || a.status === "confirmada");
+  const past = filtered.filter(a => a.status === "completada" || a.status === "cancelada");
+
 
   const handleConfirm = (name: string) => {
     toast.success("Recordatorio enviado", {
@@ -118,26 +126,41 @@ export default function Agenda() {
         </Tooltip>
       </div>
 
-      {/* Summary badges */}
-      <div className="flex gap-2 flex-wrap overflow-x-auto">
-        <Badge variant="outline" className="gap-1 py-1.5 px-3 rounded-xl border border-primary/20 bg-primary text-destructive-foreground">
-          <CheckCircle2 className="h-3 w-3" /> {upcoming.filter(a => a.status === "confirmada").length} confirmadas
-        </Badge>
-        <Badge variant="outline" className="gap-1 py-1.5 px-3 rounded-xl border-warning/30 text-warning">
-          <AlertCircle className="h-3 w-3" /> {upcoming.filter(a => a.status === "programada").length} pendientes
-        </Badge>
-        <Badge variant="secondary" className="gap-1 py-1.5 px-3 rounded-xl bg-muted/50">
-          <CheckCircle2 className="h-3 w-3" /> {past.filter(a => a.status === "completada").length} completadas
-        </Badge>
-        {past.filter(a => a.status === "cancelada").length > 0 && (
-          <Badge variant="destructive" className="gap-1 py-1.5 px-3 rounded-xl">
-            <XCircle className="h-3 w-3" /> {past.filter(a => a.status === "cancelada").length} canceladas
+      {/* Summary badges — clickable filters */}
+      <div className="flex gap-2 flex-wrap">
+        <button onClick={() => setFilter(filter === null ? null : null)}>
+          <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === null ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/30" : "border-border/40 text-muted-foreground hover:border-primary/30"}`}>
+            📋 {sorted.length} todas
           </Badge>
+        </button>
+        <button onClick={() => setFilter(filter === "confirmada" ? null : "confirmada")}>
+          <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "confirmada" ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/30" : "border-border/40 text-muted-foreground hover:border-primary/30"}`}>
+            <CheckCircle2 className="h-3 w-3" /> {sorted.filter(a => a.status === "confirmada").length} confirmadas
+          </Badge>
+        </button>
+        <button onClick={() => setFilter(filter === "programada" ? null : "programada")}>
+          <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "programada" ? "border-warning bg-warning/15 text-warning ring-2 ring-warning/30" : "border-border/40 text-muted-foreground hover:border-warning/30"}`}>
+            <AlertCircle className="h-3 w-3" /> {sorted.filter(a => a.status === "programada").length} pendientes
+          </Badge>
+        </button>
+        <button onClick={() => setFilter(filter === "completada" ? null : "completada")}>
+          <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "completada" ? "border-muted-foreground bg-muted/30 text-foreground ring-2 ring-muted-foreground/30" : "border-border/40 text-muted-foreground hover:border-muted-foreground/30"}`}>
+            <CheckCircle2 className="h-3 w-3" /> {sorted.filter(a => a.status === "completada").length} completadas
+          </Badge>
+        </button>
+        {sorted.filter(a => a.status === "cancelada").length > 0 && (
+          <button onClick={() => setFilter(filter === "cancelada" ? null : "cancelada")}>
+            <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "cancelada" ? "border-destructive bg-destructive/15 text-destructive ring-2 ring-destructive/30" : "border-border/40 text-muted-foreground hover:border-destructive/30"}`}>
+              <XCircle className="h-3 w-3" /> {sorted.filter(a => a.status === "cancelada").length} canceladas
+            </Badge>
+          </button>
         )}
         {chatAppointments.length > 0 && (
-          <Badge variant="outline" className="gap-1 py-1.5 px-3 rounded-xl border border-primary/20 text-amber-400 bg-primary">
-            <MessageCircle className="h-3 w-3" /> {chatAppointments.length} vía chat
-          </Badge>
+          <button onClick={() => setFilter(filter === "chat" ? null : "chat")}>
+            <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "chat" ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/30" : "border-border/40 text-muted-foreground hover:border-primary/30"}`}>
+              <MessageCircle className="h-3 w-3" /> {chatAppointments.length} vía chat
+            </Badge>
+          </button>
         )}
       </div>
 
