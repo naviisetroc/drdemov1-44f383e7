@@ -51,8 +51,16 @@ export default function Agenda() {
     ...(overrides[a.id] || {}),
   }));
   const sorted = [...allAppointments].sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime());
-  const upcoming = sorted.filter(a => a.status === "programada" || a.status === "confirmada");
-  const past = sorted.filter(a => a.status === "completada" || a.status === "cancelada");
+  const chatAptIds = new Set(chatAppointments.map(a => a.id));
+
+  const filtered = filter === "chat"
+    ? sorted.filter(a => chatAptIds.has(a.id))
+    : filter
+      ? sorted.filter(a => a.status === filter)
+      : sorted;
+
+  const upcoming = filtered.filter(a => a.status === "programada" || a.status === "confirmada");
+  const past = filtered.filter(a => a.status === "completada" || a.status === "cancelada");
 
   const chatAptIds = new Set(chatAppointments.map(a => a.id));
 
