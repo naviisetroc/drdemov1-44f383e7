@@ -84,7 +84,7 @@ export default function Dashboard() {
     const timer = setTimeout(() => {
       toast.success("Cita confirmada vía WhatsApp", {
         description: "Laura Pérez Vega confirmó su cita para mañana a las 9:00 AM",
-        duration: 5000
+        duration: 3000,
       });
       setShowNotif(true);
     }, 1500);
