@@ -447,12 +447,12 @@ export default function NotasMedicas() {
                   }}
                 />
               </div>
-              <div className="mt-3 pt-3 border-t border-border flex items-start justify-between gap-4">
-                <div className="flex-1">
+              <div className="mt-3 pt-3 border-t border-border space-y-3">
+                <div>
                   <p className="text-xs text-muted-foreground mb-1">Entrada original:</p>
-                  <p className="text-sm text-muted-foreground italic">{note.rawInput}</p>
+                  <p className="text-sm text-muted-foreground italic text-center">{note.rawInput}</p>
                 </div>
-                <div className="flex gap-1 shrink-0">
+                <div className="flex flex-wrap gap-1 justify-center">
                   <Button variant="ghost" size="sm" className="gap-1 text-xs h-7" onClick={() => handleEditNote(note)}>
                     <Pencil className="h-3 w-3" /> Editar
                   </Button>

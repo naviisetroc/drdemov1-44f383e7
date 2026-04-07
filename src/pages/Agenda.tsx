@@ -119,7 +119,7 @@ export default function Agenda() {
       </div>
 
       {/* Summary badges */}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap overflow-x-auto">
         <Badge variant="outline" className="gap-1 py-1.5 px-3 rounded-xl border border-primary/20 bg-primary text-destructive-foreground">
           <CheckCircle2 className="h-3 w-3" /> {upcoming.filter(a => a.status === "confirmada").length} confirmadas
         </Badge>
@@ -159,76 +159,63 @@ export default function Agenda() {
             const config = statusConfig[apt.status] || statusConfig.programada;
             const fromChat = chatAptIds.has(apt.id);
             return (
-              <div key={apt.id} className={`flex items-center justify-between rounded-xl border p-4 hover:bg-muted/20 transition-all ${fromChat ? "border-success/30 bg-success/5" : "border-border/40 bg-muted/10"}`}>
-                <div className="flex items-center gap-4">
-                  <div className="text-center min-w-[52px] rounded-xl bg-primary/10 py-2 px-3">
-                    <p className={`font-display text-lg font-bold ${config.color} leading-none`}>
-                      {new Date(apt.datetime).getDate()}
-                    </p>
-                    <p className="text-[9px] text-muted-foreground uppercase mt-0.5">
-                      {new Date(apt.datetime).toLocaleDateString("es-MX", { month: "short" })}
-                    </p>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium">{apt.patientName}</p>
-                      {fromChat && (
-                        <Badge variant="outline" className="text-[9px] border-success/30 text-success gap-0.5 py-0 px-1.5 rounded-full">
-                          <MessageCircle className="h-2.5 w-2.5" />
-                          Chat
-                        </Badge>
-                      )}
+              <div key={apt.id} className={`rounded-xl border p-4 hover:bg-muted/20 transition-all ${fromChat ? "border-success/30 bg-success/5" : "border-border/40 bg-muted/10"}`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="text-center min-w-[52px] rounded-xl bg-primary/10 py-2 px-3">
+                      <p className={`font-display text-lg font-bold ${config.color} leading-none`}>
+                        {new Date(apt.datetime).getDate()}
+                      </p>
+                      <p className="text-[9px] text-muted-foreground uppercase mt-0.5">
+                        {new Date(apt.datetime).toLocaleDateString("es-MX", { month: "short" })}
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground">{apt.reason}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      🕐 {new Date(apt.datetime).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
-                      {apt.notes && <span className="ml-2">· 📝 {apt.notes}</span>}
-                    </p>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium truncate">{apt.patientName}</p>
+                        {fromChat && (
+                          <Badge variant="outline" className="text-[9px] border-success/30 text-success gap-0.5 py-0 px-1.5 rounded-full shrink-0">
+                            <MessageCircle className="h-2.5 w-2.5" />
+                            Chat
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate">{apt.reason}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        🕐 {new Date(apt.datetime).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
+                        {apt.notes && <span className="ml-2">· 📝 {apt.notes}</span>}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {apt.status === "programada" && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="sm" className="text-xs rounded-xl hover:bg-primary/10 hover:text-primary" onClick={() => handleConfirm(apt.patientName)}>
-                          📲 Recordar
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Enviar recordatorio por WhatsApp</TooltipContent>
-                    </Tooltip>
-                  )}
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs rounded-xl hover:bg-accent/10 hover:text-accent"
-                        onClick={() => { setSelectedApt(apt); setNewDatetime(apt.datetime); setRescheduleDialogOpen(true); }}
-                      >
-                        <CalendarClock className="h-3.5 w-3.5 mr-1" />
-                        Reagendar
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Reagendar esta cita</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs rounded-xl hover:bg-destructive/10 hover:text-destructive"
-                        onClick={() => { setSelectedApt(apt); setCancelDialogOpen(true); }}
-                      >
-                        <Ban className="h-3.5 w-3.5 mr-1" />
-                        Cancelar
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Cancelar esta cita</TooltipContent>
-                  </Tooltip>
-                  <Badge variant={config.variant} className="text-[10px] gap-1 shrink-0 rounded-full">
+                  <Badge variant={config.variant} className="text-[10px] gap-1 shrink-0 rounded-full ml-2">
                     <config.icon className="h-2.5 w-2.5" />
                     {config.label}
                   </Badge>
+                </div>
+                <div className="flex items-center gap-2 mt-3 flex-wrap">
+                  {apt.status === "programada" && (
+                    <Button variant="ghost" size="sm" className="text-xs rounded-xl hover:bg-primary/10 hover:text-primary" onClick={() => handleConfirm(apt.patientName)}>
+                      📲 Recordar
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs rounded-xl hover:bg-accent/10 hover:text-accent"
+                    onClick={() => { setSelectedApt(apt); setNewDatetime(apt.datetime); setRescheduleDialogOpen(true); }}
+                  >
+                    <CalendarClock className="h-3.5 w-3.5 mr-1" />
+                    Reagendar
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs rounded-xl hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => { setSelectedApt(apt); setCancelDialogOpen(true); }}
+                  >
+                    <Ban className="h-3.5 w-3.5 mr-1" />
+                    Cancelar
+                  </Button>
                 </div>
               </div>
             );

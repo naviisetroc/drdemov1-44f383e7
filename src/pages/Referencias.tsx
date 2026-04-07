@@ -358,7 +358,7 @@ export default function Referencias() {
                 <p className="text-xs text-muted-foreground font-medium mb-2">📋 Resumen clínico adjunto:</p>
                 {renderRefContent(ref.summary)}
               </div>
-              <div className="flex gap-2 pt-1">
+              <div className="flex flex-wrap gap-2 pt-1">
                 <Button variant="outline" size="sm" className="gap-1.5" onClick={() => handleEditRef(ref)}>
                   <Pencil className="h-3.5 w-3.5" /> Editar
                 </Button>
@@ -366,7 +366,7 @@ export default function Referencias() {
                   <Copy className="h-3.5 w-3.5" /> Copiar
                 </Button>
                 <Button variant="outline" size="sm" className="gap-1.5">
-                  <FileDown className="h-3.5 w-3.5" /> Exportar PDF
+                  <FileDown className="h-3.5 w-3.5" /> PDF
                 </Button>
               </div>
             </CardContent>
