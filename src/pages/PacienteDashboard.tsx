@@ -27,6 +27,7 @@ import PatientMedicalHistory from "@/components/PatientMedicalHistory";
 import PatientFiles from "@/components/PatientFiles";
 import PatientSymptomTracker from "@/components/PatientSymptomTracker";
 import FontSizeButton from "@/components/FontSizeButton";
+import { toast } from "sonner";
 
 interface PatientSession {
   id: string;
@@ -95,6 +96,20 @@ export default function PacienteDashboard() {
     init();
     // Retry once after a tick for mobile cold-start edge case
     const timer = setTimeout(init, 150);
+
+    // Show font-size tip once per session
+    const tipKey = "medisec_font_tip_shown";
+    if (!sessionStorage.getItem(tipKey)) {
+      sessionStorage.setItem(tipKey, "1");
+      const tipTimer = setTimeout(() => {
+        toast("💡 ¿Necesitas texto más grande?", {
+          description: "Pulsa el botón  Ꞇ  en la esquina superior derecha para aumentar el tamaño de la fuente.",
+          duration: 8000,
+        });
+      }, 1200);
+      return () => { clearTimeout(timer); clearTimeout(tipTimer); };
+    }
+
     return () => clearTimeout(timer);
   }, [navigate]);
 
