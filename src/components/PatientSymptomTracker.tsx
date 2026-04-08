@@ -10,7 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +21,13 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import {
   getPatientSymptoms,
@@ -26,6 +35,7 @@ import {
   deletePatientSymptom,
   SymptomEntry,
 } from "@/stores/patientSymptomStore";
+import { Appointment } from "@/data/mockData";
 
 function intensityLabel(v: number) {
   if (v <= 3) return { text: "Leve", color: "bg-emerald-500/10 text-emerald-600" };
@@ -46,17 +56,39 @@ function timeAgo(iso: string) {
 
 interface PatientSymptomTrackerProps {
   patientId: string;
+  appointments?: Appointment[];
 }
 
-export default function PatientSymptomTracker({ patientId }: PatientSymptomTrackerProps) {
+export default function PatientSymptomTracker({ patientId, appointments = [] }: PatientSymptomTrackerProps) {
   const [entries, setEntries] = useState<SymptomEntry[]>(() => getPatientSymptoms(patientId));
   const [addOpen, setAddOpen] = useState(false);
   const [text, setText] = useState("");
   const [intensity, setIntensity] = useState(5);
+  const [painType, setPainType] = useState("");
+  const [location, setLocation] = useState("");
+  const [duration, setDuration] = useState("");
+  const [history, setHistory] = useState("");
+  const [notes, setNotes] = useState("");
+  const [appointmentId, setAppointmentId] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<SymptomEntry | null>(null);
+
+  const upcomingAppointments = appointments.filter(
+    (a) => a.status === "programada" || a.status === "confirmada"
+  );
 
   function refresh() {
     setEntries(getPatientSymptoms(patientId));
+  }
+
+  function resetForm() {
+    setText("");
+    setIntensity(5);
+    setPainType("");
+    setLocation("");
+    setDuration("");
+    setHistory("");
+    setNotes("");
+    setAppointmentId("");
   }
 
   function handleAdd() {
@@ -64,9 +96,15 @@ export default function PatientSymptomTracker({ patientId }: PatientSymptomTrack
       toast({ title: "Describe cómo te sientes", variant: "destructive" });
       return;
     }
-    addPatientSymptom(patientId, text.trim(), intensity);
-    setText("");
-    setIntensity(5);
+    addPatientSymptom(patientId, text.trim(), intensity, {
+      painType: painType.trim() || undefined,
+      location: location.trim() || undefined,
+      duration: duration.trim() || undefined,
+      history: history.trim() || undefined,
+      notes: notes.trim() || undefined,
+      appointmentId: appointmentId || undefined,
+    });
+    resetForm();
     setAddOpen(false);
     refresh();
     toast({ title: "Síntoma registrado", description: "Tu médico podrá verlo en tu expediente." });
@@ -126,6 +164,19 @@ export default function PatientSymptomTracker({ patientId }: PatientSymptomTrack
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm">{entry.text}</p>
+                      {(entry.painType || entry.location || entry.duration) && (
+                        <div className="flex flex-wrap gap-1.5 mt-1">
+                          {entry.painType && (
+                            <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-md">{entry.painType}</span>
+                          )}
+                          {entry.location && (
+                            <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-md">{entry.location}</span>
+                          )}
+                          {entry.duration && (
+                            <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-md">{entry.duration}</span>
+                          )}
+                        </div>
+                      )}
                       <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                         <Badge className={`rounded-full border-transparent text-[10px] px-2 py-0 ${il.color}`}>
                           {entry.intensity}/10 — {il.text}
@@ -153,33 +204,78 @@ export default function PatientSymptomTracker({ patientId }: PatientSymptomTrack
       </Card>
 
       {/* Add dialog */}
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="sm:max-w-sm">
+      <Dialog open={addOpen} onOpenChange={(open) => { if (!open) resetForm(); setAddOpen(open); }}>
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <HeartPulse className="h-4 w-4 text-primary" />
-              ¿Cómo te sientes?
+              Reportar Síntomas
             </DialogTitle>
+            <DialogDescription>
+              Completa el formulario de preconsulta.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground">
-                Describe tus síntomas
-              </label>
-              <Textarea
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Ej: Me duele la rodilla al caminar, siento inflamación..."
-                className="rounded-xl resize-none min-h-[80px]"
+            {/* Cita asociada */}
+            {upcomingAppointments.length > 0 && (
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-muted-foreground">Cita asociada</Label>
+                <Select value={appointmentId} onValueChange={setAppointmentId}>
+                  <SelectTrigger className="rounded-xl">
+                    <SelectValue placeholder="Seleccionar cita..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {upcomingAppointments.map((a) => (
+                      <SelectItem key={a.id} value={a.id}>
+                        {a.reason} — {new Date(a.datetime).toLocaleDateString("es-MX", { day: "numeric", month: "short" })}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Tipo de dolor */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-muted-foreground">Tipo de dolor</Label>
+              <Input
+                value={painType}
+                onChange={(e) => setPainType(e.target.value)}
+                placeholder="Ej: Punzante, sordo, quemante..."
+                className="rounded-xl"
               />
             </div>
+
+            {/* Ubicación */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-muted-foreground">Ubicación</Label>
+              <Input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Ej: Rodilla derecha, espalda baja..."
+                className="rounded-xl"
+              />
+            </div>
+
+            {/* Duración */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-muted-foreground">Duración</Label>
+              <Input
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                placeholder="Ej: 3 días, intermitente..."
+                className="rounded-xl"
+              />
+            </div>
+
+            {/* Intensidad */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-medium text-muted-foreground">
-                  Intensidad del malestar
-                </label>
+                <Label className="text-xs font-medium text-muted-foreground">
+                  Intensidad: {intensity}/10
+                </Label>
                 <Badge className={`rounded-full border-transparent text-xs ${intensityLabel(intensity).color}`}>
-                  {intensity}/10 — {intensityLabel(intensity).text}
+                  {intensityLabel(intensity).text}
                 </Badge>
               </div>
               <Slider
@@ -196,10 +292,45 @@ export default function PatientSymptomTracker({ patientId }: PatientSymptomTrack
                 <span>Intenso</span>
               </div>
             </div>
+
+            {/* Antecedentes relevantes */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-muted-foreground">Antecedentes relevantes</Label>
+              <Textarea
+                value={history}
+                onChange={(e) => setHistory(e.target.value)}
+                placeholder="Ej: Cirugía previa, alergias, condiciones crónicas..."
+                className="rounded-xl resize-none min-h-[70px]"
+              />
+            </div>
+
+            {/* Notas adicionales */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-muted-foreground">Notas adicionales (opcional)</Label>
+              <Textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Cualquier otra información que quieras compartir..."
+                className="rounded-xl resize-none min-h-[70px]"
+              />
+            </div>
+
+            {/* Descripción general - lo que antes era el único campo */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-muted-foreground">
+                Describe tus síntomas <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Ej: Me duele la rodilla al caminar, siento inflamación..."
+                className="rounded-xl resize-none min-h-[80px]"
+              />
+            </div>
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setAddOpen(false)}>Cancelar</Button>
-            <Button onClick={handleAdd}>Guardar registro</Button>
+            <Button variant="outline" onClick={() => { resetForm(); setAddOpen(false); }}>Cancelar</Button>
+            <Button onClick={handleAdd}>Enviar Síntomas</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

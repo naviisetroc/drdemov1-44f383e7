@@ -212,7 +212,7 @@ export default function PacienteDashboard() {
         />
 
         {/* ─── SÍNTOMAS ─── */}
-        <PatientSymptomTracker patientId={patient.id} />
+        <PatientSymptomTracker patientId={patient.id} appointments={appointments} />
 
         {/* ─── ARCHIVOS ─── */}
         <PatientFiles patientId={patient.id} />
