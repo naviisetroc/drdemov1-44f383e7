@@ -7,6 +7,7 @@ import { addChatPatient, addChatAppointment, ChatPatient, convertToRegistered } 
 import { addPatientSymptom } from "@/stores/patientSymptomStore";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { useFontSize } from "@/hooks/useFontSize";
 
 interface Message {
   id: string;
