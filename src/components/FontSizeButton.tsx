@@ -11,14 +11,14 @@ export default function FontSizeButton() {
       variant="ghost"
       size="icon"
       onClick={cycle}
-      className="text-primary-foreground hover:bg-primary-foreground/20 rounded-xl relative h-9 w-9"
+      className="text-primary-foreground hover:bg-primary-foreground/20 rounded-xl relative h-11 w-11 animate-bounce-subtle"
       title="Cambiar tamaño de fuente"
     >
       <span className="font-bold leading-none tracking-tight" style={{ fontFamily: "system-ui, sans-serif" }}>
-        <span className="text-base">A</span>
-        <span className="text-xs">a</span>
+        <span className="text-lg">A</span>
+        <span className="text-sm">a</span>
       </span>
-      <span className="absolute -bottom-0.5 -right-0.5 text-[8px] font-bold bg-primary-foreground/30 rounded-full h-3.5 w-3.5 flex items-center justify-center leading-none">
+      <span className="absolute -bottom-0.5 -right-0.5 text-[9px] font-bold bg-primary-foreground/30 rounded-full h-4 w-4 flex items-center justify-center leading-none">
         {level}
       </span>
     </Button>
