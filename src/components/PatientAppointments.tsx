@@ -135,10 +135,10 @@ export default function PatientAppointments({
                     }`}
                   >
                     {/* Top row: date + status */}
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
                         <div
-                          className={`h-11 w-11 rounded-xl flex flex-col items-center justify-center ${cfg.bg}`}
+                          className={`h-11 w-11 rounded-xl flex flex-col items-center justify-center shrink-0 ${cfg.bg}`}
                         >
                           <span className={`text-xs font-bold ${cfg.text} leading-none`}>
                             {dt.toLocaleDateString("es-MX", { day: "numeric" })}
@@ -149,12 +149,12 @@ export default function PatientAppointments({
                             {dt.toLocaleDateString("es-MX", { month: "short" })}
                           </span>
                         </div>
-                        <div>
-                          <p className="text-sm font-semibold leading-tight">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold leading-tight break-words">
                             {apt.reason}
                           </p>
-                          <div className="flex items-center gap-1.5 mt-1 text-muted-foreground">
-                            <Clock className="h-3 w-3" />
+                          <div className="flex flex-wrap items-center gap-1.5 mt-1 text-muted-foreground">
+                            <Clock className="h-3 w-3 shrink-0" />
                             <span className="text-xs">
                               {dt.toLocaleTimeString("es-MX", {
                                 hour: "2-digit",
@@ -171,7 +171,7 @@ export default function PatientAppointments({
                         </div>
                       </div>
                       <Badge
-                        className={`rounded-full ${cfg.bg} ${cfg.text} border-transparent gap-1.5 px-2.5 py-0.5 text-[11px] font-medium`}
+                        className={`rounded-full ${cfg.bg} ${cfg.text} border-transparent gap-1.5 px-2.5 py-0.5 text-[11px] font-medium shrink-0`}
                       >
                         <span
                           className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`}
@@ -181,35 +181,35 @@ export default function PatientAppointments({
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-2 pt-1 border-t border-border/20">
+                    <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/20">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 text-xs gap-1.5 text-muted-foreground hover:text-foreground"
+                        className="h-9 text-xs gap-1.5 text-muted-foreground hover:text-foreground px-3"
                         onClick={() => setDetailAppt(apt)}
                       >
-                        <Eye className="h-3.5 w-3.5" />
-                        Ver detalles
+                        <Eye className="h-4 w-4 shrink-0" />
+                        <span>Ver detalles</span>
                       </Button>
                       {isActive && (
                         <>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 text-xs gap-1.5 text-primary hover:text-primary"
+                            className="h-9 text-xs gap-1.5 text-primary hover:text-primary px-3"
                             onClick={() => handleAction("reagendar", apt)}
                           >
-                            <RotateCcw className="h-3.5 w-3.5" />
-                            Reagendar
+                            <RotateCcw className="h-4 w-4 shrink-0" />
+                            <span>Reagendar</span>
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 text-xs gap-1.5 text-destructive hover:text-destructive"
+                            className="h-9 text-xs gap-1.5 text-destructive hover:text-destructive px-3"
                             onClick={() => handleAction("cancelar", apt)}
                           >
-                            <X className="h-3.5 w-3.5" />
-                            Cancelar
+                            <X className="h-4 w-4 shrink-0" />
+                            <span>Cancelar</span>
                           </Button>
                         </>
                       )}
