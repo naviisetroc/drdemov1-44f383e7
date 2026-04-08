@@ -64,12 +64,14 @@ export default function PacienteChat() {
       toast.custom(() => (
         <div className="w-full max-w-sm rounded-2xl bg-gradient-to-r from-primary to-accent p-4 shadow-xl text-primary-foreground flex items-start gap-3">
           <div className="h-10 w-10 rounded-xl bg-primary-foreground/25 flex items-center justify-center shrink-0 mt-0.5">
-            <span className="text-xl font-bold">Aa</span>
+            <span className="font-bold leading-none tracking-tight" style={{ fontFamily: "system-ui, sans-serif" }}>
+              <span className="text-xl">A</span><span className="text-sm">a</span>
+            </span>
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-bold text-base leading-tight">¿Necesitas texto más grande?</p>
             <p className="text-sm opacity-90 mt-1 leading-snug">
-              Pulsa el botón <strong>Ꞇ</strong> en la esquina superior derecha para aumentar el tamaño de la fuente.
+              Pulsa el botón <strong style={{ fontFamily: "system-ui, sans-serif" }}>Aa</strong> en la esquina superior derecha para aumentar el tamaño de la fuente.
             </p>
           </div>
         </div>
