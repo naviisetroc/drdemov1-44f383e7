@@ -105,6 +105,7 @@ export default function PatientMedicalHistory({
     text: string;
   } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiTrigger, setAiTrigger] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pendingRecordRef = useRef<ClinicalRecord | null>(null);
 
@@ -149,7 +150,7 @@ export default function PatientMedicalHistory({
         }
       };
     }
-  }, [aiExplain?.record?.id, aiLoading]);
+  }, [aiTrigger]);
 
   function handleExplain(record: ClinicalRecord) {
     // Clear any running animation
@@ -160,6 +161,7 @@ export default function PatientMedicalHistory({
     pendingRecordRef.current = record;
     setAiLoading(true);
     setAiExplain({ record, text: "" });
+    setAiTrigger((t) => t + 1);
   }
 
   function handleCloseExplain() {
