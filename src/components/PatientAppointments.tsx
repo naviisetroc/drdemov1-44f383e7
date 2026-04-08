@@ -134,50 +134,50 @@ export default function PatientAppointments({
                         : "border-border/20 bg-muted/20 opacity-75"
                     }`}
                   >
-                    {/* Top row: date + status */}
-                    <div className="flex items-start justify-between gap-2 mb-3">
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                    {/* Top row: status badge */}
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
                         <div
-                          className={`h-11 w-11 rounded-xl flex flex-col items-center justify-center shrink-0 ${cfg.bg}`}
+                          className={`h-9 w-9 rounded-lg flex flex-col items-center justify-center shrink-0 ${cfg.bg}`}
                         >
-                          <span className={`text-xs font-bold ${cfg.text} leading-none`}>
+                          <span className={`text-[11px] font-bold ${cfg.text} leading-none`}>
                             {dt.toLocaleDateString("es-MX", { day: "numeric" })}
                           </span>
                           <span
-                            className={`text-[10px] uppercase ${cfg.text} leading-none mt-0.5`}
+                            className={`text-[9px] uppercase ${cfg.text} leading-none mt-0.5`}
                           >
                             {dt.toLocaleDateString("es-MX", { month: "short" })}
                           </span>
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-semibold leading-tight break-words">
-                            {apt.reason}
-                          </p>
-                          <div className="flex flex-wrap items-center gap-1.5 mt-1 text-muted-foreground">
-                            <Clock className="h-3 w-3 shrink-0" />
-                            <span className="text-xs">
-                              {dt.toLocaleTimeString("es-MX", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </span>
-                            <span className="text-xs">•</span>
-                            <span className="text-xs">
-                              {dt.toLocaleDateString("es-MX", {
-                                weekday: "long",
-                              })}
-                            </span>
-                          </div>
-                        </div>
+                        <Badge
+                          className={`rounded-full ${cfg.bg} ${cfg.text} border-transparent gap-1 px-2 py-0.5 text-[11px] font-medium`}
+                        >
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`}
+                          />
+                          {cfg.label}
+                        </Badge>
                       </div>
-                      <Badge
-                        className={`rounded-full ${cfg.bg} ${cfg.text} border-transparent gap-1.5 px-2.5 py-0.5 text-[11px] font-medium shrink-0`}
-                      >
-                        <span
-                          className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`}
-                        />
-                        {cfg.label}
-                      </Badge>
+                    </div>
+
+                    {/* Reason & time - full width so text never gets squeezed */}
+                    <p className="text-sm font-semibold leading-snug" style={{ overflowWrap: "break-word", wordBreak: "normal" }}>
+                      {apt.reason}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-1.5 mt-1 text-muted-foreground">
+                      <Clock className="h-3 w-3 shrink-0" />
+                      <span className="text-xs">
+                        {dt.toLocaleTimeString("es-MX", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      <span className="text-xs">•</span>
+                      <span className="text-xs">
+                        {dt.toLocaleDateString("es-MX", {
+                          weekday: "long",
+                        })}
+                      </span>
                     </div>
 
                     {/* Actions */}

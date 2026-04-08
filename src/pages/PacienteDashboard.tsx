@@ -81,12 +81,21 @@ export default function PacienteDashboard() {
     const sess: PatientSession = JSON.parse(raw);
     setSession(sess);
 
-    const allPatients = getChatPatients();
-    const found = allPatients.find((p) => p.id === sess.id);
-    if (found) setPatient(found);
+    // Small delay to ensure store is fully hydrated on mobile first-load
+    const init = () => {
+      const allPatients = getChatPatients();
+      const found = allPatients.find((p) => p.id === sess.id);
+      if (found) {
+        setPatient(found);
+        const allAppts = getChatAppointments();
+        setAppointments(allAppts.filter((a) => a.patientId === sess.id));
+      }
+    };
 
-    const allAppts = getChatAppointments();
-    setAppointments(allAppts.filter((a) => a.patientId === sess.id));
+    init();
+    // Retry once after a tick for mobile cold-start edge case
+    const timer = setTimeout(init, 150);
+    return () => clearTimeout(timer);
   }, [navigate]);
 
   function handleLogout() {
@@ -133,9 +142,9 @@ export default function PacienteDashboard() {
 
       <div className="max-w-2xl mx-auto p-4 space-y-4">
         {/* ─── HERO SUMMARY ─── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="space-y-3">
           {/* Next appointment */}
-          <Card className="glass-strong border-border/30 shadow-sm sm:col-span-2">
+          <Card className="glass-strong border-border/30 shadow-sm">
             <CardContent className="p-4 flex items-center gap-4">
               <div className="h-12 w-12 rounded-2xl bg-primary/15 flex items-center justify-center shrink-0">
                 <Calendar className="h-6 w-6 text-primary" />
@@ -144,7 +153,7 @@ export default function PacienteDashboard() {
                 <p className="text-xs text-muted-foreground font-medium mb-0.5">Próxima cita</p>
                 {nextAppointment ? (
                   <>
-                    <p className="text-sm font-semibold truncate">{nextAppointment.reason}</p>
+                    <p className="text-sm font-semibold" style={{ overflowWrap: "break-word", wordBreak: "normal" }}>{nextAppointment.reason}</p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(nextAppointment.datetime).toLocaleDateString("es-MX", {
                         weekday: "long",
@@ -167,12 +176,12 @@ export default function PacienteDashboard() {
 
           {/* Patient status */}
           <Card className="glass-strong border-border/30 shadow-sm">
-            <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full gap-2">
+            <CardContent className="p-4 flex items-center gap-3">
               <Badge className={`rounded-full ${status.color} gap-1.5 px-3 py-1`}>
                 {status.icon}
                 {status.label}
               </Badge>
-              <p className="text-[11px] text-muted-foreground">Estado actual</p>
+              <p className="text-xs text-muted-foreground">Estado actual</p>
             </CardContent>
           </Card>
         </div>
