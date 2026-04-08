@@ -307,6 +307,7 @@ export default function PacienteChat() {
           <h1 className="font-semibold text-sm">Dr. Alejandro Ramírez</h1>
           <p className="text-xs opacity-80">Asistente virtual • En línea</p>
         </div>
+        <FontSizeButton />
         <Badge variant="secondary" className="text-[10px] bg-primary-foreground/15 text-primary-foreground border-0">Demo</Badge>
       </header>
 
