@@ -11,7 +11,7 @@ export default function FontSizeButton() {
       variant="ghost"
       size="icon"
       onClick={cycle}
-      className="text-primary-foreground hover:bg-primary-foreground/20 rounded-xl relative h-11 w-11 animate-bounce-subtle"
+      className="text-white hover:bg-white/20 rounded-xl relative h-11 w-11 animate-bounce-subtle"
       title="Cambiar tamaño de fuente"
     >
       <span className="font-bold leading-none tracking-tight" style={{ fontFamily: "system-ui, sans-serif" }}>
