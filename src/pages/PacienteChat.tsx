@@ -58,6 +58,21 @@ export default function PacienteChat() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
 
+  // Show font-size tip once per session
+  useEffect(() => {
+    const tipKey = "medisec_font_tip_shown";
+    if (!sessionStorage.getItem(tipKey)) {
+      sessionStorage.setItem(tipKey, "1");
+      const t = setTimeout(() => {
+        toast("💡 ¿Necesitas texto más grande?", {
+          description: "Pulsa el botón  Ꞇ  en la esquina superior derecha para aumentar el tamaño de la fuente.",
+          duration: 8000,
+        });
+      }, 1500);
+      return () => clearTimeout(t);
+    }
+  }, []);
+
   function addBot(text: string, options?: string[]) {
     setTyping(true);
     const delay = 800 + Math.random() * 1200;
