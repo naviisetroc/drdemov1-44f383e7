@@ -102,10 +102,19 @@ export default function PacienteDashboard() {
     if (!sessionStorage.getItem(tipKey)) {
       sessionStorage.setItem(tipKey, "1");
       const tipTimer = setTimeout(() => {
-        toast("💡 ¿Necesitas texto más grande?", {
-          description: "Pulsa el botón  Ꞇ  en la esquina superior derecha para aumentar el tamaño de la fuente.",
-          duration: 8000,
-        });
+        toast.custom(() => (
+          <div className="w-full max-w-sm rounded-2xl bg-gradient-to-r from-primary to-accent p-4 shadow-xl text-primary-foreground flex items-start gap-3">
+            <div className="h-10 w-10 rounded-xl bg-primary-foreground/25 flex items-center justify-center shrink-0 mt-0.5">
+              <span className="text-xl font-bold">Aa</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-base leading-tight">¿Necesitas texto más grande?</p>
+              <p className="text-sm opacity-90 mt-1 leading-snug">
+                Pulsa el botón <strong>Ꞇ</strong> en la esquina superior derecha para aumentar el tamaño de la fuente.
+              </p>
+            </div>
+          </div>
+        ), { duration: 10000 });
       }, 1200);
       return () => { clearTimeout(timer); clearTimeout(tipTimer); };
     }
