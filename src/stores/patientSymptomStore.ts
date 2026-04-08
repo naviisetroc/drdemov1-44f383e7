@@ -4,6 +4,12 @@ export interface SymptomEntry {
   text: string;
   intensity: number; // 1-10
   date: string; // ISO
+  painType?: string;
+  location?: string;
+  duration?: string;
+  history?: string;
+  notes?: string;
+  appointmentId?: string;
 }
 
 const STORAGE_KEY = "medisec_patient_symptoms";
@@ -29,7 +35,15 @@ export function getPatientSymptoms(patientId: string): SymptomEntry[] {
 export function addPatientSymptom(
   patientId: string,
   text: string,
-  intensity: number
+  intensity: number,
+  extra?: {
+    painType?: string;
+    location?: string;
+    duration?: string;
+    history?: string;
+    notes?: string;
+    appointmentId?: string;
+  }
 ): SymptomEntry {
   const entry: SymptomEntry = {
     id: `sym-${Date.now()}`,
@@ -37,6 +51,7 @@ export function addPatientSymptom(
     text,
     intensity,
     date: new Date().toISOString(),
+    ...extra,
   };
   const all = load();
   all.push(entry);
