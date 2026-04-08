@@ -44,7 +44,7 @@ export default function PacienteChat() {
   const [input, setInput] = useState("");
   const [step, setStep] = useState<Step>("nombre");
   const [typing, setTyping] = useState(false);
-  const [patientData, setPatientData] = useState<Partial<ChatPatient>>({});
+  const [patientData, setPatientData] = useState<Partial<ChatPatient> & { symptomIntensity?: number }>({});
   const [selectedTime, setSelectedTime] = useState("");
   const [completed, setCompleted] = useState(false);
   const [createdPatientId, setCreatedPatientId] = useState("");
