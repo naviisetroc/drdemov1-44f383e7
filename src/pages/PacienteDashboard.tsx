@@ -26,6 +26,7 @@ import PatientAppointments from "@/components/PatientAppointments";
 import PatientMedicalHistory from "@/components/PatientMedicalHistory";
 import PatientFiles from "@/components/PatientFiles";
 import PatientSymptomTracker from "@/components/PatientSymptomTracker";
+import FontSizeButton from "@/components/FontSizeButton";
 
 interface PatientSession {
   id: string;
