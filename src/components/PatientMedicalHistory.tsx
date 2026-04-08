@@ -262,7 +262,7 @@ export default function PatientMedicalHistory({
                       {/* Summary row always visible */}
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Stethoscope className="h-3 w-3 shrink-0" />
-                        <span className="truncate">{rec.diagnosis}</span>
+                        <span style={{ overflowWrap: "break-word", wordBreak: "normal" }}>{rec.diagnosis}</span>
                       </div>
 
                       {/* Expanded details */}

@@ -140,7 +140,7 @@ export default function PatientFiles({ patientId }: PatientFilesProps) {
                       <Icon className={`h-4 w-4 ${cfg.color}`} />
                     </div>
                     <div className="flex-1 min-w-0 overflow-hidden">
-                      <p className="text-sm font-medium truncate">{file.name}</p>
+                      <p className="text-sm font-medium" style={{ overflowWrap: "break-word", wordBreak: "normal" }}>{file.name}</p>
                       <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
                         <Badge className="rounded-full bg-muted text-muted-foreground border-transparent text-[10px] px-1.5 py-0 shrink-0">
                           {cfg.label}
