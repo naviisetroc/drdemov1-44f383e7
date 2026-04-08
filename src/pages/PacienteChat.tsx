@@ -222,6 +222,11 @@ export default function PacienteChat() {
 
     addChatPatient(patient);
 
+    // Auto-register symptom in the tracker
+    if (data.symptoms && patientData.symptomIntensity) {
+      addPatientSymptom(id, data.symptoms, patientData.symptomIntensity);
+    }
+
     let appointmentCreated = false;
     if (time) {
       appointmentCreated = true;
