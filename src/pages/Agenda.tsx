@@ -134,7 +134,7 @@ export default function Agenda() {
           </Badge>
         </button>
         <button onClick={() => setFilter(filter === "confirmada" ? null : "confirmada")}>
-          <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "confirmada" ? "border-blue-500 bg-blue-500/20 text-blue-400 ring-2 ring-blue-500/30" : "border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"}`}>
+          <Badge variant="outline" className={`gap-1 py-1.5 px-3 rounded-xl cursor-pointer transition-all ${filter === "confirmada" ? "border-blue-500 bg-blue-500/20 text-blue-600 ring-2 ring-blue-500/30" : "border-blue-500/30 bg-blue-500/10 text-blue-600 hover:bg-blue-500/20"}`}>
             <CheckCircle2 className="h-3 w-3" /> {sorted.filter(a => a.status === "confirmada").length} confirmadas
           </Badge>
         </button>
