@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { addChatPatient, addChatAppointment, ChatPatient, convertToRegistered } from "@/stores/patientChatStore";
+import { addPatientSymptom } from "@/stores/patientSymptomStore";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -17,7 +18,7 @@ interface Message {
 
 type Step =
   | "welcome" | "nombre" | "edad" | "sexo" | "motivo" | "sintomas"
-  | "historial" | "confirm_appointment" | "select_time" | "summary"
+  | "sintomas_intensidad" | "historial" | "confirm_appointment" | "select_time" | "summary"
   | "offer_account" | "register_email" | "register_password" | "done";
 
 const timeSlots = [
@@ -43,7 +44,7 @@ export default function PacienteChat() {
   const [input, setInput] = useState("");
   const [step, setStep] = useState<Step>("nombre");
   const [typing, setTyping] = useState(false);
-  const [patientData, setPatientData] = useState<Partial<ChatPatient>>({});
+  const [patientData, setPatientData] = useState<Partial<ChatPatient> & { symptomIntensity?: number }>({});
   const [selectedTime, setSelectedTime] = useState("");
   const [completed, setCompleted] = useState(false);
   const [createdPatientId, setCreatedPatientId] = useState("");
@@ -118,8 +119,21 @@ export default function PacienteChat() {
         break;
       case "sintomas":
         setPatientData((d) => ({ ...d, symptoms: msg }));
+        setStep("sintomas_intensidad");
+        addBot("Gracias por la información. En una escala del **1 al 10**, ¿qué tan intenso es tu malestar?\n\n• **1-3:** Leve\n• **4-6:** Moderado\n• **7-10:** Intenso", ["1", "3", "5", "7", "10"]);
+        break;
+      case "sintomas_intensidad": {
+        const intensity = parseInt(msg);
+        if (isNaN(intensity) || intensity < 1 || intensity > 10) {
+          addBot("Por favor, ingresa un número del **1 al 10**.");
+          return;
+        }
+        setPatientData((d) => ({ ...d, symptomIntensity: intensity }));
         setStep("historial");
-        addBot("¿Tienes algún **antecedente médico relevante**?\n\nPor ejemplo: enfermedades crónicas, alergias, cirugías previas, medicamentos actuales.\n\nSi no tienes ninguno, escribe \"Ninguno\".");
+        const label = intensity <= 3 ? "Leve" : intensity <= 6 ? "Moderado" : "Intenso";
+        addBot(`Registrado: **${label} (${intensity}/10)**.\n\n¿Tienes algún **antecedente médico relevante**?\n\nPor ejemplo: enfermedades crónicas, alergias, cirugías previas, medicamentos actuales.\n\nSi no tienes ninguno, escribe "Ninguno".`);
+        break;
+      }
         break;
       case "historial":
         setPatientData((d) => ({ ...d, history: msg }));
@@ -208,6 +222,11 @@ export default function PacienteChat() {
 
     addChatPatient(patient);
 
+    // Auto-register symptom in the tracker
+    if (data.symptoms && patientData.symptomIntensity) {
+      addPatientSymptom(id, data.symptoms, patientData.symptomIntensity);
+    }
+
     let appointmentCreated = false;
     if (time) {
       appointmentCreated = true;
@@ -229,7 +248,8 @@ export default function PacienteChat() {
 
     setTyping(true);
     setTimeout(() => {
-      const summaryMsg = `✅ **¡Listo!** He registrado toda tu información.\n\n📋 **Resumen de tu registro:**\n\n👤 **Nombre:** ${patient.name}\n🎂 **Edad:** ${patient.age} años\n🩺 **Motivo:** ${patient.reason}\n📝 **Síntomas:** ${patient.symptoms}\n📂 **Antecedentes:** ${patient.history}${time ? `\n\n📅 **Cita agendada:** ${time}` : ""}\n\nEl Dr. Ramírez revisará tu información antes de la consulta. ${time ? "Recibirás un recordatorio antes de tu cita." : ""}`;
+      const intensityInfo = patientData.symptomIntensity ? `\n💢 **Intensidad:** ${patientData.symptomIntensity}/10` : "";
+      const summaryMsg = `✅ **¡Listo!** He registrado toda tu información.\n\n📋 **Resumen de tu registro:**\n\n👤 **Nombre:** ${patient.name}\n🎂 **Edad:** ${patient.age} años\n🩺 **Motivo:** ${patient.reason}\n📝 **Síntomas:** ${patient.symptoms}${intensityInfo}\n📂 **Antecedentes:** ${patient.history}${time ? `\n\n📅 **Cita agendada:** ${time}` : ""}\n\nEl Dr. Ramírez revisará tu información antes de la consulta. ${time ? "Recibirás un recordatorio antes de tu cita." : ""}`;
 
       setMessages((prev) => [
         ...prev,
