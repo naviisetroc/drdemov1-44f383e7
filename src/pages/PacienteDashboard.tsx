@@ -110,7 +110,7 @@ export default function PacienteDashboard() {
   const lastIndication = indications.length > 0 ? indications[indications.length - 1] : null;
 
   return (
-    <div className="min-h-screen gradient-bg">
+    <div className="min-h-screen gradient-bg overflow-x-hidden">
       {/* Header */}
       <header className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-4 py-3 flex items-center gap-3 shadow-elevated">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-foreground/20 backdrop-blur-sm">
