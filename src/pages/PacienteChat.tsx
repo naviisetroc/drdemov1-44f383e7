@@ -7,6 +7,8 @@ import { addChatPatient, addChatAppointment, ChatPatient, convertToRegistered } 
 import { addPatientSymptom } from "@/stores/patientSymptomStore";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { useFontSize } from "@/hooks/useFontSize";
+import FontSizeButton from "@/components/FontSizeButton";
 
 interface Message {
   id: string;
@@ -306,6 +308,7 @@ export default function PacienteChat() {
           <h1 className="font-semibold text-sm">Dr. Alejandro Ramírez</h1>
           <p className="text-xs opacity-80">Asistente virtual • En línea</p>
         </div>
+        <FontSizeButton />
         <Badge variant="secondary" className="text-[10px] bg-primary-foreground/15 text-primary-foreground border-0">Demo</Badge>
       </header>
 

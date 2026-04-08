@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Folder,
 } from "lucide-react";
+import { useFontSize } from "@/hooks/useFontSize";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +26,7 @@ import PatientAppointments from "@/components/PatientAppointments";
 import PatientMedicalHistory from "@/components/PatientMedicalHistory";
 import PatientFiles from "@/components/PatientFiles";
 import PatientSymptomTracker from "@/components/PatientSymptomTracker";
+import FontSizeButton from "@/components/FontSizeButton";
 
 interface PatientSession {
   id: string;
@@ -118,6 +120,7 @@ export default function PacienteDashboard() {
           <h1 className="font-semibold text-sm">Portal del Paciente</h1>
           <p className="text-xs opacity-80">Bienvenido/a, {patient.name.split(" ")[0]}</p>
         </div>
+        <FontSizeButton />
         <Button
           variant="ghost"
           size="icon"
