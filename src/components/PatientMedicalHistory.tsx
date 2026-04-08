@@ -214,7 +214,7 @@ export default function PatientMedicalHistory({
                 const isExpanded = expandedId === rec.id;
                 const dt = new Date(rec.date);
                 return (
-                  <div key={rec.id} className="relative pl-12 pb-4">
+                  <div key={rec.id} className="relative pl-12 pb-4 overflow-hidden">
                     {/* Timeline dot */}
                     <div className="absolute left-[12px] top-1 h-4 w-4 rounded-full border-2 border-primary bg-background z-10" />
 
@@ -332,7 +332,7 @@ export default function PatientMedicalHistory({
                         </span>
                       </div>
                       {rx.medications.map((m, i) => (
-                        <p key={i} className="text-sm text-muted-foreground">
+                        <p key={i} className="text-sm text-muted-foreground break-words">
                           • <strong className="text-foreground">{m.name}</strong> {m.dose} — {m.frequency} ({m.duration})
                         </p>
                       ))}

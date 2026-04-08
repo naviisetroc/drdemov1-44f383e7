@@ -157,13 +157,13 @@ export default function PatientSymptomTracker({ patientId, appointments = [] }: 
                 return (
                   <div
                     key={entry.id}
-                    className="flex items-start gap-3 p-3 rounded-xl border border-border/30 bg-card"
+                    className="flex items-start gap-3 p-3 rounded-xl border border-border/30 bg-card overflow-hidden"
                   >
                     <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                       <Gauge className="h-4 w-4 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm">{entry.text}</p>
+                      <p className="text-sm break-words">{entry.text}</p>
                       {(entry.painType || entry.location || entry.duration) && (
                         <div className="flex flex-wrap gap-1.5 mt-1">
                           {entry.painType && (

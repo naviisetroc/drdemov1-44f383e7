@@ -134,18 +134,18 @@ export default function PatientFiles({ patientId }: PatientFilesProps) {
                 return (
                   <div
                     key={file.id}
-                    className="flex items-center gap-3 p-3 rounded-xl border border-border/30 bg-card hover:shadow-sm transition-all"
+                    className="flex items-center gap-3 p-3 rounded-xl border border-border/30 bg-card hover:shadow-sm transition-all overflow-hidden"
                   >
                     <div className={`h-9 w-9 rounded-lg bg-muted/40 flex items-center justify-center shrink-0`}>
                       <Icon className={`h-4 w-4 ${cfg.color}`} />
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 overflow-hidden">
                       <p className="text-sm font-medium truncate">{file.name}</p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Badge className="rounded-full bg-muted text-muted-foreground border-transparent text-[10px] px-1.5 py-0">
+                      <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
+                        <Badge className="rounded-full bg-muted text-muted-foreground border-transparent text-[10px] px-1.5 py-0 shrink-0">
                           {cfg.label}
                         </Badge>
-                        <span>
+                        <span className="whitespace-nowrap">
                           {new Date(file.date).toLocaleDateString("es-MX", {
                             day: "numeric",
                             month: "short",
