@@ -18,14 +18,15 @@ interface Message {
 
 type Step =
   | "welcome" | "nombre" | "edad" | "sexo" | "motivo" | "sintomas"
-  | "sintomas_intensidad" | "historial" | "confirm_appointment" | "select_time" | "summary"
+  | "sintomas_intensidad" | "sintomas_antecedentes" | "sintomas_notas"
+  | "historial" | "confirm_appointment" | "select_time" | "summary"
   | "offer_account" | "register_email" | "register_password" | "done";
 
 const timeSlots = [
-  "Lunes 24 Mar — 11:00 AM",
-  "Martes 25 Mar — 3:00 PM",
-  "Miércoles 26 Mar — 9:30 AM",
-  "Jueves 27 Mar — 1:00 PM",
+  "Lunes 13 Abr — 10:00 AM",
+  "Martes 14 Abr — 2:00 PM",
+  "Miércoles 15 Abr — 11:30 AM",
+  "Jueves 16 Abr — 9:00 AM",
 ];
 
 function now() {
@@ -44,7 +45,7 @@ export default function PacienteChat() {
   const [input, setInput] = useState("");
   const [step, setStep] = useState<Step>("nombre");
   const [typing, setTyping] = useState(false);
-  const [patientData, setPatientData] = useState<Partial<ChatPatient> & { symptomIntensity?: number }>({});
+  const [patientData, setPatientData] = useState<Partial<ChatPatient> & { symptomIntensity?: number; symptomHistory?: string; symptomNotes?: string }>({});
   const [selectedTime, setSelectedTime] = useState("");
   const [completed, setCompleted] = useState(false);
   const [createdPatientId, setCreatedPatientId] = useState("");
@@ -129,12 +130,25 @@ export default function PacienteChat() {
           return;
         }
         setPatientData((d) => ({ ...d, symptomIntensity: intensity }));
-        setStep("historial");
+        setStep("sintomas_antecedentes");
         const label = intensity <= 3 ? "Leve" : intensity <= 6 ? "Moderado" : "Intenso";
-        addBot(`Registrado: **${label} (${intensity}/10)**.\n\n¿Tienes algún **antecedente médico relevante**?\n\nPor ejemplo: enfermedades crónicas, alergias, cirugías previas, medicamentos actuales.\n\nSi no tienes ninguno, escribe "Ninguno".`);
+        addBot(`Registrado: **${label} (${intensity}/10)**.\n\n¿Tienes algún **antecedente médico relevante** relacionado con estos síntomas?\n\nPor ejemplo: enfermedades crónicas, alergias, cirugías previas.\n\nSi no tienes, escribe **"Ninguno"**.`);
         break;
       }
+      case "sintomas_antecedentes": {
+        const histVal = msg.toLowerCase() === "ninguno" ? "" : msg;
+        setPatientData((d) => ({ ...d, symptomHistory: histVal }));
+        setStep("sintomas_notas");
+        addBot("¿Alguna **nota adicional** sobre tus síntomas?\n\nPor ejemplo: si tomaste algún medicamento, cuándo empezó exactamente, etc.\n\nSi no tienes notas, escribe **\"No\"**.");
         break;
+      }
+      case "sintomas_notas": {
+        const notesVal = msg.toLowerCase() === "no" || msg.toLowerCase() === "ninguno" ? "" : msg;
+        setPatientData((d) => ({ ...d, symptomNotes: notesVal }));
+        setStep("historial");
+        addBot("Ahora, ¿tienes algún **antecedente médico general** que el doctor deba saber?\n\nPor ejemplo: enfermedades crónicas, alergias a medicamentos, cirugías anteriores.\n\nSi no tienes, escribe **\"Ninguno\"**.");
+        break;
+      }
       case "historial":
         setPatientData((d) => ({ ...d, history: msg }));
         setStep("confirm_appointment");
@@ -155,7 +169,6 @@ export default function PacienteChat() {
         finalize(patientData, msg);
         break;
 
-      // --- Account conversion flow ---
       case "offer_account":
         if (msg.toLowerCase().includes("sí") || msg.toLowerCase().includes("si") || msg.toLowerCase().includes("crear")) {
           setStep("register_email");
@@ -201,7 +214,7 @@ export default function PacienteChat() {
     }
   }
 
-  function finalize(data: Partial<ChatPatient>, time: string) {
+  function finalize(data: Partial<ChatPatient> & { symptomIntensity?: number; symptomHistory?: string; symptomNotes?: string }, time: string) {
     const id = `chat-${Date.now()}`;
     setCreatedPatientId(id);
     const summary = `Paciente ${data.sex === "F" ? "femenina" : "masculino"} de ${data.age} años.\n\n**Motivo de consulta:** ${data.reason}\n**Síntomas:** ${data.symptoms}\n**Antecedentes:** ${data.history}`;
@@ -222,9 +235,12 @@ export default function PacienteChat() {
 
     addChatPatient(patient);
 
-    // Auto-register symptom in the tracker
-    if (data.symptoms && patientData.symptomIntensity) {
-      addPatientSymptom(id, data.symptoms, patientData.symptomIntensity);
+    // Auto-register symptom with extra fields
+    if (data.symptoms && data.symptomIntensity) {
+      addPatientSymptom(id, data.symptoms, data.symptomIntensity, {
+        history: data.symptomHistory || undefined,
+        notes: data.symptomNotes || undefined,
+      });
     }
 
     let appointmentCreated = false;
@@ -234,7 +250,7 @@ export default function PacienteChat() {
         id: `apt-${Date.now()}`,
         patientId: id,
         patientName: patient.name,
-        datetime: "2026-03-24T11:00",
+        datetime: "2026-04-13T10:00",
         status: "programada",
         reason: patient.reason,
         notes: `Registrado vía chat. Síntomas: ${patient.symptoms}`,
@@ -248,8 +264,10 @@ export default function PacienteChat() {
 
     setTyping(true);
     setTimeout(() => {
-      const intensityInfo = patientData.symptomIntensity ? `\n💢 **Intensidad:** ${patientData.symptomIntensity}/10` : "";
-      const summaryMsg = `✅ **¡Listo!** He registrado toda tu información.\n\n📋 **Resumen de tu registro:**\n\n👤 **Nombre:** ${patient.name}\n🎂 **Edad:** ${patient.age} años\n🩺 **Motivo:** ${patient.reason}\n📝 **Síntomas:** ${patient.symptoms}${intensityInfo}\n📂 **Antecedentes:** ${patient.history}${time ? `\n\n📅 **Cita agendada:** ${time}` : ""}\n\nEl Dr. Ramírez revisará tu información antes de la consulta. ${time ? "Recibirás un recordatorio antes de tu cita." : ""}`;
+      const intensityInfo = data.symptomIntensity ? `\n💢 **Intensidad:** ${data.symptomIntensity}/10` : "";
+      const historyInfo = data.symptomHistory ? `\n📂 **Antecedentes (síntomas):** ${data.symptomHistory}` : "";
+      const notesInfo = data.symptomNotes ? `\n📋 **Notas:** ${data.symptomNotes}` : "";
+      const summaryMsg = `✅ **¡Listo!** He registrado toda tu información.\n\n📋 **Resumen de tu registro:**\n\n👤 **Nombre:** ${patient.name}\n🎂 **Edad:** ${patient.age} años\n🩺 **Motivo:** ${patient.reason}\n📝 **Síntomas:** ${patient.symptoms}${intensityInfo}${historyInfo}${notesInfo}\n📂 **Antecedentes generales:** ${patient.history}${time ? `\n\n📅 **Cita agendada:** ${time}` : ""}\n\nEl Dr. Ramírez revisará tu información antes de la consulta. ${time ? "Recibirás un recordatorio antes de tu cita." : ""}`;
 
       setMessages((prev) => [
         ...prev,
@@ -257,7 +275,6 @@ export default function PacienteChat() {
       ]);
       setTyping(false);
 
-      // After summary, offer account creation
       setStep("offer_account");
       setTimeout(() => {
         setTyping(true);

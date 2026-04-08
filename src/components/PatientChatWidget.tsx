@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Send, Bot, MessageCircle, X, Sparkles, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChatPatient, getChatAppointments } from "@/stores/patientChatStore";
+import { ChatPatient, getChatAppointments, addChatAppointment } from "@/stores/patientChatStore";
 import { getPatientPrescriptions, getPatientIndications } from "@/stores/patientMockPrescriptions";
 import { getPatientSymptoms, addPatientSymptom } from "@/stores/patientSymptomStore";
 import { Appointment } from "@/data/mockData";
@@ -16,6 +16,21 @@ interface Msg {
   options?: string[];
 }
 
+interface PendingSymptom {
+  text: string;
+  step: "intensity" | "antecedentes" | "notas" | "offer_appointment" | "select_time";
+  intensity?: number;
+  history?: string;
+  notes?: string;
+}
+
+const timeSlots = [
+  "Lunes 13 Abr — 10:00 AM",
+  "Martes 14 Abr — 2:00 PM",
+  "Miércoles 15 Abr — 11:30 AM",
+  "Jueves 16 Abr — 9:00 AM",
+];
+
 function now() {
   return new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
 }
@@ -27,9 +42,6 @@ function generatePatientResponse(q: string, patient: ChatPatient): string {
   const indications = getPatientIndications(patient.id);
   const symptoms = getPatientSymptoms(patient.id);
 
-  // --- Symptom-aware responses ---
-  // This case is now handled via the conversational flow in the widget (pendingSymptom state)
-  // We return a special marker so the widget knows to start the symptom registration flow
   if (lower.includes("duele") || lower.includes("dolor") || lower.includes("molest") || (lower.includes("mal") && (lower.includes("siento") || lower.includes("estoy") || lower.includes("sigue")))) {
     return "__SYMPTOM_FLOW__";
   }
@@ -45,7 +57,6 @@ function generatePatientResponse(q: string, patient: ChatPatient): string {
     return res;
   }
 
-  // --- Appointments ---
   if (lower.includes("cita") && (lower.includes("cuándo") || lower.includes("cuando") || lower.includes("tengo") || lower.includes("próxima") || lower.includes("proxima") || lower.includes("ver"))) {
     const upcoming = appts.filter((a) => a.status === "programada" || a.status === "confirmada");
     if (upcoming.length === 0) return "No tienes citas programadas por el momento. ¿Te gustaría agendar una?";
@@ -77,7 +88,6 @@ function generatePatientResponse(q: string, patient: ChatPatient): string {
     return "Para cancelar tu cita, por favor comunícate directamente con el consultorio al **(55) 1234-5678** con al menos 24 horas de anticipación.\n\n¿Hay algo más en lo que pueda ayudarte?";
   }
 
-  // --- Prescriptions ---
   if (lower.includes("receta") || lower.includes("recetaron") || lower.includes("medicamento") || lower.includes("medicina")) {
     if (prescriptions.length === 0) return "No tienes recetas registradas en el sistema. Consulta con el Dr. Ramírez en tu próxima cita.";
     const last = prescriptions[prescriptions.length - 1];
@@ -103,7 +113,6 @@ function generatePatientResponse(q: string, patient: ChatPatient): string {
     return res;
   }
 
-  // --- Indications ---
   if (lower.includes("indicacion") || lower.includes("indicaciones") || lower.includes("instrucciones") || lower.includes("cuidado") || lower.includes("rehabilitación") || lower.includes("rehabilitacion") || lower.includes("ejercicio")) {
     if (indications.length === 0) return "No tienes indicaciones registradas. Consulta con el Dr. Ramírez.";
     const last = indications[indications.length - 1];
@@ -121,17 +130,14 @@ function generatePatientResponse(q: string, patient: ChatPatient): string {
     return res;
   }
 
-  // --- History / Summary ---
   if (lower.includes("historial") || lower.includes("resumen") || lower.includes("información") || lower.includes("mi perfil") || lower.includes("mis datos")) {
     return `📋 **Tu información médica:**\n\n👤 **Nombre:** ${patient.name}\n🎂 **Edad:** ${patient.age} años\n🩺 **Motivo de registro:** ${patient.reason}\n📝 **Síntomas reportados:** ${patient.symptoms}\n📂 **Antecedentes:** ${patient.history}\n📅 **Registro:** ${new Date(patient.createdAt).toLocaleDateString("es-MX")}`;
   }
 
-  // --- Help ---
   if (lower.includes("ayuda") || lower.includes("qué puedes") || lower.includes("que puedes") || lower.includes("opciones") || lower.includes("menú") || lower.includes("menu")) {
     return "Puedo ayudarte con:\n\n• 📅 **\"¿Cuándo es mi cita?\"** — Ver tus citas\n• 📅 **\"Quiero una cita\"** — Agendar nueva cita\n• 🔄 **\"Quiero reagendar\"** — Cambiar fecha de cita\n• 💊 **\"¿Qué me recetaron?\"** — Ver tus recetas\n• 📋 **\"Indicaciones\"** — Ver cuidados e instrucciones\n• 📊 **\"Mis síntomas\"** — Ver tus registros de síntomas\n• 👤 **\"Mi historial\"** — Ver tu información médica\n\n¿En qué te puedo ayudar? 😊";
   }
 
-  // --- Greetings ---
   if (lower.includes("hola") || lower.includes("buenos") || lower.includes("buenas")) {
     return `¡Hola, **${patient.name.split(" ")[0]}**! 👋 ¿En qué te puedo ayudar hoy?\n\nEscribe **"ayuda"** para ver todas las opciones disponibles.`;
   }
@@ -172,7 +178,7 @@ export default function PatientChatWidget({ patient, forceOpen, onOpenChange }: 
   ]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
-  const [pendingSymptom, setPendingSymptom] = useState<string | null>(null);
+  const [pendingSymptom, setPendingSymptom] = useState<PendingSymptom | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -191,27 +197,84 @@ export default function PatientChatWidget({ patient, forceOpen, onOpenChange }: 
   }
 
   function processMessage(msg: string) {
-    // If we're waiting for intensity rating
     if (pendingSymptom) {
-      const num = parseInt(msg);
-      if (isNaN(num) || num < 1 || num > 10) {
-        addBot("Por favor, ingresa un número del **1 al 10** para la intensidad.\n\n• 1-3: Leve\n• 4-6: Moderado\n• 7-10: Intenso");
+      const ps = pendingSymptom;
+
+      if (ps.step === "intensity") {
+        const num = parseInt(msg);
+        if (isNaN(num) || num < 1 || num > 10) {
+          addBot("Por favor, ingresa un número del **1 al 10** para la intensidad.\n\n• 1-3: Leve\n• 4-6: Moderado\n• 7-10: Intenso");
+          return;
+        }
+        setPendingSymptom({ ...ps, intensity: num, step: "antecedentes" });
+        const label = num <= 3 ? "Leve" : num <= 6 ? "Moderado" : "Intenso";
+        addBot(`Registrado: **${label} (${num}/10)**.\n\n¿Tienes algún **antecedente médico relevante** relacionado con este malestar?\n\nPor ejemplo: enfermedades crónicas, alergias, cirugías previas.\n\nSi no tienes, escribe **"Ninguno"**.`);
         return;
       }
-      addPatientSymptom(patient.id, pendingSymptom, num);
-      toast.success("Síntoma registrado", { description: "Tu médico podrá verlo en tu expediente." });
-      const label = num <= 3 ? "Leve" : num <= 6 ? "Moderado" : "Intenso";
-      const extra = num >= 7
-        ? "\n\n⚠️ La intensidad es alta. Te recomiendo comunicarte con el consultorio al **(55) 1234-5678** si el dolor es insoportable."
-        : "\n\nSeguiremos monitoreando tu evolución. Si cambia la intensidad, cuéntame.";
-      addBot(`✅ **Síntoma registrado exitosamente:**\n\n📝 **Síntoma:** ${pendingSymptom}\n💢 **Intensidad:** ${num}/10 — ${label}${extra}\n\n¿Necesitas ayuda con algo más?`);
-      setPendingSymptom(null);
-      return;
+
+      if (ps.step === "antecedentes") {
+        const historyVal = msg.toLowerCase() === "ninguno" ? "" : msg;
+        setPendingSymptom({ ...ps, history: historyVal, step: "notas" });
+        addBot("¿Alguna **nota adicional** que quieras agregar?\n\nPor ejemplo: cuándo empezó, si tomaste algún medicamento, etc.\n\nSi no tienes notas, escribe **\"No\"**.");
+        return;
+      }
+
+      if (ps.step === "notas") {
+        const notesVal = msg.toLowerCase() === "no" || msg.toLowerCase() === "ninguno" ? "" : msg;
+        const finalPs = { ...ps, notes: notesVal };
+
+        // Save the symptom
+        addPatientSymptom(patient.id, finalPs.text, finalPs.intensity!, {
+          history: finalPs.history || undefined,
+          notes: finalPs.notes || undefined,
+        });
+        toast.success("Síntoma registrado", { description: "Tu médico podrá verlo en tu expediente." });
+
+        const label = finalPs.intensity! <= 3 ? "Leve" : finalPs.intensity! <= 6 ? "Moderado" : "Intenso";
+        let summary = `✅ **Síntoma registrado exitosamente:**\n\n📝 **Síntoma:** ${finalPs.text}\n💢 **Intensidad:** ${finalPs.intensity}/10 — ${label}`;
+        if (finalPs.history) summary += `\n📂 **Antecedentes:** ${finalPs.history}`;
+        if (finalPs.notes) summary += `\n📋 **Notas:** ${finalPs.notes}`;
+
+        if (finalPs.intensity! >= 7) {
+          summary += "\n\n⚠️ La intensidad es alta. Te recomiendo agendar una cita para que el doctor te revise.";
+        }
+
+        setPendingSymptom({ ...finalPs, step: "offer_appointment" });
+        addBot(summary + "\n\n¿Te gustaría **agendar una cita** con el Dr. Ramírez para tratar estos síntomas?", ["Sí, agendar cita", "No por ahora"]);
+        return;
+      }
+
+      if (ps.step === "offer_appointment") {
+        if (msg.toLowerCase().includes("no")) {
+          setPendingSymptom(null);
+          addBot("¡Entendido! Tu síntoma ya quedó registrado. Si necesitas algo más, no dudes en escribirme. 😊");
+          return;
+        }
+        setPendingSymptom({ ...ps, step: "select_time" });
+        addBot("Perfecto. Estos son los horarios disponibles para tu cita:", timeSlots);
+        return;
+      }
+
+      if (ps.step === "select_time") {
+        addChatAppointment({
+          id: `apt-${Date.now()}`,
+          patientId: patient.id,
+          patientName: patient.name,
+          datetime: "2026-04-13T10:00",
+          status: "programada",
+          reason: `Síntoma reportado: ${ps.text}`,
+          notes: `Intensidad: ${ps.intensity}/10. Registrado vía chat.`,
+        });
+        toast.success("Cita agendada", { description: `Cita programada: ${msg}` });
+        addBot(`📅 **¡Cita agendada exitosamente!**\n\n🗓 **Horario:** ${msg}\n🩺 **Motivo:** ${ps.text}\n\nRecibirás un recordatorio antes de tu cita. ¿Necesitas algo más?`);
+        setPendingSymptom(null);
+        return;
+      }
     }
 
     const response = generatePatientResponse(msg, patient);
     if (response === "__SYMPTOM_FLOW__") {
-      setPendingSymptom(msg);
+      setPendingSymptom({ text: msg, step: "intensity" });
       addBot(`Lamento que no te sientas bien. 😔 Voy a registrar tu síntoma automáticamente.\n\nEn una escala del **1 al 10**, ¿qué tan intenso es tu malestar?\n\n• **1-3:** Leve\n• **4-6:** Moderado\n• **7-10:** Intenso`, ["1", "3", "5", "7", "10"]);
       return;
     }
