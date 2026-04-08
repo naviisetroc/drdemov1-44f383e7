@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   FileText,
   User,
@@ -105,23 +105,71 @@ export default function PatientMedicalHistory({
     text: string;
   } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pendingRecordRef = useRef<ClinicalRecord | null>(null);
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
+
+  // Start typing animation after dialog is open and state is settled
+  useEffect(() => {
+    if (aiExplain && pendingRecordRef.current && aiExplain.text === "" && aiLoading) {
+      const record = pendingRecordRef.current;
+      pendingRecordRef.current = null;
+
+      const fullText =
+        AI_EXPLANATIONS[record.id] ??
+        `Tu consulta del ${new Date(record.date).toLocaleDateString("es-MX")} fue por ${record.reason.toLowerCase()}. El diagnóstico fue: ${record.diagnosis}. El plan a seguir incluye: ${record.plan}`;
+      
+      let i = 0;
+      // Small delay to let dialog mount on mobile
+      const timeout = setTimeout(() => {
+        intervalRef.current = setInterval(() => {
+          i += 3;
+          if (i >= fullText.length) {
+            setAiExplain({ record, text: fullText });
+            setAiLoading(false);
+            if (intervalRef.current) clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          } else {
+            setAiExplain({ record, text: fullText.slice(0, i) });
+          }
+        }, 20);
+      }, 100);
+
+      return () => {
+        clearTimeout(timeout);
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+      };
+    }
+  }, [aiExplain?.record?.id, aiLoading]);
 
   function handleExplain(record: ClinicalRecord) {
+    // Clear any running animation
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    pendingRecordRef.current = record;
     setAiLoading(true);
     setAiExplain({ record, text: "" });
-    // Simulate AI typing
-    const fullText =
-      AI_EXPLANATIONS[record.id] ??
-      `Tu consulta del ${new Date(record.date).toLocaleDateString("es-MX")} fue por ${record.reason.toLowerCase()}. El diagnóstico fue: ${record.diagnosis}. El plan a seguir incluye: ${record.plan}`;
-    let i = 0;
-    const interval = setInterval(() => {
-      i += 3;
-      setAiExplain({ record, text: fullText.slice(0, i) });
-      if (i >= fullText.length) {
-        clearInterval(interval);
-        setAiLoading(false);
-      }
-    }, 20);
+  }
+
+  function handleCloseExplain() {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    pendingRecordRef.current = null;
+    setAiExplain(null);
+    setAiLoading(false);
   }
 
   return (
@@ -331,7 +379,7 @@ export default function PatientMedicalHistory({
       </Card>
 
       {/* AI Explanation dialog */}
-      <Dialog open={!!aiExplain} onOpenChange={() => { setAiExplain(null); setAiLoading(false); }}>
+      <Dialog open={!!aiExplain} onOpenChange={(open) => { if (!open) handleCloseExplain(); }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -356,7 +404,7 @@ export default function PatientMedicalHistory({
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setAiExplain(null); setAiLoading(false); }}>
+            <Button variant="outline" onClick={handleCloseExplain}>
               Cerrar
             </Button>
           </DialogFooter>

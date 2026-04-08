@@ -89,10 +89,17 @@ export default function PacienteDashboard() {
 
   function handleLogout() {
     localStorage.removeItem("medisec_patient_session");
-    navigate("/paciente/login");
+    window.location.href = "/paciente/login";
   }
 
-  if (!session || !patient) return null;
+  if (!session || !patient) return (
+    <div className="min-h-screen gradient-bg flex items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="h-10 w-10 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+        <p className="text-sm text-muted-foreground">Cargando...</p>
+      </div>
+    </div>
+  );
 
   const status = getPatientStatus(appointments);
   const nextAppointment = appointments

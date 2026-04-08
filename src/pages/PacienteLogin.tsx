@@ -23,7 +23,7 @@ export default function PacienteLogin() {
       if (patient) {
         localStorage.setItem("medisec_patient_session", JSON.stringify({ id: patient.id, name: patient.name, email: patient.email }));
         toast.success(`¡Bienvenido/a, ${patient.name}!`);
-        navigate("/paciente/dashboard");
+        window.location.href = "/paciente/dashboard";
       } else {
         toast.error("Credenciales incorrectas", { description: "Verifica tu correo y contraseña." });
       }
