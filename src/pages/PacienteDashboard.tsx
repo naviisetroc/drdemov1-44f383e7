@@ -81,12 +81,21 @@ export default function PacienteDashboard() {
     const sess: PatientSession = JSON.parse(raw);
     setSession(sess);
 
-    const allPatients = getChatPatients();
-    const found = allPatients.find((p) => p.id === sess.id);
-    if (found) setPatient(found);
+    // Small delay to ensure store is fully hydrated on mobile first-load
+    const init = () => {
+      const allPatients = getChatPatients();
+      const found = allPatients.find((p) => p.id === sess.id);
+      if (found) {
+        setPatient(found);
+        const allAppts = getChatAppointments();
+        setAppointments(allAppts.filter((a) => a.patientId === sess.id));
+      }
+    };
 
-    const allAppts = getChatAppointments();
-    setAppointments(allAppts.filter((a) => a.patientId === sess.id));
+    init();
+    // Retry once after a tick for mobile cold-start edge case
+    const timer = setTimeout(init, 150);
+    return () => clearTimeout(timer);
   }, [navigate]);
 
   function handleLogout() {
