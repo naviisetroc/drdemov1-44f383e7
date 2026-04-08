@@ -379,7 +379,7 @@ export default function PatientMedicalHistory({
       </Card>
 
       {/* AI Explanation dialog */}
-      <Dialog open={!!aiExplain} onOpenChange={() => { setAiExplain(null); setAiLoading(false); }}>
+      <Dialog open={!!aiExplain} onOpenChange={(open) => { if (!open) handleCloseExplain(); }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -404,7 +404,7 @@ export default function PatientMedicalHistory({
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setAiExplain(null); setAiLoading(false); }}>
+            <Button variant="outline" onClick={handleCloseExplain}>
               Cerrar
             </Button>
           </DialogFooter>
