@@ -172,6 +172,7 @@ export default function PatientChatWidget({ patient, forceOpen, onOpenChange }: 
   ]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+  const [pendingSymptom, setPendingSymptom] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -189,19 +190,45 @@ export default function PatientChatWidget({ patient, forceOpen, onOpenChange }: 
     }, 600 + Math.random() * 800);
   }
 
+  function processMessage(msg: string) {
+    // If we're waiting for intensity rating
+    if (pendingSymptom) {
+      const num = parseInt(msg);
+      if (isNaN(num) || num < 1 || num > 10) {
+        addBot("Por favor, ingresa un número del **1 al 10** para la intensidad.\n\n• 1-3: Leve\n• 4-6: Moderado\n• 7-10: Intenso");
+        return;
+      }
+      addPatientSymptom(patient.id, pendingSymptom, num);
+      toast.success("Síntoma registrado", { description: "Tu médico podrá verlo en tu expediente." });
+      const label = num <= 3 ? "Leve" : num <= 6 ? "Moderado" : "Intenso";
+      const extra = num >= 7
+        ? "\n\n⚠️ La intensidad es alta. Te recomiendo comunicarte con el consultorio al **(55) 1234-5678** si el dolor es insoportable."
+        : "\n\nSeguiremos monitoreando tu evolución. Si cambia la intensidad, cuéntame.";
+      addBot(`✅ **Síntoma registrado exitosamente:**\n\n📝 **Síntoma:** ${pendingSymptom}\n💢 **Intensidad:** ${num}/10 — ${label}${extra}\n\n¿Necesitas ayuda con algo más?`);
+      setPendingSymptom(null);
+      return;
+    }
+
+    const response = generatePatientResponse(msg, patient);
+    if (response === "__SYMPTOM_FLOW__") {
+      setPendingSymptom(msg);
+      addBot(`Lamento que no te sientas bien. 😔 Voy a registrar tu síntoma automáticamente.\n\nEn una escala del **1 al 10**, ¿qué tan intenso es tu malestar?\n\n• **1-3:** Leve\n• **4-6:** Moderado\n• **7-10:** Intenso`, ["1", "3", "5", "7", "10"]);
+      return;
+    }
+    addBot(response);
+  }
+
   function handleSend() {
     if (!input.trim() || typing) return;
     const msg = input.trim();
     setMessages((prev) => [...prev, { id: String(Date.now()), text: msg, sender: "user", time: now() }]);
     setInput("");
-    const response = generatePatientResponse(msg, patient);
-    addBot(response);
+    processMessage(msg);
   }
 
   function handleOption(opt: string) {
     setMessages((prev) => [...prev, { id: String(Date.now()), text: opt, sender: "user", time: now() }]);
-    const response = generatePatientResponse(opt, patient);
-    addBot(response);
+    processMessage(opt);
   }
 
   if (!open) {
