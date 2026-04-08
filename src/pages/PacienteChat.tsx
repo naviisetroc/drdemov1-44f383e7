@@ -8,6 +8,7 @@ import { addPatientSymptom } from "@/stores/patientSymptomStore";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useFontSize } from "@/hooks/useFontSize";
+import FontSizeButton from "@/components/FontSizeButton";
 
 interface Message {
   id: string;
