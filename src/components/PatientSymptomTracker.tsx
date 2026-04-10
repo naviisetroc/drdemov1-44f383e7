@@ -95,6 +95,27 @@ export default function PatientSymptomTracker({ patientId, appointments = [] }: 
     setHistory("");
     setNotes("");
     setAppointmentId("");
+    setAttachments([]);
+  }
+
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setAttachments((prev) => [
+          ...prev,
+          { name: file.name, type: file.type, dataUrl: reader.result as string },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
+  }
+
+  function removeAttachment(index: number) {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
   }
 
   function handleAdd() {
