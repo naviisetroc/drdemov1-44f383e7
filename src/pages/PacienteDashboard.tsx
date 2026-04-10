@@ -154,7 +154,18 @@ export default function PacienteDashboard() {
           <Stethoscope className="h-5 w-5" />
         </div>
         <div className="flex-1">
-          <h1 className="font-semibold text-sm">Portal del Paciente</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="font-semibold text-sm">Portal del Paciente</h1>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setDemoNewPatient(!demoNewPatient)}
+              className={`text-xs h-7 px-2 rounded-lg transition-all ${demoNewPatient ? 'bg-white/30 text-white' : 'bg-primary-foreground/15 text-primary-foreground/80 hover:bg-primary-foreground/25'}`}
+            >
+              <UserPlus className="h-3.5 w-3.5 mr-1" />
+              {demoNewPatient ? "Vista normal" : "Nuevo paciente"}
+            </Button>
+          </div>
           <p className="text-xs opacity-80">Bienvenido/a, {patient.name.split(" ")[0]}</p>
         </div>
         <FontSizeButton />
