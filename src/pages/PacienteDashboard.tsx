@@ -179,6 +179,15 @@ export default function PacienteDashboard() {
         </Button>
       </header>
 
+      {demoNewPatient && (
+        <div className="bg-accent/15 border-b border-accent/20 px-4 py-2.5 text-center">
+          <p className="text-xs text-accent font-medium flex items-center justify-center gap-1.5">
+            <Eye className="h-3.5 w-3.5" />
+            Vista demo: Paciente recién registrado — sin historial ni citas previas
+          </p>
+        </div>
+      )}
+
       <div className="max-w-2xl mx-auto p-4 space-y-4">
         {/* ─── HERO SUMMARY ─── */}
         <div className="space-y-3">
