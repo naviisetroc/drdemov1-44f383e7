@@ -384,6 +384,7 @@ export default function PatientMedicalHistory({
                 );
               })}
           </div>
+          )}
         </CardContent>
       </Card>
 
