@@ -117,6 +117,18 @@ export default function Pacientes() {
               <Input type="email" value={newPatient.email} onChange={e => setNewPatient(p => ({ ...p, email: e.target.value }))} placeholder="correo@ejemplo.com" className="mt-1 rounded-xl" />
             </div>
             <div>
+              <Label>Seguro médico</Label>
+              <Input value={newPatient.insuranceProvider} onChange={e => setNewPatient(p => ({ ...p, insuranceProvider: e.target.value }))} placeholder="Ej: GNP Seguros" className="mt-1 rounded-xl" />
+            </div>
+            <div>
+              <Label>Contacto de emergencia</Label>
+              <Input value={newPatient.emergencyContact} onChange={e => setNewPatient(p => ({ ...p, emergencyContact: e.target.value }))} placeholder="Ej: Juan García — Esposo — 55 1234 5678" className="mt-1 rounded-xl" />
+            </div>
+            <div>
+              <Label>Alergias (separadas por coma)</Label>
+              <Input value={newPatient.allergies} onChange={e => setNewPatient(p => ({ ...p, allergies: e.target.value }))} placeholder="Ej: Penicilina, Aspirina" className="mt-1 rounded-xl" />
+            </div>
+            <div>
               <Label>Condición principal (opcional)</Label>
               <Input value={newPatient.condition} onChange={e => setNewPatient(p => ({ ...p, condition: e.target.value }))} placeholder="Ej: Diabetes mellitus tipo 2" className="mt-1 rounded-xl" />
             </div>
