@@ -204,8 +204,13 @@ export default function PatientMedicalHistory({
             </div>
           </div>
 
-          {/* Timeline */}
-          <div className="relative">
+          {records.length === 0 && prescriptions.length === 0 && indications.length === 0 ? (
+            <div className="flex flex-col items-center text-center py-8 text-muted-foreground">
+              <FileText className="h-10 w-10 mb-2 opacity-30" />
+              <p className="text-sm">Sin historial médico aún</p>
+              <p className="text-xs mt-1">Tu historial aparecerá aquí después de tu primera consulta con el médico.</p>
+            </div>
+          ) : (
             {/* Timeline line */}
             <div className="absolute left-[19px] top-0 bottom-0 w-px bg-border/50" />
 
