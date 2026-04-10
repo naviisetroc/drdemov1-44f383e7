@@ -13,6 +13,9 @@ import {
   Activity,
   ChevronRight,
   Folder,
+  Eye,
+  EyeOff,
+  UserPlus,
 } from "lucide-react";
 import { useFontSize } from "@/hooks/useFontSize";
 import { Button } from "@/components/ui/button";
@@ -69,9 +72,10 @@ export default function PacienteDashboard() {
   const [patient, setPatient] = useState<ChatPatient | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [chatOpen, setChatOpen] = useState(false);
+  const [demoNewPatient, setDemoNewPatient] = useState(false);
 
-  const prescriptions = patient ? getPatientPrescriptions(patient.id) : [];
-  const indications = patient ? getPatientIndications(patient.id) : [];
+  const prescriptions = demoNewPatient ? [] : (patient ? getPatientPrescriptions(patient.id) : []);
+  const indications = demoNewPatient ? [] : (patient ? getPatientIndications(patient.id) : []);
 
   useEffect(() => {
     const raw = localStorage.getItem("medisec_patient_session");
@@ -135,8 +139,9 @@ export default function PacienteDashboard() {
     </div>
   );
 
-  const status = getPatientStatus(appointments);
-  const nextAppointment = appointments
+  const effectiveAppointments = demoNewPatient ? [] : appointments;
+  const status = getPatientStatus(effectiveAppointments);
+  const nextAppointment = effectiveAppointments
     .filter((a) => a.status === "programada" || a.status === "confirmada")
     .sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime())[0];
   const lastIndication = indications.length > 0 ? indications[indications.length - 1] : null;
@@ -149,7 +154,18 @@ export default function PacienteDashboard() {
           <Stethoscope className="h-5 w-5" />
         </div>
         <div className="flex-1">
-          <h1 className="font-semibold text-sm">Portal del Paciente</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="font-semibold text-sm">Portal del Paciente</h1>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setDemoNewPatient(!demoNewPatient)}
+              className={`text-xs h-7 px-2 rounded-lg transition-all ${demoNewPatient ? 'bg-white/30 text-white' : 'bg-primary-foreground/15 text-primary-foreground/80 hover:bg-primary-foreground/25'}`}
+            >
+              <UserPlus className="h-3.5 w-3.5 mr-1" />
+              {demoNewPatient ? "Vista normal" : "Nuevo paciente"}
+            </Button>
+          </div>
           <p className="text-xs opacity-80">Bienvenido/a, {patient.name.split(" ")[0]}</p>
         </div>
         <FontSizeButton />
@@ -162,6 +178,15 @@ export default function PacienteDashboard() {
           <LogOut className="h-4 w-4" />
         </Button>
       </header>
+
+      {demoNewPatient && (
+        <div className="bg-accent/15 border-b border-accent/20 px-4 py-2.5 text-center">
+          <p className="text-xs text-accent font-medium flex items-center justify-center gap-1.5">
+            <Eye className="h-3.5 w-3.5" />
+            Vista demo: Paciente recién registrado — sin historial ni citas previas
+          </p>
+        </div>
+      )}
 
       <div className="max-w-2xl mx-auto p-4 space-y-4">
         {/* ─── HERO SUMMARY ─── */}
@@ -237,7 +262,7 @@ export default function PacienteDashboard() {
         </Button>
 
         {/* ─── CITAS ─── */}
-        <PatientAppointments appointments={appointments} />
+        <PatientAppointments appointments={effectiveAppointments} />
 
         {/* ─── HISTORIAL ─── */}
         <PatientMedicalHistory
@@ -247,10 +272,10 @@ export default function PacienteDashboard() {
         />
 
         {/* ─── SÍNTOMAS ─── */}
-        <PatientSymptomTracker patientId={patient.id} appointments={appointments} />
+        <PatientSymptomTracker patientId={demoNewPatient ? "demo-new" : patient.id} appointments={effectiveAppointments} />
 
         {/* ─── ARCHIVOS ─── */}
-        <PatientFiles patientId={patient.id} />
+        <PatientFiles patientId={demoNewPatient ? "demo-new" : patient.id} />
       </div>
 
       {/* Floating Chat Widget */}
