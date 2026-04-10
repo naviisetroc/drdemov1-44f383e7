@@ -269,13 +269,14 @@ export default function PacienteDashboard() {
           patient={patient}
           prescriptions={prescriptions}
           indications={indications}
+          isEmpty={demoNewPatient}
         />
 
         {/* ─── SÍNTOMAS ─── */}
         <PatientSymptomTracker patientId={demoNewPatient ? "demo-new" : patient.id} appointments={effectiveAppointments} />
 
         {/* ─── ARCHIVOS ─── */}
-        <PatientFiles patientId={demoNewPatient ? "demo-new" : patient.id} />
+        <PatientFiles patientId={demoNewPatient ? "demo-new" : patient.id} isEmpty={demoNewPatient} />
       </div>
 
       {/* Floating Chat Widget */}

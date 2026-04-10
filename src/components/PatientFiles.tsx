@@ -55,10 +55,11 @@ const SEED_FILES: PatientFile[] = [
 
 interface PatientFilesProps {
   patientId: string;
+  isEmpty?: boolean;
 }
 
-export default function PatientFiles({ patientId }: PatientFilesProps) {
-  const [files, setFiles] = useState<PatientFile[]>(SEED_FILES);
+export default function PatientFiles({ patientId, isEmpty = false }: PatientFilesProps) {
+  const [files, setFiles] = useState<PatientFile[]>(isEmpty ? [] : SEED_FILES);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<PatientFile | null>(null);
   const [viewTarget, setViewTarget] = useState<PatientFile | null>(null);

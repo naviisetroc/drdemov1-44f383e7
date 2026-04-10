@@ -91,14 +91,16 @@ interface PatientMedicalHistoryProps {
   patient: ChatPatient;
   prescriptions: Prescription[];
   indications: Indication[];
+  isEmpty?: boolean;
 }
 
 export default function PatientMedicalHistory({
   patient,
   prescriptions,
   indications,
+  isEmpty = false,
 }: PatientMedicalHistoryProps) {
-  const records = getPatientClinicalRecords(patient.id);
+  const records = isEmpty ? [] : getPatientClinicalRecords(patient.id);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [aiExplain, setAiExplain] = useState<{
     record: ClinicalRecord;
@@ -202,9 +204,14 @@ export default function PatientMedicalHistory({
             </div>
           </div>
 
-          {/* Timeline */}
+          {records.length === 0 && prescriptions.length === 0 && indications.length === 0 ? (
+            <div className="flex flex-col items-center text-center py-8 text-muted-foreground">
+              <FileText className="h-10 w-10 mb-2 opacity-30" />
+              <p className="text-sm">Sin historial médico aún</p>
+              <p className="text-xs mt-1">Tu historial aparecerá aquí después de tu primera consulta con el médico.</p>
+            </div>
+          ) : (
           <div className="relative">
-            {/* Timeline line */}
             <div className="absolute left-[19px] top-0 bottom-0 w-px bg-border/50" />
 
             {/* Clinical records */}
@@ -377,6 +384,7 @@ export default function PatientMedicalHistory({
                 );
               })}
           </div>
+          )}
         </CardContent>
       </Card>
 
