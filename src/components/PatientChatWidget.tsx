@@ -290,11 +290,29 @@ export default function PatientChatWidget({ patient, forceOpen, onOpenChange }: 
     addBot(response);
   }
 
+  function handleWidgetFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setWidgetAttachments((prev) => [
+          ...prev,
+          { name: file.name, type: file.type, dataUrl: reader.result as string },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
+  }
+
   function handleSend() {
-    if (!input.trim() || typing) return;
-    const msg = input.trim();
-    setMessages((prev) => [...prev, { id: String(Date.now()), text: msg, sender: "user", time: now() }]);
+    if ((!input.trim() && widgetAttachments.length === 0) || typing) return;
+    const msg = input.trim() || (widgetAttachments.length > 0 ? `📎 ${widgetAttachments.map(a => a.name).join(", ")}` : "");
+    const atts = widgetAttachments.length > 0 ? widgetAttachments : undefined;
+    setMessages((prev) => [...prev, { id: String(Date.now()), text: msg, sender: "user", time: now(), attachments: atts }]);
     setInput("");
+    setWidgetAttachments([]);
     processMessage(msg);
   }
 
