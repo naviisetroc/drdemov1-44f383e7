@@ -139,8 +139,9 @@ export default function PacienteDashboard() {
     </div>
   );
 
-  const status = getPatientStatus(appointments);
-  const nextAppointment = appointments
+  const effectiveAppointments = demoNewPatient ? [] : appointments;
+  const status = getPatientStatus(effectiveAppointments);
+  const nextAppointment = effectiveAppointments
     .filter((a) => a.status === "programada" || a.status === "confirmada")
     .sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime())[0];
   const lastIndication = indications.length > 0 ? indications[indications.length - 1] : null;
