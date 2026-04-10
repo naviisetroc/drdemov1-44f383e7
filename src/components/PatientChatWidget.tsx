@@ -186,6 +186,8 @@ export default function PatientChatWidget({ patient, forceOpen, onOpenChange }: 
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const [pendingSymptom, setPendingSymptom] = useState<PendingSymptom | null>(null);
+  const [widgetAttachments, setWidgetAttachments] = useState<ChatFileAttachment[]>([]);
+  const widgetFileRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
