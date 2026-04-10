@@ -379,6 +379,20 @@ export default function PacienteChat() {
                     <span key={i}>{part}</span>
                   )
                 )}
+                {msg.attachments && msg.attachments.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-1.5">
+                    {msg.attachments.map((att, i) => (
+                      att.type.startsWith("image/") ? (
+                        <img key={i} src={att.dataUrl} alt={att.name} className="h-20 w-20 rounded-lg object-cover border border-primary-foreground/20" />
+                      ) : (
+                        <div key={i} className="flex items-center gap-1.5 bg-primary-foreground/10 rounded-lg px-2 py-1.5 text-[10px]">
+                          <Paperclip className="h-3 w-3" />
+                          <span className="truncate max-w-[100px]">{att.name}</span>
+                        </div>
+                      )
+                    ))}
+                  </div>
+                )}
               </div>
               {msg.options && (
                 <div className="flex flex-wrap gap-2">
@@ -421,10 +435,50 @@ export default function PacienteChat() {
       {/* Input */}
       {!completed ? (
         <div className="border-t border-border/40 glass p-3">
+          {chatAttachments.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-2">
+              {chatAttachments.map((att, i) => (
+                <div key={i} className="relative">
+                  {att.type.startsWith("image/") ? (
+                    <img src={att.dataUrl} alt={att.name} className="h-12 w-12 rounded-lg object-cover border border-border/40" />
+                  ) : (
+                    <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center border border-border/40">
+                      <Paperclip className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setChatAttachments(prev => prev.filter((_, idx) => idx !== i))}
+                    className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"
+                  >
+                    <X className="h-2.5 w-2.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <input
+            ref={chatFileRef}
+            type="file"
+            accept="image/*,.pdf,.doc,.docx"
+            multiple
+            className="hidden"
+            onChange={handleChatFileSelect}
+          />
           <form
             onSubmit={(e) => { e.preventDefault(); handleSend(); }}
             className="flex gap-2"
           >
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="rounded-full shrink-0 h-10 w-10 text-muted-foreground hover:text-primary"
+              onClick={() => chatFileRef.current?.click()}
+              disabled={typing}
+            >
+              <Camera className="h-4 w-4" />
+            </Button>
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -432,7 +486,7 @@ export default function PacienteChat() {
               className="flex-1 rounded-full bg-muted/30 border-border/40 focus:border-primary/50"
               disabled={typing}
             />
-            <Button type="submit" size="icon" className="rounded-full shrink-0 bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={typing || !input.trim()}>
+            <Button type="submit" size="icon" className="rounded-full shrink-0 bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={typing || (!input.trim() && chatAttachments.length === 0)}>
               <Send className="h-4 w-4" />
             </Button>
           </form>
