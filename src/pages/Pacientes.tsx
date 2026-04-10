@@ -49,10 +49,13 @@ export default function Pacientes() {
       lastVisit: new Date().toISOString().split("T")[0],
       status: "activo",
       conditions: newPatient.condition ? [newPatient.condition] : [],
+      insuranceProvider: newPatient.insuranceProvider || undefined,
+      emergencyContact: newPatient.emergencyContact || undefined,
+      allergies: newPatient.allergies ? newPatient.allergies.split(",").map(a => a.trim()).filter(Boolean) : undefined,
     };
     setLocalPatients(prev => [...prev, p]);
     setDialogOpen(false);
-    setNewPatient({ name: "", age: "", sex: "M", phone: "", email: "", condition: "" });
+    setNewPatient({ name: "", age: "", sex: "M", phone: "", email: "", condition: "", insuranceProvider: "", emergencyContact: "", allergies: "" });
     toast.success("Paciente registrado", { description: `${p.name} fue agregado exitosamente` });
   };
 
