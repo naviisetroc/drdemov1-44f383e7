@@ -101,18 +101,35 @@ export default function PacienteChat() {
     }, delay);
   }
 
-  function addUser(text: string) {
+  function addUser(text: string, attachments?: ChatAttachment[]) {
     setMessages((prev) => [
       ...prev,
-      { id: String(Date.now()), text, sender: "user", time: now() },
+      { id: String(Date.now()), text, sender: "user", time: now(), attachments },
     ]);
   }
 
+  function handleChatFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setChatAttachments((prev) => [
+          ...prev,
+          { name: file.name, type: file.type, dataUrl: reader.result as string },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
+  }
+
   function handleSend() {
-    if (!input.trim()) return;
-    const msg = input.trim();
-    addUser(msg);
+    if (!input.trim() && chatAttachments.length === 0) return;
+    const msg = input.trim() || (chatAttachments.length > 0 ? `📎 ${chatAttachments.map(a => a.name).join(", ")}` : "");
+    addUser(msg, chatAttachments.length > 0 ? chatAttachments : undefined);
     setInput("");
+    setChatAttachments([]);
     processStep(msg);
   }
 
