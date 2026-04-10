@@ -205,6 +205,19 @@ export default function PatientSymptomTracker({ patientId, appointments = [] }: 
                           )}
                         </div>
                       )}
+                      {entry.attachments && entry.attachments.length > 0 && (
+                        <div className="flex gap-1.5 mt-1.5">
+                          {entry.attachments.map((att, i) => (
+                            att.type.startsWith("image/") ? (
+                              <img key={i} src={att.dataUrl} alt={att.name} className="h-8 w-8 rounded-md object-cover border border-border/30" />
+                            ) : (
+                              <div key={i} className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center" title={att.name}>
+                                <Paperclip className="h-3 w-3 text-primary" />
+                              </div>
+                            )
+                          ))}
+                        </div>
+                      )}
                       <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                         <Badge className={`rounded-full border-transparent text-[10px] px-2 py-0 ${il.color}`}>
                           {entry.intensity}/10 — {il.text}
