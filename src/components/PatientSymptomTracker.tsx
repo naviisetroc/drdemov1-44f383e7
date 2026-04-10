@@ -130,6 +130,7 @@ export default function PatientSymptomTracker({ patientId, appointments = [] }: 
       history: history.trim() || undefined,
       notes: notes.trim() || undefined,
       appointmentId: appointmentId || undefined,
+      attachments: attachments.length > 0 ? attachments : undefined,
     });
     resetForm();
     setAddOpen(false);
