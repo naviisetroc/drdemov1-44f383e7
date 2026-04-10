@@ -355,6 +355,77 @@ export default function PatientSymptomTracker({ patientId, appointments = [] }: 
                 className="rounded-xl resize-none min-h-[80px]"
               />
             </div>
+
+            {/* Adjuntar fotos/archivos */}
+            <div className="space-y-2">
+              <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <Camera className="h-3.5 w-3.5" />
+                Si es físico tu síntoma, sube una foto
+              </Label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,.pdf,.doc,.docx"
+                multiple
+                className="hidden"
+                onChange={handleFileSelect}
+              />
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 rounded-xl text-xs"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Camera className="h-3.5 w-3.5" />
+                  Foto
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 rounded-xl text-xs"
+                  onClick={() => {
+                    if (fileInputRef.current) {
+                      fileInputRef.current.accept = "*/*";
+                      fileInputRef.current.click();
+                      setTimeout(() => {
+                        if (fileInputRef.current) fileInputRef.current.accept = "image/*,.pdf,.doc,.docx";
+                      }, 100);
+                    }
+                  }}
+                >
+                  <Paperclip className="h-3.5 w-3.5" />
+                  Archivo
+                </Button>
+              </div>
+              {attachments.length > 0 && (
+                <div className="space-y-1.5">
+                  {attachments.map((att, i) => (
+                    <div key={i} className="flex items-center gap-2 p-2 rounded-lg border border-border/30 bg-muted/30">
+                      {att.type.startsWith("image/") ? (
+                        <img src={att.dataUrl} alt={att.name} className="h-10 w-10 rounded-md object-cover" />
+                      ) : (
+                        <div className="h-10 w-10 rounded-md bg-primary/10 flex items-center justify-center">
+                          <Paperclip className="h-4 w-4 text-primary" />
+                        </div>
+                      )}
+                      <span className="text-xs flex-1 truncate">{att.name}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                        onClick={() => removeAttachment(i)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => { resetForm(); setAddOpen(false); }}>Cancelar</Button>
