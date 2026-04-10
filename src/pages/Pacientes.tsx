@@ -19,7 +19,7 @@ export default function Pacientes() {
   const [filter, setFilter] = useState<"todos" | "activo" | "inactivo" | "nuevo">("todos");
   const { chatPatients } = useStoreSync();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [newPatient, setNewPatient] = useState({ name: "", age: "", sex: "M", phone: "", email: "", condition: "" });
+  const [newPatient, setNewPatient] = useState({ name: "", age: "", sex: "M", phone: "", email: "", condition: "", insuranceProvider: "", emergencyContact: "", allergies: "" });
   const [localPatients, setLocalPatients] = useState<Patient[]>([]);
 
   const chatPats = chatPatients.map(chatPatientToPatient);
