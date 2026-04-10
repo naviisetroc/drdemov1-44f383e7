@@ -91,14 +91,16 @@ interface PatientMedicalHistoryProps {
   patient: ChatPatient;
   prescriptions: Prescription[];
   indications: Indication[];
+  isEmpty?: boolean;
 }
 
 export default function PatientMedicalHistory({
   patient,
   prescriptions,
   indications,
+  isEmpty = false,
 }: PatientMedicalHistoryProps) {
-  const records = getPatientClinicalRecords(patient.id);
+  const records = isEmpty ? [] : getPatientClinicalRecords(patient.id);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [aiExplain, setAiExplain] = useState<{
     record: ClinicalRecord;
