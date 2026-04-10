@@ -8,12 +8,19 @@ import { getPatientSymptoms, addPatientSymptom } from "@/stores/patientSymptomSt
 import { Appointment } from "@/data/mockData";
 import { toast } from "sonner";
 
+interface ChatFileAttachment {
+  name: string;
+  type: string;
+  dataUrl: string;
+}
+
 interface Msg {
   id: string;
   text: string;
   sender: "bot" | "user";
   time: string;
   options?: string[];
+  attachments?: ChatFileAttachment[];
 }
 
 interface PendingSymptom {
