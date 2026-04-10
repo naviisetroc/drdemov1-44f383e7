@@ -10,12 +10,19 @@ import { toast } from "sonner";
 import { useFontSize } from "@/hooks/useFontSize";
 import FontSizeButton from "@/components/FontSizeButton";
 
+interface ChatAttachment {
+  name: string;
+  type: string;
+  dataUrl: string;
+}
+
 interface Message {
   id: string;
   text: string;
   sender: "bot" | "user";
   time: string;
   options?: string[];
+  attachments?: ChatAttachment[];
 }
 
 type Step =
@@ -52,6 +59,8 @@ export default function PacienteChat() {
   const [completed, setCompleted] = useState(false);
   const [createdPatientId, setCreatedPatientId] = useState("");
   const [registerEmail, setRegisterEmail] = useState("");
+  const [chatAttachments, setChatAttachments] = useState<ChatAttachment[]>([]);
+  const chatFileRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
