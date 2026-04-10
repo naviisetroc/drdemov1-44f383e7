@@ -13,6 +13,9 @@ import {
   Activity,
   ChevronRight,
   Folder,
+  Eye,
+  EyeOff,
+  UserPlus,
 } from "lucide-react";
 import { useFontSize } from "@/hooks/useFontSize";
 import { Button } from "@/components/ui/button";
