@@ -211,7 +211,7 @@ export default function PatientMedicalHistory({
               <p className="text-xs mt-1">Tu historial aparecerá aquí después de tu primera consulta con el médico.</p>
             </div>
           ) : (
-            {/* Timeline line */}
+          <div className="relative">
             <div className="absolute left-[19px] top-0 bottom-0 w-px bg-border/50" />
 
             {/* Clinical records */}
