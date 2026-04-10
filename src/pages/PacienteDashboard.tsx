@@ -253,7 +253,7 @@ export default function PacienteDashboard() {
         </Button>
 
         {/* ─── CITAS ─── */}
-        <PatientAppointments appointments={appointments} />
+        <PatientAppointments appointments={effectiveAppointments} />
 
         {/* ─── HISTORIAL ─── */}
         <PatientMedicalHistory
@@ -263,10 +263,10 @@ export default function PacienteDashboard() {
         />
 
         {/* ─── SÍNTOMAS ─── */}
-        <PatientSymptomTracker patientId={patient.id} appointments={appointments} />
+        <PatientSymptomTracker patientId={demoNewPatient ? "demo-new" : patient.id} appointments={effectiveAppointments} />
 
         {/* ─── ARCHIVOS ─── */}
-        <PatientFiles patientId={patient.id} />
+        <PatientFiles patientId={demoNewPatient ? "demo-new" : patient.id} />
       </div>
 
       {/* Floating Chat Widget */}
