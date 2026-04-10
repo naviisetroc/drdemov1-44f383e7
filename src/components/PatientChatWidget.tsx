@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, MessageCircle, X, Sparkles, CheckCheck } from "lucide-react";
+import { Send, Bot, MessageCircle, X, Sparkles, CheckCheck, Camera, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatPatient, getChatAppointments, addChatAppointment } from "@/stores/patientChatStore";
