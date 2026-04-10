@@ -19,7 +19,7 @@ export default function Pacientes() {
   const [filter, setFilter] = useState<"todos" | "activo" | "inactivo" | "nuevo">("todos");
   const { chatPatients } = useStoreSync();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [newPatient, setNewPatient] = useState({ name: "", age: "", sex: "M", phone: "", email: "", condition: "" });
+  const [newPatient, setNewPatient] = useState({ name: "", age: "", sex: "M", phone: "", email: "", condition: "", insuranceProvider: "", emergencyContact: "", allergies: "" });
   const [localPatients, setLocalPatients] = useState<Patient[]>([]);
 
   const chatPats = chatPatients.map(chatPatientToPatient);
@@ -49,10 +49,13 @@ export default function Pacientes() {
       lastVisit: new Date().toISOString().split("T")[0],
       status: "activo",
       conditions: newPatient.condition ? [newPatient.condition] : [],
+      insuranceProvider: newPatient.insuranceProvider || undefined,
+      emergencyContact: newPatient.emergencyContact || undefined,
+      allergies: newPatient.allergies ? newPatient.allergies.split(",").map(a => a.trim()).filter(Boolean) : undefined,
     };
     setLocalPatients(prev => [...prev, p]);
     setDialogOpen(false);
-    setNewPatient({ name: "", age: "", sex: "M", phone: "", email: "", condition: "" });
+    setNewPatient({ name: "", age: "", sex: "M", phone: "", email: "", condition: "", insuranceProvider: "", emergencyContact: "", allergies: "" });
     toast.success("Paciente registrado", { description: `${p.name} fue agregado exitosamente` });
   };
 
@@ -112,6 +115,18 @@ export default function Pacientes() {
             <div>
               <Label>Email</Label>
               <Input type="email" value={newPatient.email} onChange={e => setNewPatient(p => ({ ...p, email: e.target.value }))} placeholder="correo@ejemplo.com" className="mt-1 rounded-xl" />
+            </div>
+            <div>
+              <Label>Seguro médico</Label>
+              <Input value={newPatient.insuranceProvider} onChange={e => setNewPatient(p => ({ ...p, insuranceProvider: e.target.value }))} placeholder="Ej: GNP Seguros" className="mt-1 rounded-xl" />
+            </div>
+            <div>
+              <Label>Contacto de emergencia</Label>
+              <Input value={newPatient.emergencyContact} onChange={e => setNewPatient(p => ({ ...p, emergencyContact: e.target.value }))} placeholder="Ej: Juan García — Esposo — 55 1234 5678" className="mt-1 rounded-xl" />
+            </div>
+            <div>
+              <Label>Alergias (separadas por coma)</Label>
+              <Input value={newPatient.allergies} onChange={e => setNewPatient(p => ({ ...p, allergies: e.target.value }))} placeholder="Ej: Penicilina, Aspirina" className="mt-1 rounded-xl" />
             </div>
             <div>
               <Label>Condición principal (opcional)</Label>
