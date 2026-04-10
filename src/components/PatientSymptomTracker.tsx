@@ -76,7 +76,8 @@ export default function PatientSymptomTracker({ patientId, appointments = [] }: 
   const [notes, setNotes] = useState("");
   const [appointmentId, setAppointmentId] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<SymptomEntry | null>(null);
-
+  const [attachments, setAttachments] = useState<SymptomAttachment[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const upcomingAppointments = appointments.filter(
     (a) => a.status === "programada" || a.status === "confirmada"
   );
