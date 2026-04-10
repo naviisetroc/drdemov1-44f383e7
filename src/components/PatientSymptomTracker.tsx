@@ -38,6 +38,7 @@ import {
   addPatientSymptom,
   deletePatientSymptom,
   SymptomEntry,
+  SymptomAttachment,
 } from "@/stores/patientSymptomStore";
 import { Appointment } from "@/data/mockData";
 
