@@ -1,3 +1,9 @@
+export interface SymptomAttachment {
+  name: string;
+  type: string;
+  dataUrl: string; // base64 data URL
+}
+
 export interface SymptomEntry {
   id: string;
   patientId: string;
@@ -10,6 +16,7 @@ export interface SymptomEntry {
   history?: string;
   notes?: string;
   appointmentId?: string;
+  attachments?: SymptomAttachment[];
 }
 
 const STORAGE_KEY = "medisec_patient_symptoms";
@@ -43,6 +50,7 @@ export function addPatientSymptom(
     history?: string;
     notes?: string;
     appointmentId?: string;
+    attachments?: SymptomAttachment[];
   }
 ): SymptomEntry {
   const entry: SymptomEntry = {

@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   HeartPulse,
   Plus,
   Trash2,
   Clock,
   Gauge,
+  Camera,
+  Paperclip,
+  X,
+  Image as ImageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,6 +38,7 @@ import {
   addPatientSymptom,
   deletePatientSymptom,
   SymptomEntry,
+  SymptomAttachment,
 } from "@/stores/patientSymptomStore";
 import { Appointment } from "@/data/mockData";
 
@@ -71,7 +76,8 @@ export default function PatientSymptomTracker({ patientId, appointments = [] }: 
   const [notes, setNotes] = useState("");
   const [appointmentId, setAppointmentId] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<SymptomEntry | null>(null);
-
+  const [attachments, setAttachments] = useState<SymptomAttachment[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const upcomingAppointments = appointments.filter(
     (a) => a.status === "programada" || a.status === "confirmada"
   );
@@ -89,6 +95,27 @@ export default function PatientSymptomTracker({ patientId, appointments = [] }: 
     setHistory("");
     setNotes("");
     setAppointmentId("");
+    setAttachments([]);
+  }
+
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setAttachments((prev) => [
+          ...prev,
+          { name: file.name, type: file.type, dataUrl: reader.result as string },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
+  }
+
+  function removeAttachment(index: number) {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
   }
 
   function handleAdd() {
@@ -103,6 +130,7 @@ export default function PatientSymptomTracker({ patientId, appointments = [] }: 
       history: history.trim() || undefined,
       notes: notes.trim() || undefined,
       appointmentId: appointmentId || undefined,
+      attachments: attachments.length > 0 ? attachments : undefined,
     });
     resetForm();
     setAddOpen(false);
@@ -175,6 +203,19 @@ export default function PatientSymptomTracker({ patientId, appointments = [] }: 
                           {entry.duration && (
                             <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-md">{entry.duration}</span>
                           )}
+                        </div>
+                      )}
+                      {entry.attachments && entry.attachments.length > 0 && (
+                        <div className="flex gap-1.5 mt-1.5">
+                          {entry.attachments.map((att, i) => (
+                            att.type.startsWith("image/") ? (
+                              <img key={i} src={att.dataUrl} alt={att.name} className="h-8 w-8 rounded-md object-cover border border-border/30" />
+                            ) : (
+                              <div key={i} className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center" title={att.name}>
+                                <Paperclip className="h-3 w-3 text-primary" />
+                              </div>
+                            )
+                          ))}
                         </div>
                       )}
                       <div className="flex items-center gap-2 mt-1.5 flex-wrap">
@@ -326,6 +367,77 @@ export default function PatientSymptomTracker({ patientId, appointments = [] }: 
                 placeholder="Ej: Me duele la rodilla al caminar, siento inflamación..."
                 className="rounded-xl resize-none min-h-[80px]"
               />
+            </div>
+
+            {/* Adjuntar fotos/archivos */}
+            <div className="space-y-2">
+              <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <Camera className="h-3.5 w-3.5" />
+                Si es físico tu síntoma, sube una foto
+              </Label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,.pdf,.doc,.docx"
+                multiple
+                className="hidden"
+                onChange={handleFileSelect}
+              />
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 rounded-xl text-xs"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Camera className="h-3.5 w-3.5" />
+                  Foto
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 rounded-xl text-xs"
+                  onClick={() => {
+                    if (fileInputRef.current) {
+                      fileInputRef.current.accept = "*/*";
+                      fileInputRef.current.click();
+                      setTimeout(() => {
+                        if (fileInputRef.current) fileInputRef.current.accept = "image/*,.pdf,.doc,.docx";
+                      }, 100);
+                    }
+                  }}
+                >
+                  <Paperclip className="h-3.5 w-3.5" />
+                  Archivo
+                </Button>
+              </div>
+              {attachments.length > 0 && (
+                <div className="space-y-1.5">
+                  {attachments.map((att, i) => (
+                    <div key={i} className="flex items-center gap-2 p-2 rounded-lg border border-border/30 bg-muted/30">
+                      {att.type.startsWith("image/") ? (
+                        <img src={att.dataUrl} alt={att.name} className="h-10 w-10 rounded-md object-cover" />
+                      ) : (
+                        <div className="h-10 w-10 rounded-md bg-primary/10 flex items-center justify-center">
+                          <Paperclip className="h-4 w-4 text-primary" />
+                        </div>
+                      )}
+                      <span className="text-xs flex-1 truncate">{att.name}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                        onClick={() => removeAttachment(i)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
           <DialogFooter className="gap-2">

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, MessageCircle, X, Sparkles, CheckCheck } from "lucide-react";
+import { Send, Bot, MessageCircle, X, Sparkles, CheckCheck, Camera, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatPatient, getChatAppointments, addChatAppointment } from "@/stores/patientChatStore";
@@ -8,12 +8,19 @@ import { getPatientSymptoms, addPatientSymptom } from "@/stores/patientSymptomSt
 import { Appointment } from "@/data/mockData";
 import { toast } from "sonner";
 
+interface ChatFileAttachment {
+  name: string;
+  type: string;
+  dataUrl: string;
+}
+
 interface Msg {
   id: string;
   text: string;
   sender: "bot" | "user";
   time: string;
   options?: string[];
+  attachments?: ChatFileAttachment[];
 }
 
 interface PendingSymptom {
@@ -179,6 +186,8 @@ export default function PatientChatWidget({ patient, forceOpen, onOpenChange }: 
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const [pendingSymptom, setPendingSymptom] = useState<PendingSymptom | null>(null);
+  const [widgetAttachments, setWidgetAttachments] = useState<ChatFileAttachment[]>([]);
+  const widgetFileRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -281,11 +290,29 @@ export default function PatientChatWidget({ patient, forceOpen, onOpenChange }: 
     addBot(response);
   }
 
+  function handleWidgetFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setWidgetAttachments((prev) => [
+          ...prev,
+          { name: file.name, type: file.type, dataUrl: reader.result as string },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
+  }
+
   function handleSend() {
-    if (!input.trim() || typing) return;
-    const msg = input.trim();
-    setMessages((prev) => [...prev, { id: String(Date.now()), text: msg, sender: "user", time: now() }]);
+    if ((!input.trim() && widgetAttachments.length === 0) || typing) return;
+    const msg = input.trim() || (widgetAttachments.length > 0 ? `📎 ${widgetAttachments.map(a => a.name).join(", ")}` : "");
+    const atts = widgetAttachments.length > 0 ? widgetAttachments : undefined;
+    setMessages((prev) => [...prev, { id: String(Date.now()), text: msg, sender: "user", time: now(), attachments: atts }]);
     setInput("");
+    setWidgetAttachments([]);
     processMessage(msg);
   }
 
@@ -342,6 +369,20 @@ export default function PatientChatWidget({ patient, forceOpen, onOpenChange }: 
                     <span key={i}>{part}</span>
                   )
                 )}
+                {msg.attachments && msg.attachments.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {msg.attachments.map((att, i) => (
+                      att.type.startsWith("image/") ? (
+                        <img key={i} src={att.dataUrl} alt={att.name} className="h-16 w-16 rounded-lg object-cover border border-primary-foreground/20" />
+                      ) : (
+                        <div key={i} className="flex items-center gap-1 bg-primary-foreground/10 rounded-lg px-2 py-1 text-[10px]">
+                          <Paperclip className="h-2.5 w-2.5" />
+                          <span className="truncate max-w-[80px]">{att.name}</span>
+                        </div>
+                      )
+                    ))}
+                  </div>
+                )}
               </div>
               {msg.options && (
                 <div className="flex flex-wrap gap-1.5">
@@ -379,7 +420,47 @@ export default function PatientChatWidget({ patient, forceOpen, onOpenChange }: 
 
       {/* Input */}
       <div className="border-t border-border/30 p-2 bg-card/80">
+        {widgetAttachments.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-2 px-1">
+            {widgetAttachments.map((att, i) => (
+              <div key={i} className="relative">
+                {att.type.startsWith("image/") ? (
+                  <img src={att.dataUrl} alt={att.name} className="h-10 w-10 rounded-lg object-cover border border-border/40" />
+                ) : (
+                  <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center border border-border/40">
+                    <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setWidgetAttachments(prev => prev.filter((_, idx) => idx !== i))}
+                  className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"
+                >
+                  <X className="h-2 w-2" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <input
+          ref={widgetFileRef}
+          type="file"
+          accept="image/*,.pdf,.doc,.docx"
+          multiple
+          className="hidden"
+          onChange={handleWidgetFileSelect}
+        />
         <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="flex gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="rounded-full h-9 w-9 shrink-0 text-muted-foreground hover:text-primary"
+            onClick={() => widgetFileRef.current?.click()}
+            disabled={typing}
+          >
+            <Camera className="h-3.5 w-3.5" />
+          </Button>
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -387,7 +468,7 @@ export default function PatientChatWidget({ patient, forceOpen, onOpenChange }: 
             className="flex-1 rounded-full text-sm h-9 bg-muted/30 border-border/40"
             disabled={typing}
           />
-          <Button type="submit" size="icon" className="rounded-full h-9 w-9 shrink-0 bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={typing || !input.trim()}>
+          <Button type="submit" size="icon" className="rounded-full h-9 w-9 shrink-0 bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={typing || (!input.trim() && widgetAttachments.length === 0)}>
             <Send className="h-3.5 w-3.5" />
           </Button>
         </form>
