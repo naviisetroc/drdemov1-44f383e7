@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, CheckCheck, Stethoscope, UserPlus, LogIn, Camera, Paperclip, X } from "lucide-react";
+import { Send, Bot, User, CheckCheck, Stethoscope, UserPlus, LogIn, Paperclip, X } from "lucide-react";
+import CameraClipIcon from "@/components/CameraClipIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -477,7 +478,7 @@ export default function PacienteChat() {
               onClick={() => chatFileRef.current?.click()}
               disabled={typing}
             >
-              <Camera className="h-4 w-4" />
+              <CameraClipIcon size={18} />
             </Button>
             <Input
               value={input}

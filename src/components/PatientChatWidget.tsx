@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, MessageCircle, X, Sparkles, CheckCheck, Camera, Paperclip } from "lucide-react";
+import { Send, Bot, MessageCircle, X, Sparkles, CheckCheck, Paperclip } from "lucide-react";
+import CameraClipIcon from "@/components/CameraClipIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatPatient, getChatAppointments, addChatAppointment } from "@/stores/patientChatStore";
@@ -459,7 +460,7 @@ export default function PatientChatWidget({ patient, forceOpen, onOpenChange }: 
             onClick={() => widgetFileRef.current?.click()}
             disabled={typing}
           >
-            <Camera className="h-3.5 w-3.5" />
+            <CameraClipIcon size={15} />
           </Button>
           <Input
             value={input}
