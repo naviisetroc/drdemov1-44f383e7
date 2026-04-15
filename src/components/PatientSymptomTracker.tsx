@@ -5,7 +5,7 @@ import {
   Trash2,
   Clock,
   Gauge,
-  Camera,
+  
   Paperclip,
   X,
   Image as ImageIcon,
@@ -372,7 +372,7 @@ export default function PatientSymptomTracker({ patientId, appointments = [] }: 
             {/* Adjuntar fotos/archivos */}
             <div className="space-y-2">
               <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                <Camera className="h-3.5 w-3.5" />
+                <CameraClipIcon size={14} />
                 Si es físico tu síntoma, sube una foto
               </Label>
               <input
@@ -391,8 +391,8 @@ export default function PatientSymptomTracker({ patientId, appointments = [] }: 
                   className="gap-1.5 rounded-xl text-xs"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <Camera className="h-3.5 w-3.5" />
-                  Foto
+                  <CameraClipIcon size={14} />
+                  Foto / Archivo
                 </Button>
                 <Button
                   type="button"
