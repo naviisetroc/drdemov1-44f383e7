@@ -25,6 +25,7 @@ export default function PacienteDetalle() {
   const patient = patients.find((p) => p.id === id);
   const [extraFiles, setExtraFiles] = useState<PatientFile[]>([]);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [previewFile, setPreviewFile] = useState<PatientFile | null>(null);
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState<PatientFile["type"]>("estudio");
   const [fileNotes, setFileNotes] = useState("");
@@ -265,7 +266,7 @@ export default function PacienteDetalle() {
                       <div className="flex gap-1 shrink-0">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Eye className="h-3.5 w-3.5" /></Button>
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setPreviewFile(file)}><Eye className="h-3.5 w-3.5" /></Button>
                           </TooltipTrigger>
                           <TooltipContent>Ver archivo</TooltipContent>
                         </Tooltip>
@@ -406,117 +407,53 @@ export default function PacienteDetalle() {
           </CardContent>
         </Card>
       )}
-      {/* Expedientes / Files */}
-      {!isNewPatient && (
-        <Card className="glass border-border/40">
-          <CardHeader className="pb-3">
-            <CardTitle className="font-display text-base flex items-center gap-2">
-              <div className="h-7 w-7 rounded-lg bg-primary/15 flex items-center justify-center">
-                <FolderOpen className="h-3.5 w-3.5 text-primary" />
+
+      {/* File Preview Dialog */}
+      <Dialog open={!!previewFile} onOpenChange={(open) => !open && setPreviewFile(null)}>
+        <DialogContent className="sm:max-w-lg glass-strong rounded-2xl border-border/40">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <File className="h-5 w-5 text-primary" />
+              {previewFile?.name}
+            </DialogTitle>
+          </DialogHeader>
+          {previewFile && (
+            <div className="space-y-4 pt-2">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p className="text-xs text-muted-foreground">Tipo</p>
+                  <p className="font-medium capitalize">{previewFile.type}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Fecha</p>
+                  <p className="font-medium">{new Date(previewFile.date).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Tamaño</p>
+                  <p className="font-medium">{previewFile.size}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Paciente</p>
+                  <p className="font-medium">{patient.name}</p>
+                </div>
               </div>
-              Expedientes y Archivos
-              <Badge variant="secondary" className="text-[10px] ml-auto bg-primary/10 text-primary border-primary/20">{allFiles.length} archivos</Badge>
-              <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
-                <DialogTrigger asChild>
-                  <Button size="sm" className="gap-1.5 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 ml-2">
-                    <Upload className="h-3.5 w-3.5" /> Subir archivo
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md glass-strong rounded-2xl border-border/40">
-                  <DialogHeader>
-                    <DialogTitle className="font-display flex items-center gap-2">
-                      <Upload className="h-5 w-5 text-primary" />
-                      Subir archivo al expediente
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 pt-2">
-                    <div>
-                      <label className="text-sm font-medium">Nombre del archivo</label>
-                      <Input value={fileName} onChange={(e) => setFileName(e.target.value)} placeholder="Ej: Hemoglobina_glucosilada.pdf" className="mt-1 bg-muted/30 border-border/40 rounded-xl" />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Tipo de documento</label>
-                      <Select value={fileType} onValueChange={(v) => setFileType(v as PatientFile["type"])}>
-                        <SelectTrigger className="mt-1 bg-muted/30 border-border/40 rounded-xl">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="estudio">📊 Estudio</SelectItem>
-                          <SelectItem value="análisis">🧪 Análisis</SelectItem>
-                          <SelectItem value="receta">💊 Receta</SelectItem>
-                          <SelectItem value="imagen">🖼️ Imagen médica</SelectItem>
-                          <SelectItem value="otro">📄 Otro</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Notas (opcional)</label>
-                      <Textarea value={fileNotes} onChange={(e) => setFileNotes(e.target.value)} placeholder="Descripción o resultados relevantes..." className="mt-1 min-h-[80px] bg-muted/30 border-border/40 rounded-xl" />
-                    </div>
-                    <div className="rounded-xl border-2 border-dashed border-border/40 p-6 text-center hover:border-primary/40 transition-colors cursor-pointer">
-                      <Upload className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">Arrastra un archivo aquí o haz clic para seleccionar</p>
-                      <p className="text-xs text-muted-foreground/60 mt-1">PDF, JPG, PNG, DICOM — Máx. 20 MB</p>
-                    </div>
-                    <Button onClick={handleUploadFile} className="w-full gap-2 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90" disabled={!fileName.trim()}>
-                      <Upload className="h-4 w-4" /> Subir archivo
-                    </Button>
+              {previewFile.notes && (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Notas / Resultados</p>
+                  <div className="rounded-xl bg-muted/20 border border-border/30 p-3">
+                    <p className="text-sm">{previewFile.notes}</p>
                   </div>
-                </DialogContent>
-              </Dialog>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {allFiles.length === 0 ? (
-              <div className="text-center py-8">
-                <FolderOpen className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">No hay archivos en el expediente.</p>
-                <Button variant="outline" size="sm" className="mt-3 gap-1.5 rounded-xl border-border/40" onClick={() => setUploadOpen(true)}>
-                  <Upload className="h-3.5 w-3.5" /> Subir primer archivo
-                </Button>
+                </div>
+              )}
+              <div className="rounded-xl border-2 border-dashed border-border/30 p-8 text-center bg-muted/10">
+                <File className="h-12 w-12 text-muted-foreground/30 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">Vista previa del documento</p>
+                <p className="text-xs text-muted-foreground/60 mt-1">(Demo — archivo simulado)</p>
               </div>
-            ) : (
-              <div className="space-y-2">
-                {allFiles.map((file) => {
-                  const typeIcons: Record<string, string> = { estudio: "📊", "análisis": "🧪", receta: "💊", imagen: "🖼️", otro: "📄" };
-                  return (
-                    <div key={file.id} className="flex items-center gap-3 rounded-xl border border-border/30 p-3 bg-muted/10 hover:border-primary/20 transition-all">
-                      <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center text-lg shrink-0">
-                        {typeIcons[file.type] || "📄"}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{file.name}</p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span>{new Date(file.date).toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" })}</span>
-                          <span>·</span>
-                          <span>{file.size}</span>
-                          {file.notes && <><span>·</span><span className="truncate">{file.notes}</span></>}
-                        </div>
-                      </div>
-                      <div className="flex gap-1 shrink-0">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Eye className="h-3.5 w-3.5" /></Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Ver archivo</TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive hover:text-destructive" onClick={() => handleDeleteFile(file.id)}>
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Eliminar</TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
