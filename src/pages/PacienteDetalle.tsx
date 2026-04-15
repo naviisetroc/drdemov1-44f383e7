@@ -407,6 +407,53 @@ export default function PacienteDetalle() {
           </CardContent>
         </Card>
       )}
+
+      {/* File Preview Dialog */}
+      <Dialog open={!!previewFile} onOpenChange={(open) => !open && setPreviewFile(null)}>
+        <DialogContent className="sm:max-w-lg glass-strong rounded-2xl border-border/40">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <File className="h-5 w-5 text-primary" />
+              {previewFile?.name}
+            </DialogTitle>
+          </DialogHeader>
+          {previewFile && (
+            <div className="space-y-4 pt-2">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p className="text-xs text-muted-foreground">Tipo</p>
+                  <p className="font-medium capitalize">{previewFile.type}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Fecha</p>
+                  <p className="font-medium">{new Date(previewFile.date).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Tamaño</p>
+                  <p className="font-medium">{previewFile.size}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Paciente</p>
+                  <p className="font-medium">{patient.name}</p>
+                </div>
+              </div>
+              {previewFile.notes && (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Notas / Resultados</p>
+                  <div className="rounded-xl bg-muted/20 border border-border/30 p-3">
+                    <p className="text-sm">{previewFile.notes}</p>
+                  </div>
+                </div>
+              )}
+              <div className="rounded-xl border-2 border-dashed border-border/30 p-8 text-center bg-muted/10">
+                <File className="h-12 w-12 text-muted-foreground/30 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">Vista previa del documento</p>
+                <p className="text-xs text-muted-foreground/60 mt-1">(Demo — archivo simulado)</p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
