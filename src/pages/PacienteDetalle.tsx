@@ -266,7 +266,7 @@ export default function PacienteDetalle() {
                       <div className="flex gap-1 shrink-0">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Eye className="h-3.5 w-3.5" /></Button>
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setPreviewFile(file)}><Eye className="h-3.5 w-3.5" /></Button>
                           </TooltipTrigger>
                           <TooltipContent>Ver archivo</TooltipContent>
                         </Tooltip>
