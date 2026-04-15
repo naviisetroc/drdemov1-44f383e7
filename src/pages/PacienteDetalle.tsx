@@ -25,6 +25,7 @@ export default function PacienteDetalle() {
   const patient = patients.find((p) => p.id === id);
   const [extraFiles, setExtraFiles] = useState<PatientFile[]>([]);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [previewFile, setPreviewFile] = useState<PatientFile | null>(null);
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState<PatientFile["type"]>("estudio");
   const [fileNotes, setFileNotes] = useState("");
