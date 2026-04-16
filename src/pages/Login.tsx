@@ -56,7 +56,7 @@ export default function Login() {
             <Stethoscope className="h-8 w-8 text-primary-foreground" />
           </div>
           <h1 className="font-display text-3xl font-bold bg-gradient-to-r from-primary via-foreground to-accent bg-clip-text text-transparent">
-            Dr. Guapo
+            Dr. House
           </h1>
           <p className="text-sm text-muted-foreground">Tu secretario médico inteligente con IA</p>
         </div>
