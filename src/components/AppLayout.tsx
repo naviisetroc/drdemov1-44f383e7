@@ -59,7 +59,7 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
           </div>
           <div>
             <h1 className="font-display text-base font-bold text-sidebar-primary-foreground">
-              Dr. Guapo
+              Dr. House
             </h1>
             <p className="text-[10px] text-sidebar-muted">Secretario Inteligente</p>
           </div>
@@ -134,7 +134,7 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
           </button>
           <div className="flex items-center gap-2">
             <Stethoscope className="h-5 w-5 text-primary" />
-            <span className="font-display text-base font-bold">Dr. Guapo</span>
+            <span className="font-display text-base font-bold">Dr. House</span>
           </div>
         </header>
 
